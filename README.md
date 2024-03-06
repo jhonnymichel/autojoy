@@ -21,10 +21,12 @@ Currently only supports Windows.
 
 ### RPCS3
 
-- In xinput mode, detects Wireless Guitar Hero Guitars, any regular Xbox controllers and Wireless Rock Band Drum Kits.
+- In xinput mode, detects Guitars, any regular Xbox controllers and Drum Kits.
 - In SDL mode, detects all of the above + DualSense controllers.
 
 Automatically assigns the right player to the right settings based on the connected controllers in the right order.
+
+Settings were tested with Guitar Hero Guitars and Rock Band Pro Drums.
 
 ## How to run it
 
