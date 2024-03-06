@@ -21,12 +21,22 @@ Currently only supports Windows.
 
 ### RPCS3
 
-Detects Guitar Hero Guitars, regular Xbox controllers and Rock Band Drum Kits. automatically assigns the right player to the right settings based on the connected controllers in the right order.
+- In xinput mode, detects Wireless Guitar Hero Guitars, any regular Xbox controllers and Wireless Rock Band Drum Kits.
+- In SDL mode, detects all of the above + DualSense controllers.
+
+Automatically assigns the right player to the right settings based on the connected controllers in the right order.
 
 ## How to run it
 
 Right now there is no executable to run or to initialize with the system. this is coming later.
 
 create a `user/paths.json` file following the template.
+create a `user/settings.json` file following the template.
+
+### Settings
+
+#### joystickMode
+
+what input API to use. possible values are `xinput` and `sdl`.
 
 run `npm install` and `node index.mjs`. Now the app will take care of everything for you.

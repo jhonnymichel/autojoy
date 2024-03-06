@@ -10,6 +10,7 @@
   "author": "Jhonny Michel <jhonnymichel@outlook.com>",
   "license": "MIT",
   "dependencies": {
+    "@kmamal/sdl": "^0.10.2",
     "node-direct-input": "^1.0.0",
     "usb": "^2.11.0",
     "xinput": "^0.5.0",

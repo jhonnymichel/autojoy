@@ -1,4 +1,4 @@
-XINPUT_DEVSUBTYPE_GUITAR_ALTERNATE:
+GUITAR:
   Handler: XInput
   Device: "XInput Pad #1"
   Config:
@@ -84,7 +84,7 @@ XINPUT_DEVSUBTYPE_GUITAR_ALTERNATE:
     Vendor ID: 4794
     Product ID: 512
   Buddy Device: "Null"
-XINPUT_DEVSUBTYPE_DRUM_KIT:
+DRUM_KIT:
   Handler: XInput
   Device: "XInput Pad #1"
   Config:
@@ -170,7 +170,7 @@ XINPUT_DEVSUBTYPE_DRUM_KIT:
     Vendor ID: 4794
     Product ID: 536
   Buddy Device: "Null"
-XINPUT_DEVSUBTYPE_GAMEPAD:
+GAMEPAD:
   Handler: XInput
   Device: "XInput Pad #1"
   Config:
