@@ -26,7 +26,7 @@ Currently only supports Windows.
 
 Automatically assigns the right player to the right settings based on the connected controllers in the right order.
 
-Settings were tested with Guitar Hero Guitars and Rock Band Pro Drums.
+Settings were tested with Guitar Hero Guitars and Rock Band Pro Drums, in Rock Band Games (rpcs3 docs state that tilt in GH guitars will not work on RB games but the config provided in this repository actually has tilt working on Rock Band. the hacky mapping results in Guitar Hero games not working that well. you can remap the settings from `config-templates/rpcs3` to what's indicated [here](https://wiki.rpcs3.net/index.php?title=Help:Peripherals_and_accessories) if you want to play Guitar Hero)
 
 ## How to run it
 
