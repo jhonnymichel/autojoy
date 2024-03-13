@@ -101,13 +101,17 @@ function handleXinputDeviceListUpdate(deviceList) {
       position
     );
     newConfig[identifier].Handler = inputHandlers[user.settings.joystickMode];
-    console.log(newConfig[identifier].Device);
   });
 
   savers.yml(newConfig, path.resolve(rpcs3Path, configFileName));
   savers.yml(
     getActiveProfileObject(),
     path.resolve(rpcs3Path, activeProfileFileName)
+  );
+
+  console.log(
+    "RPCS3: settings saved at",
+    path.resolve(rpcs3Path, configFileName)
   );
 }
 
@@ -131,7 +135,6 @@ function handleSDLDeviceListUpdate(deviceList) {
 
     newConfig[identifier].Device = fixedList[position].name;
     newConfig[identifier].Handler = inputHandlers[user.settings.joystickMode];
-    console.log(newConfig[identifier].Device);
   });
 
   savers.yml(newConfig, path.resolve(rpcs3Path, configFileName));

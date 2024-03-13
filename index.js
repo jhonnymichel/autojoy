@@ -15,6 +15,10 @@ const store = {
     store.__cbs.push(cb);
   },
   dispatch(changes) {
+    if (!changes) {
+      return;
+    }
+
     store.__state = {
       ...store.__state,
       ...changes,
@@ -25,6 +29,17 @@ const store = {
     });
   },
   actions: {
+    message(msg) {
+      const { type, data } = msg;
+      switch (type) {
+        case "deviceList":
+          return {
+            deviceList: data.filter((d) => d),
+          };
+        default:
+          break;
+      }
+    },
     stdout(msg) {
       const newLogs = [...store.__state.msg, msg.toString()];
 
@@ -62,6 +77,7 @@ const store = {
     serverStatus: "starting", // starting, restarting, running, killed
     joystickMode: user.settings.joystickMode,
     msg: [],
+    deviceList: [],
   },
   get state() {
     return store.__state;
@@ -84,7 +100,7 @@ function startServer() {
 
   // Forward messages from child process to main process
   appProcess.on("message", (message) => {
-    dispatch(actions.stdout("Message from app.js:", message));
+    dispatch(actions.message(JSON.parse(message)));
   });
 
   // Handle output from the child process
@@ -141,15 +157,26 @@ function startTray() {
         })),
       },
       {
+        type: "separator",
+      },
+      ...(store.state.deviceList.length
+        ? store.state.deviceList.map((d) => ({
+            type: "normal",
+            enabled: false,
+            label: `${d.name} (${d.type})`,
+          }))
+        : [{ type: "normal", enabled: false, label: "No devices detected." }]),
+      {
+        type: "separator",
+      },
+      {
         type: "normal",
         label: "About",
         click: () => {
           createAboutWindow();
         },
       },
-      {
-        type: "separator",
-      },
+
       {
         type: "normal",
         label: "Exit",
