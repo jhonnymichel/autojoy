@@ -2,3 +2,4 @@ node_modules/
 user/paths.json
 user/settings.json
 autojoy-win32-x64/
+logs.*

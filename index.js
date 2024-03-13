@@ -4,6 +4,7 @@ import { joystickModes } from "./app/constants.mjs";
 import { user } from "./app/settings.mjs";
 import { fileURLToPath } from "url";
 import path from "path";
+import { savers } from "./app/file.mjs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -24,6 +25,17 @@ const store = {
     });
   },
   actions: {
+    stdout(msg) {
+      const newLogs = [...store.__state.msg, msg.toString()];
+
+      savers.txt(newLogs.join("\n"), "logs.txt");
+
+      console.log(msg.toString());
+
+      return {
+        msg: newLogs,
+      };
+    },
     restartingServer() {
       return {
         serverStatus: "restarting",
@@ -49,6 +61,7 @@ const store = {
   __state: {
     serverStatus: "starting", // starting, restarting, running, killed
     joystickMode: user.settings.joystickMode,
+    msg: [],
   },
   get state() {
     return store.__state;
@@ -58,25 +71,32 @@ const store = {
 const { dispatch, actions } = store;
 
 app.on("ready", () => {
-  console.log("App started, activating server");
+  dispatch(actions.stdout("App started, activating server"));
   startServer();
   startTray();
 });
 
 function startServer() {
   // Spawn the child process
-  appProcess = fork("app/index.mjs");
+  appProcess = fork(path.resolve(__dirname, "app/index.mjs"), [], {
+    stdio: ["pipe", "pipe", "pipe", "ipc"], // Ensure stdout is piped
+  });
 
   // Forward messages from child process to main process
   appProcess.on("message", (message) => {
-    console.log("Message from app.js:", message);
+    dispatch(actions.stdout("Message from app.js:", message));
   });
 
-  // Handle errors in the child process
+  // Handle output from the child process
+  appProcess.stdout.on("data", (data) => {
+    dispatch(actions.stdout(data));
+  });
+
+  appProcess.stderr.on("data", (data) => {
+    dispatch(actions.stdout(data));
+  });
+
   appProcess.on("exit", () => {
-    if (store.state.serverStatus === "killed") {
-      return;
-    }
     console.error("Restarting server");
     dispatch(actions.restartingServer());
     startServer();

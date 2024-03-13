@@ -139,6 +139,11 @@ function handleSDLDeviceListUpdate(deviceList) {
     getActiveProfileObject(),
     path.resolve(rpcs3Path, activeProfileFileName)
   );
+
+  console.log(
+    "RPCS3: settings saved at",
+    path.resolve(rpcs3Path, configFileName)
+  );
 }
 
 const deviceListUpdateHandlers = {

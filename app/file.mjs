@@ -34,4 +34,7 @@ export const savers = {
     const serialized = JSON.stringify(obj);
     fs.writeFileSync(resolvePathFromProjectRoot(path), serialized, "utf-8");
   },
+  txt(text, path) {
+    fs.writeFileSync(resolvePathFromProjectRoot(path), text, "utf-8");
+  },
 };
