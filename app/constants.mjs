@@ -14,7 +14,7 @@ export const xinputSubtypeToGlobalType = {
   XINPUT_DEVSUBTYPE_GAMEPAD: deviceType.gamepad,
 };
 
-export const user = {
-  paths: loaders.json("user/paths.json"),
-  settings: loaders.json("user/settings.json"),
+export const joystickModes = {
+  xinput: "xinput",
+  sdl: "sdl",
 };

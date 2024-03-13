@@ -1,15 +1,22 @@
 import * as xinput from "xinput-ffi";
 import sdl from "@kmamal/sdl";
-import { deviceType, user, xinputSubtypeToGlobalType } from "./constants.mjs";
+import {
+  deviceType,
+  joystickModes,
+  xinputSubtypeToGlobalType,
+} from "./constants.mjs";
+import { user } from "./settings.mjs";
 
 const subscribers = [];
 let deviceList = [];
 
 const mode = user.settings.joystickMode; // sdl or xinput
 
-if (mode !== "sdl" && mode !== "xinput") {
+if (!Object.values(joystickModes).includes(mode)) {
   throw new TypeError(
-    `user settings.joystickMode invalid value. can be 'sdl' or 'xinput'. found '${mode}'`
+    `user settings.joystickMode invalid value. can be ${Object.values(
+      joystickModes
+    )}. found '${mode}'`
   );
 }
 
@@ -54,7 +61,6 @@ async function xinputHandler() {
     newDeviceList.length !== deviceList.length
   ) {
     deviceList = newDeviceList;
-    console.log(deviceList);
     subscribers.forEach((notify) => notify([...deviceList]));
   }
 
@@ -87,7 +93,6 @@ async function sdlHandler() {
     newDeviceList.length !== deviceList.length
   ) {
     deviceList = newDeviceList;
-    console.log(deviceList);
     subscribers.forEach((notify) => notify([...deviceList]));
   }
 

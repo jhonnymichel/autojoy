@@ -1,4 +1,4 @@
-import { user } from "../constants.mjs";
+import { user } from "../settings.mjs";
 import { loaders, savers } from "../file.mjs";
 import path from "path";
 
@@ -148,7 +148,6 @@ const deviceListUpdateHandlers = {
 
 const rpcs3 = {
   handleDeviceListUpdate(deviceList) {
-    console.log(user.settings.joystickMode);
     deviceListUpdateHandlers[user.settings.joystickMode](deviceList);
   },
 };
