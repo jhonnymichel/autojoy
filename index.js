@@ -129,7 +129,7 @@ function killServer() {
 
 function startTray() {
   const icon = nativeImage.createFromPath(
-    path.resolve(__dirname, "./assets/joystick.png")
+    path.resolve(__dirname, "./assets/tray.png")
   );
   const tray = new Tray(icon);
 
