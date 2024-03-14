@@ -1,5 +1,3 @@
-import { loaders } from "./file.mjs";
-
 export const deviceType = {
   guitar: "GUITAR",
   drumKit: "DRUM_KIT",
