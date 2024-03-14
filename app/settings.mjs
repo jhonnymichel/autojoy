@@ -1,4 +1,8 @@
-import { loaders, savers } from "./file.mjs";
+import { loaders, resolvePathFromProjectRoot, savers } from "./file.mjs";
+
+export const userFolderPath = resolvePathFromProjectRoot("user");
+export const templatesFolderPath =
+  resolvePathFromProjectRoot("config-templates");
 
 export const user = {
   get paths() {

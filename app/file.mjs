@@ -10,7 +10,7 @@ import yaml from "yaml";
  * Loaders and savers for each type of file
  */
 
-function resolvePathFromProjectRoot(src) {
+export function resolvePathFromProjectRoot(src) {
   return path.resolve(__dirname, "..", src);
 }
 

@@ -1,7 +1,7 @@
-import { app, Tray, Menu, nativeImage, BrowserWindow } from "electron";
+import { app, Tray, Menu, nativeImage, BrowserWindow, shell } from "electron";
 import { fork } from "child_process";
 import { joystickModes } from "./app/constants.mjs";
-import { user } from "./app/settings.mjs";
+import { user, userFolderPath } from "./app/settings.mjs";
 import { fileURLToPath } from "url";
 import path from "path";
 import { savers } from "./app/file.mjs";
@@ -142,6 +142,14 @@ function startTray() {
         label: `Autojoy controller service is ${store.state.serverStatus}`,
         type: "normal",
         enabled: false,
+      },
+      { type: "separator" },
+      {
+        label: `Open settings folder`,
+        type: "normal",
+        click: () => {
+          shell.openPath(userFolderPath);
+        },
       },
       { type: "separator" },
       {
