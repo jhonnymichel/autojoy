@@ -36,6 +36,7 @@ const handlers = {
 
 async function xinputHandler() {
   const newDeviceList = [];
+
   for (
     let position = 0;
     position < xinput.constants.XUSER_MAX_COUNT;

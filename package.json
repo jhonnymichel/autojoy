@@ -17,7 +17,7 @@
   "author": "Jhonny Michel <jhonnymichel@outlook.com>",
   "license": "MIT",
   "dependencies": {
-    "@kmamal/sdl": "^0.10.2",
+    "@kmamal/sdl": "^0.10.7",
     "xinput-ffi": "^4.0.0",
     "yaml": "^2.4.0"
   },
