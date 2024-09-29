@@ -1,5 +1,3 @@
-import * as xinput from "xinput-ffi";
-import sdl from "@kmamal/sdl";
 import {
   deviceType,
   joystickModes,
@@ -20,9 +18,19 @@ if (!Object.values(joystickModes).includes(mode)) {
   );
 }
 
+async function getApi() {
+  if (mode === joystickModes.sdl) {
+    return (await import("@kmamal/sdl")).default;
+  }
+
+  if (mode === joystickModes.xinput) {
+    return await import("xinput-ffi");
+  }
+}
+
 export const deviceListener = {
-  listen() {
-    handlers[mode]();
+  async listen() {
+    handlers[mode](await getApi());
   },
   onListChange(notify) {
     subscribers.push(notify);
@@ -34,7 +42,7 @@ const handlers = {
   xinput: xinputHandler,
 };
 
-async function xinputHandler() {
+async function xinputHandler(xinput) {
   const newDeviceList = [];
 
   for (
@@ -65,7 +73,9 @@ async function xinputHandler() {
     subscribers.forEach((notify) => notify([...deviceList]));
   }
 
-  setTimeout(xinputHandler, 1000);
+  setTimeout(() => {
+    xinputHandler(xinput);
+  }, 1000);
 }
 
 function extractSDLType(device) {
@@ -75,7 +85,7 @@ function extractSDLType(device) {
   return deviceType.gamepad;
 }
 
-async function sdlHandler() {
+async function sdlHandler(sdl) {
   const devices = sdl.joystick.devices;
   const gameControllers = devices.filter(
     (device) => device.type === "gamecontroller"
@@ -97,5 +107,7 @@ async function sdlHandler() {
     subscribers.forEach((notify) => notify([...deviceList]));
   }
 
-  setTimeout(sdlHandler, 1000);
+  setTimeout(() => {
+    sdlHandler(sdl);
+  }, 1000);
 }
