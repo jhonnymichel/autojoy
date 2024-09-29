@@ -51,8 +51,16 @@ const store = {
         msg: newLogs,
       };
     },
-    restartingServer() {
+    restartingServer(context) {
+      if (context?.isUserIssuedRestart) {
+        return {
+          serverStatus: "restarting",
+        };
+      }
+
+      const lastRestartAfterCrash = Date.now();
       return {
+        lastRestartAfterCrash,
         serverStatus: "restarting",
       };
     },
@@ -61,12 +69,23 @@ const store = {
         serverStatus: "running",
       };
     },
+    serverStopped(exitCode) {
+      if (exitCode === 1) {
+        return {
+          serverStatus: "crashed",
+        };
+      }
+
+      return {
+        serverStatus: "killed",
+      };
+    },
     changeJoystickMode(mode) {
       user.settings = {
         joystickMode: mode,
       };
 
-      killServer();
+      restartServer({ userAction: true });
 
       return {
         joystickMode: user.settings.joystickMode,
@@ -74,7 +93,8 @@ const store = {
     },
   },
   __state: {
-    serverStatus: "starting", // starting, restarting, running, killed
+    serverStatus: "starting", // starting, restarting, running, killed, crashed
+    lastRestartAfterCrash: 0,
     joystickMode: user.settings.joystickMode,
     msg: [],
     deviceList: [],
@@ -112,10 +132,10 @@ function startServer() {
     dispatch(actions.stdout(data));
   });
 
-  appProcess.on("exit", () => {
-    console.error("Restarting server");
-    dispatch(actions.restartingServer());
-    startServer();
+  appProcess.on("exit", (exitCode) => {
+    dispatch(actions.serverStopped(exitCode));
+    appProcess = null;
+    restartServer();
   });
 
   appProcess.on("spawn", () => {
@@ -125,6 +145,44 @@ function startServer() {
 
 function killServer() {
   appProcess.kill();
+}
+
+let restartAgainTimeoutId;
+
+function restartServer(context) {
+  clearTimeout(restartAgainTimeoutId);
+
+  if (appProcess) {
+    killServer();
+    return;
+  }
+
+  const isUserIssuedRestart =
+    context?.userAction || store.state.serverStatus === "killed";
+
+  const currentTime = Date.now();
+  const lastRestart = store.state.lastRestartAfterCrash;
+  if (!isUserIssuedRestart && currentTime - lastRestart <= 3000) {
+    console.error(
+      "Server died twice in",
+      currentTime - lastRestart,
+      "ms. Preventing auto restart. Waiting a minute before trying again."
+    );
+
+    restartAgainTimeoutId = setTimeout(() => {
+      restartServer();
+    }, 60000);
+
+    return;
+  }
+  console.error("Restarting server");
+  dispatch(
+    actions.restartingServer({
+      isUserIssuedRestart,
+    })
+  );
+
+  startServer();
 }
 
 function startTray() {
