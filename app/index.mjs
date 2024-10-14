@@ -1,12 +1,25 @@
 import { user } from "./settings.mjs";
-import { deviceListener } from "./device-listener.mjs";
+import { joystickListener } from "./joystick-listener.mjs";
 import rpcs3 from "./integrations/rpcs3.mjs";
+import { microphoneListener } from "./microphone-listener.mjs";
 
 console.log("input server started. settings:", user.settings);
-deviceListener.onListChange((deviceList) => {
-  console.log("device list changed: ", deviceList);
-  process.send(JSON.stringify({ type: "deviceList", data: deviceList }));
+joystickListener.onListChange((joystickList) => {
+  console.log("joystick list changed: ", joystickList);
+  process.send(JSON.stringify({ type: "joystickList", data: joystickList }));
 });
-deviceListener.onListChange(rpcs3.handleDeviceListUpdate);
 
-deviceListener.listen();
+joystickListener.onListChange(rpcs3.handleJoystickListUpdate);
+joystickListener.listen();
+
+if (user.settings.manageMicrophones === true) {
+  microphoneListener.onListChange((microphoneList) => {
+    console.log("microphone list changed: ", microphoneList);
+    process.send(
+      JSON.stringify({ type: "microphoneList", data: microphoneList })
+    );
+  });
+
+  joystickListener.onListChange(rpcs3.handleMicrophoneListUpdate);
+  microphoneListener.listen();
+}

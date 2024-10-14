@@ -1,3 +1,4 @@
 {
-  "joystickMode": "xinput"
+  "joystickMode": "xinput",
+  "manageMicrophones": true
 }

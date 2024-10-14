@@ -32,9 +32,13 @@ const store = {
     message(msg) {
       const { type, data } = msg;
       switch (type) {
-        case "deviceList":
+        case "joystickList":
           return {
-            deviceList: data.filter((d) => d),
+            joystickList: data.filter((d) => d),
+          };
+        case "microphoneList":
+          return {
+            microphoneList: data.filter((d) => d),
           };
         default:
           break;
@@ -82,6 +86,7 @@ const store = {
     },
     changeJoystickMode(mode) {
       user.settings = {
+        ...user.settings,
         joystickMode: mode,
       };
 
@@ -91,13 +96,27 @@ const store = {
         joystickMode: user.settings.joystickMode,
       };
     },
+    toggleMicrophoneManagement(enabled) {
+      user.settings = {
+        ...user.settings,
+        manageMicrophones: enabled,
+      };
+
+      restartServer({ userAction: true });
+
+      return {
+        manageMicrophones: enabled,
+      };
+    },
   },
   __state: {
     serverStatus: "starting", // starting, restarting, running, killed, crashed
     lastRestartAfterCrash: 0,
     joystickMode: user.settings.joystickMode,
+    manageMicrophones: user.settings.manageMicrophones ?? false,
     msg: [],
-    deviceList: [],
+    joystickList: [],
+    microphoneList: [],
   },
   get state() {
     return store.__state;
@@ -222,16 +241,42 @@ function startTray() {
           },
         })),
       },
-      {
-        type: "separator",
-      },
-      ...(store.state.deviceList.length
-        ? store.state.deviceList.map((d) => ({
+      ...(store.state.joystickList.length
+        ? store.state.joystickList.map((d) => ({
             type: "normal",
             enabled: false,
             label: `${d.name} (${d.type})`,
           }))
-        : [{ type: "normal", enabled: false, label: "No devices detected." }]),
+        : [
+            { type: "normal", enabled: false, label: "No joysticks detected." },
+          ]),
+      {
+        type: "separator",
+      },
+      {
+        label: "Manage Microphones",
+        type: "checkbox",
+        enabled: true,
+        checked: store.state.manageMicrophones === true,
+        click: () => {
+          dispatch(
+            actions.toggleMicrophoneManagement(!store.state.manageMicrophones)
+          );
+        },
+      },
+      ...(store.state.microphoneList.length
+        ? store.state.microphoneList.map((d) => ({
+            type: "normal",
+            enabled: false,
+            label: `${d.name}`,
+          }))
+        : [
+            {
+              type: "normal",
+              enabled: false,
+              label: "No Microphones detected.",
+            },
+          ]),
       {
         type: "separator",
       },
@@ -242,7 +287,6 @@ function startTray() {
           createAboutWindow();
         },
       },
-
       {
         type: "normal",
         label: "Exit",
