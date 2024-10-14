@@ -1,7 +1,7 @@
 # autojoy
 
-Detects connected xinput devices and can automatically update emulators, games and other apps settings based on them.
-When controllers are different from eachother (a guitar and a drum controller, for example), this becomes useful.
+Detects connected devices and can automatically update emulators, games and other apps settings based on them.
+When controllers are different from eachother (a guitar and a drum controller, for example) and connection order matters, this becomes useful.
 
 ## Use Case
 
@@ -13,6 +13,8 @@ Or when you play the same game with a variable number of players or wants to swi
 
 - Player 1 is a Guitar Controller, Player 2 is Drums. Next time you play, you want to play Drums but Player 1 is set as a Guitar. You'd have to reassign controllers in the settings or keep both instruments turned on even when you're playing alone.
 
+In some emulatoers, when you attach an USB peripheral such as a Microphone, you have to change settings again to pick that device up.
+
 ## Supported Operational Systems
 
 Currently only supports Windows.
@@ -23,6 +25,7 @@ Currently only supports Windows.
 
 - In xinput mode, detects Guitars, any regular Xbox controllers and Drum Kits.
 - In SDL mode, detects all of the above + DualSense controllers.
+- Manage Microphones mode can be turned on.
 
 Automatically assigns the right player to the right settings based on the connected controllers in the right order.
 
