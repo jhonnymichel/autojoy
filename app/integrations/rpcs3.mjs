@@ -42,6 +42,12 @@ const inputHandlers = {
 };
 
 // Microphone
+const microphoneDevicePrefix = `OpenAL Soft on `; // looks like RPCS3 uses OpenAL and it's not something configs can change
+const microphoneMode = `Standard`;
+const microphoneDeviceSeparator = "@@@";
+const configAudioPath = `Audio`;
+const configMicrophoneTypeKey = "Microphone Type";
+const configMicrophoneDevicesKey = "Microphone Devices";
 
 // the SDL device name for DualSense controller is PS5 Controller, but rpcs3 internally calls it DualSense Wireless Controller
 function renamePS5Controllers(arr) {
@@ -114,7 +120,7 @@ function handleXinputJoystickListUpdate(joystickList) {
   );
 
   console.log(
-    "RPCS3: settings saved at",
+    "RPCS3: Input settings saved at",
     path.resolve(rpcs3Path, inputConfigFileName)
   );
 }
@@ -148,7 +154,7 @@ function handleSDLJoystickListUpdate(joystickList) {
   );
 
   console.log(
-    "RPCS3: settings saved at",
+    "RPCS3: Input settings saved at",
     path.resolve(rpcs3Path, inputConfigFileName)
   );
 }
@@ -159,7 +165,35 @@ const joystickListUpdateHandlers = {
 };
 
 function handleMicrophoneListUpdate(microphoneList) {
-  console.log("RPCS3: Got mics, will do something about it later");
+  const currentConfig = loaders.yml(
+    path.resolve(rpcs3Path, generalConfigFileName)
+  );
+
+  const slots = [
+    microphoneList[0],
+    microphoneList[1],
+    microphoneList[2],
+    microphoneList[3],
+  ];
+
+  const microphoneDevices = slots
+    .map((mic) =>
+      mic
+        ? `${microphoneDevicePrefix}${mic.name}${microphoneDeviceSeparator}`
+        : `${microphoneDeviceSeparator}`
+    )
+    .join("");
+
+  currentConfig[configAudioPath][configMicrophoneTypeKey] = microphoneMode;
+  currentConfig[configAudioPath][configMicrophoneDevicesKey] =
+    microphoneDevices;
+
+  savers.yml(currentConfig, path.resolve(rpcs3Path, generalConfigFileName));
+
+  console.log(
+    "RPCS3: Microphone settings saved at",
+    path.resolve(rpcs3Path, generalConfigFileName)
+  );
 }
 
 const rpcs3 = {

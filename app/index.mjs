@@ -20,6 +20,6 @@ if (user.settings.manageMicrophones === true) {
     );
   });
 
-  joystickListener.onListChange(rpcs3.handleMicrophoneListUpdate);
+  microphoneListener.onListChange(rpcs3.handleMicrophoneListUpdate);
   microphoneListener.listen();
 }
