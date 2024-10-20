@@ -2,6 +2,7 @@ import { user } from "./settings.mjs";
 import { joystickListener } from "./joystick-listener.mjs";
 import rpcs3 from "./integrations/rpcs3.mjs";
 import { microphoneListener } from "./microphone-listener.mjs";
+import { getMicrophonesInUse } from "./deviceFilters.mjs";
 
 console.log("input server started. settings:", user.settings);
 joystickListener.onListChange((joystickList) => {
@@ -20,6 +21,10 @@ if (user.settings.manageMicrophones === true) {
     );
   });
 
-  microphoneListener.onListChange(rpcs3.handleMicrophoneListUpdate);
+  microphoneListener.onListChange((list) => {
+    rpcs3.handleMicrophoneListUpdate(
+      getMicrophonesInUse(list, user.settings.unusedMicrophones ?? [])
+    );
+  });
   microphoneListener.listen();
 }

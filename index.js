@@ -5,6 +5,7 @@ import { user, userFolderPath } from "./app/settings.mjs";
 import { fileURLToPath } from "url";
 import path from "path";
 import { savers } from "./app/file.mjs";
+import { isMicrophoneInUse } from "./app/deviceFilters.mjs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -108,6 +109,44 @@ const store = {
         manageMicrophones: enabled,
       };
     },
+    toggleMicrophoneUse(device) {
+      const unusedList = store.state.unusedMicrophones;
+
+      const microphoneList = store.state.microphoneList;
+      const connectedMicsWithCurrentDeviceName = microphoneList.filter(
+        (d) => d.name === device.name
+      );
+      const positionOfCurrentDevice =
+        connectedMicsWithCurrentDeviceName.indexOf(device);
+
+      const unusedListEntry = {
+        name: device.name,
+        position: positionOfCurrentDevice,
+      };
+
+      const newUnusedList = unusedList.find(
+        (entry) =>
+          entry.name === unusedListEntry.name &&
+          entry.position === unusedListEntry.position
+      )
+        ? unusedList.filter(
+            (entry) =>
+              entry.name !== unusedListEntry.name ||
+              entry.position !== unusedListEntry.position
+          )
+        : [...unusedList, unusedListEntry];
+
+      user.settings = {
+        ...user.settings,
+        unusedMicrophones: newUnusedList,
+      };
+
+      restartServer({ userAction: true });
+
+      return {
+        unusedMicrophones: newUnusedList,
+      };
+    },
   },
   __state: {
     serverStatus: "starting", // starting, restarting, running, killed, crashed
@@ -117,6 +156,7 @@ const store = {
     msg: [],
     joystickList: [],
     microphoneList: [],
+    unusedMicrophones: user.settings.unusedMicrophones ?? [],
   },
   get state() {
     return store.__state;
@@ -265,9 +305,16 @@ function startTray() {
         },
       },
       ...(store.state.microphoneList.length
-        ? store.state.microphoneList.map((d) => ({
-            type: "normal",
-            enabled: false,
+        ? store.state.microphoneList.map((d, index) => ({
+            type: "checkbox",
+            checked: isMicrophoneInUse(
+              d,
+              store.state.microphoneList,
+              store.state.unusedMicrophones
+            ),
+            click: () => {
+              dispatch(actions.toggleMicrophoneUse(d));
+            },
             label: `${d.name}`,
           }))
         : [
