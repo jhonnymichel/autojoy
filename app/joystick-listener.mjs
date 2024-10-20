@@ -10,14 +10,6 @@ let deviceList = [];
 
 const mode = user.settings.joystickMode; // sdl or xinput
 
-if (!Object.values(joystickModes).includes(mode)) {
-  throw new TypeError(
-    `user settings.joystickMode invalid value. can be ${Object.values(
-      joystickModes
-    )}. found '${mode}'`
-  );
-}
-
 async function getApi() {
   if (mode === joystickModes.sdl) {
     return (await import("@kmamal/sdl")).default;

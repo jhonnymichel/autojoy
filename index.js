@@ -1,13 +1,15 @@
 import { app, Tray, Menu, nativeImage, BrowserWindow, shell } from "electron";
 import { fork } from "child_process";
 import { joystickModes } from "./app/constants.mjs";
-import { user, userFolderPath } from "./app/settings.mjs";
+import { user, userFolderPath, validateSettings } from "./app/settings.mjs";
 import { fileURLToPath } from "url";
 import path from "path";
 import { savers } from "./app/file.mjs";
 import { isMicrophoneInUse } from "./app/deviceFilters.mjs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+validateSettings();
 
 let appProcess;
 const store = {
