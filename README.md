@@ -19,29 +19,28 @@ In some emulatoers, when you attach an USB peripheral such as a Microphone, you 
 
 Currently only supports Windows.
 
-## Supported Emulators and Controllers
+## Supported Emulators and Features
 
 ### RPCS3
 
-- In xinput mode, detects Guitars, any regular Xbox controllers and Drum Kits.
-- In SDL mode, detects all of the above + DualSense controllers.
-- Manage Microphones mode can be turned on.
+- Detects connected devices and updates settings in the emulator automatically:
+  - Guitars: Supports Xinput (Xbox, Wiitar thing, Santroller guitars in default mode) Guitar Hero guitars\*
+    - dinput and mmjoystick guitars (such as PS3 and Raphnet adapter instruments) not supported yet.
+  - Drums: Supports Xinput (Xbox) and dinput/mmjoystick\*\* (tested with Wii Rock Band 2 drums) Rock Band Drums.
+  - Regular Controllers: Supports any Xinput device and DualSense controllers\*\*.
+  - Microphones: Supports any recording device connected to the computer, including Rock Band/Guitar Hero mics.
+    - It's possible to filter out connected recording devices that you don't want to use. In the tray menu, uncheck unwanted devices.
 
-Automatically assigns the right player to the right settings based on the connected controllers in the right order.
+\*Guitar settings were tested with Xbox and Santroller (default mode) Guitar Hero Guitars in Rock Band Games. rpcs3 docs state that tilt in GH guitars will not work in RB games but the config provided in this app actually has tilt working on Rock Band. the hacky mapping results in Guitar Hero games not working that well. you can remap the settings from `config-templates/rpcs3` to what's indicated [here](https://wiki.rpcs3.net/index.php?title=Help:Peripherals_and_accessories) if you want to play Guitar Hero.
 
-Settings were tested with Guitar Hero Guitars and Rock Band Pro Drums, in Rock Band Games (rpcs3 docs state that tilt in GH guitars will not work on RB games but the config provided in this repository actually has tilt working on Rock Band. the hacky mapping results in Guitar Hero games not working that well. you can remap the settings from `config-templates/rpcs3` to what's indicated [here](https://wiki.rpcs3.net/index.php?title=Help:Peripherals_and_accessories) if you want to play Guitar Hero)
+\*\*SDL joystick mode needs to be selected for non-xinput devices to work.
 
-## How to run it
+## How to get the app
 
-Right now there is no executable to run or to initialize with the system. this is coming later.
+Download from the [releases](https://github.com/jhonnymichel/autojoy/releases) page!
 
-create a `user/paths.json` file following the template.
-create a `user/settings.json` file following the template.
-
-### Settings
+## Settings
 
 #### joystickMode
 
-what input API to use. possible values are `xinput` and `sdl`.
-
-run `npm install` and `node index.mjs`. Now the app will take care of everything for you.
+what input API to use. possible values are `xinput` and `sdl`. xinput is straight forward although limited. SDL supports more controllers, but it's a less stable mode. please open issues with you run in any problems.
