@@ -45,7 +45,11 @@ const xinputDeviceIdentifiers = [
 function prependNumbersToSDLDeviceNames(arr) {
   const counts = {};
   return arr.map((item) => {
-    counts[item.name] = counts[item.name] || 0;
+    if (counts.hasOwnProperty(item.name)) {
+      counts[item.name] += 1;
+    } else {
+      counts[item.name] = 0;
+    }
     return { ...item, name: `SDL/${counts[item.name]}/${item.name}` };
   });
 }
@@ -136,8 +140,81 @@ function handleXinputJoystickListUpdate(joystickList) {
   );
 }
 
-function handleSDLJoystickListUpdate() {
-  return;
+function handleSDLJoystickListUpdate(joystickList) {
+  const renamedList = prependNumbersToSDLDeviceNames(joystickList);
+  const newConfig = {};
+
+  wiiConstants.playerIdentifiers.forEach((identifier, position) => {
+    // setting disconnected devices
+    if (!renamedList[position]) {
+      newConfig[identifier] = configTemplates.wiimoteEmulated.GAMEPAD;
+      newConfig[identifier].Source = wiiConstants.wiimoteSources.none;
+      return;
+    }
+
+    newConfig[identifier] = {
+      ...(configTemplates.wiimoteEmulated[renamedList[position].type] ??
+        configTemplates.wiimoteEmulated.GAMEPAD),
+    };
+
+    newConfig[identifier].Device = renamedList[position].name;
+    newConfig[identifier].Source = wiiConstants.wiimoteSources.emulated;
+  });
+
+  savers.ini(
+    newConfig,
+    path.resolve(dolphinPath, wiiConstants.inputConfigFilePath)
+  );
+
+  console.log(
+    "DOLPHIN: Wii Input settings saved at",
+    path.resolve(dolphinPath, wiiConstants.inputConfigFilePath)
+  );
+
+  const newGCConfig = {};
+  const newMainConfig = loaders.ini(
+    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
+  );
+
+  gamecubeConstants.playerIdentifiers.forEach((identifier, position) => {
+    // setting disconnected devices
+    if (!renamedList[position]) {
+      newGCConfig[identifier] = configTemplates.gamecube.GAMEPAD;
+      newMainConfig.Core[gamecubeConstants.devices[position]] =
+        gamecubeConstants.deviceModes.disabled;
+      return;
+    }
+
+    newGCConfig[identifier] = {
+      ...(configTemplates.gamecube[renamedList[position].type] ??
+        configTemplates.gamecube.GAMEPAD),
+    };
+
+    newGCConfig[identifier].Device = renamedList[position].name;
+
+    newMainConfig.Core[gamecubeConstants.devices[position]] =
+      gamecubeConstants.deviceModes.enabled;
+  });
+
+  savers.ini(
+    newGCConfig,
+    path.resolve(dolphinPath, gamecubeConstants.inputConfigFilePath)
+  );
+
+  console.log(
+    "DOLPHIN: GC Input settings saved at",
+    path.resolve(dolphinPath, gamecubeConstants.inputConfigFilePath)
+  );
+
+  savers.ini(
+    newMainConfig,
+    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
+  );
+
+  console.log(
+    "DOLPHIN: Main settings saved at",
+    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
+  );
 }
 
 const joystickListUpdateHandlers = {
