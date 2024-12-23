@@ -79,6 +79,7 @@ function extractSDLType(device) {
 
 async function sdlHandler(sdl) {
   const devices = sdl.joystick.devices;
+  // TODO: support "Mayflash Wiimote PC Adapter". gotta use "name", not type.
   const gameControllers = devices.filter(
     (device) => device.type === "gamecontroller"
   );
