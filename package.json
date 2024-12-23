@@ -18,6 +18,7 @@
   "license": "MIT",
   "dependencies": {
     "@kmamal/sdl": "^0.10.7",
+    "fast-xml-parser": "^4.5.1",
     "ini": "^5.0.0",
     "xinput-ffi": "^4.0.0",
     "yaml": "^2.4.0"

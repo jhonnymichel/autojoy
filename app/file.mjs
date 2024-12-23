@@ -3,6 +3,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import yaml from "yaml";
 import * as ini from "ini";
+import { XMLBuilder, XMLParser } from "fast-xml-parser";
 
 const __filename = fileURLToPath(import.meta.url);
 let __dirname = path.dirname(__filename);
@@ -10,6 +11,9 @@ let __packagedDirname = __dirname;
 if (__dirname.includes(".asar")) {
   __dirname = path.resolve(__dirname, "..");
 }
+
+const xmlParser = new XMLParser();
+const xmlBuilder = new XMLBuilder();
 
 /**
  * Loaders and savers for each type of file
@@ -24,20 +28,26 @@ export function resolvePathFromPackagedRoot(src) {
 }
 
 export const loaders = {
-  yml(src) {
-    const file = fs.readFileSync(resolvePathFromProjectRoot(src), {
+  yml(filepath) {
+    const file = fs.readFileSync(resolvePathFromProjectRoot(filepath), {
       encoding: "utf-8",
     });
     return yaml.parse(file);
   },
-  ini(src) {
-    const file = fs.readFileSync(resolvePathFromPackagedRoot(src), {
+  ini(filepath) {
+    const file = fs.readFileSync(resolvePathFromPackagedRoot(filepath), {
       encoding: "utf-8",
     });
     return ini.parse(file);
   },
-  json(src) {
-    const file = fs.readFileSync(resolvePathFromProjectRoot(src), {
+  xml(filepath) {
+    const file = fs.readFileSync(resolvePathFromPackagedRoot(filepath), {
+      encoding: "utf-8",
+    });
+    return xmlParser.parse(file);
+  },
+  json(filepath) {
+    const file = fs.readFileSync(resolvePathFromProjectRoot(filepath), {
       encoding: "utf-8",
     });
     return JSON.parse(file);
@@ -45,43 +55,39 @@ export const loaders = {
 };
 
 export const savers = {
-  yml(obj, filePath) {
+  yml(obj, filepath) {
     const serialized = yaml.stringify(obj);
-    const resolvedPath = resolvePathFromProjectRoot(filePath);
-    const directoryPath = path.dirname(resolvedPath);
-    createDirectory(directoryPath);
-    fs.writeFileSync(resolvedPath, serialized, {
-      flag: "w",
-      encoding: "utf-8",
-    });
+    saveFile(serialized, filepath);
   },
-  ini(obj, filePath) {
+  ini(obj, filepath) {
     const serialized = ini.stringify(obj);
-    const resolvedPath = resolvePathFromProjectRoot(filePath);
-    const directoryPath = path.dirname(resolvedPath);
-    createDirectory(directoryPath);
-    fs.writeFileSync(resolvedPath, serialized, {
-      flag: "w",
-      encoding: "utf-8",
-    });
+    saveFile(serialized, filepath);
   },
-  json(obj, filePath) {
+  xml(obj, filepath) {
+    const serialized = xmlBuilder.build(obj);
+    saveFile(serialized, filepath);
+  },
+  json(obj, filepath) {
     const serialized = JSON.stringify(obj);
-    const resolvedPath = resolvePathFromProjectRoot(filePath);
-    const directoryPath = path.dirname(resolvedPath);
-    createDirectory(directoryPath);
-    fs.writeFileSync(resolvedPath, serialized, {
-      flag: "w",
-      encoding: "utf-8",
-    });
+    saveFile(serialized, filepath);
   },
-  txt(text, filePath) {
-    const resolvedPath = resolvePathFromProjectRoot(filePath);
-    const directoryPath = path.dirname(resolvedPath);
-    createDirectory(directoryPath);
-    fs.writeFileSync(resolvedPath, text, { flag: "w", encoding: "utf-8" });
+  txt(text, filepath) {
+    saveFile(text, filepath);
   },
 };
+
+export function deleteFile(filepath) {
+  if (fs.existsSync(filepath)) {
+    fs.unlinkSync(filepath);
+  }
+}
+
+function saveFile(content, filepath) {
+  const resolvedPath = resolvePathFromProjectRoot(filepath);
+  const directoryPath = path.dirname(resolvedPath);
+  createDirectory(directoryPath);
+  fs.writeFileSync(resolvedPath, content, { flag: "w", encoding: "utf-8" });
+}
 
 function createDirectory(directoryPath) {
   if (!fs.existsSync(directoryPath)) {

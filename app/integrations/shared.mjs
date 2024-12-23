@@ -8,7 +8,7 @@ export function findNextConnectedXinputIdentifier(deviceList, position) {
     if (device) {
       identifiersFound++;
       if (position === identifiersFound) {
-        return index;
+        return Number(index);
       }
     }
   }
