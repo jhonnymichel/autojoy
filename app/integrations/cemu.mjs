@@ -58,7 +58,9 @@ function handleXinputJoystickListUpdate(joystickList) {
   });
 }
 
-function handleSDLJoystickListUpdate(joystickList) {}
+function handleSDLJoystickListUpdate(joystickList) {
+  console.log("CEMU: SDL Not supported yet");
+}
 
 const joystickListUpdateHandlers = {
   xinput: handleXinputJoystickListUpdate,
