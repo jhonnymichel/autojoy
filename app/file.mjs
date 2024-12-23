@@ -2,6 +2,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import path from "path";
 import yaml from "yaml";
+import * as ini from "ini";
 
 const __filename = fileURLToPath(import.meta.url);
 let __dirname = path.dirname(__filename);
@@ -29,6 +30,12 @@ export const loaders = {
     });
     return yaml.parse(file);
   },
+  ini(src) {
+    const file = fs.readFileSync(resolvePathFromPackagedRoot(src), {
+      encoding: "utf-8",
+    });
+    return ini.parse(file);
+  },
   json(src) {
     const file = fs.readFileSync(resolvePathFromProjectRoot(src), {
       encoding: "utf-8",
@@ -40,6 +47,16 @@ export const loaders = {
 export const savers = {
   yml(obj, filePath) {
     const serialized = yaml.stringify(obj);
+    const resolvedPath = resolvePathFromProjectRoot(filePath);
+    const directoryPath = path.dirname(resolvedPath);
+    createDirectory(directoryPath);
+    fs.writeFileSync(resolvedPath, serialized, {
+      flag: "w",
+      encoding: "utf-8",
+    });
+  },
+  ini(obj, filePath) {
+    const serialized = ini.stringify(obj);
     const resolvedPath = resolvePathFromProjectRoot(filePath);
     const directoryPath = path.dirname(resolvedPath);
     createDirectory(directoryPath);
