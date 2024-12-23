@@ -1,6 +1,7 @@
 import { user } from "../settings.mjs";
 import { loaders, savers } from "../file.mjs";
 import path from "path";
+import { findNextConnectedXinputIdentifier } from "./shared.mjs";
 
 const configTemplates = loaders.yml("config-templates/rpcs3.yml");
 const rpcs3Path = user.paths.rpcs3;
@@ -49,13 +50,21 @@ const configAudioPath = `Audio`;
 const configMicrophoneTypeKey = "Microphone Type";
 const configMicrophoneDevicesKey = "Microphone Devices";
 
-// the SDL device name for DualSense controller is PS5 Controller, but rpcs3 internally calls it DualSense Wireless Controller
-function renamePS5Controllers(arr) {
+function renameDLSController(arr) {
   return arr.map((item) => {
-    const name =
-      item.name === "PS5 Controller"
-        ? "DualSense Wireless Controller"
-        : item.name;
+    let name = item.name;
+
+    switch (name) {
+      case "PS5 Controller":
+        name = "DualSense Wireless Controller";
+        break;
+      case "Controller (Xbox 360 Wireless Receiver for Windows)":
+        name = "Xbox 360 Wireless Controller";
+        break;
+      default:
+        break;
+    }
+
     return { ...item, name };
   });
 }
@@ -69,22 +78,6 @@ function appendNumbersToSDLDeviceNames(arr) {
     counts[item.name] = (counts[item.name] || 0) + 1;
     return { ...item, name: `${item.name} ${counts[item.name]}` };
   });
-}
-
-// with xinput, it's possible for device 1 to be disconnected and device 2 to be connected. the order is not always reassigned when you disconnect a controller.
-// example: [null, null, XINPUT_DEVSUBTYPE_GAMEPAD, null]. It looks like this happen when you mix x360 and one/series controllers.
-// so if we have only one controller for instance, it'll be assigned to player 1 in the emulator, but the selected device would be XInput pad #3
-function findNextConnectedXinputIdentifier(deviceList, position) {
-  let identifiersFound = -1;
-  for (let index in deviceList) {
-    const device = deviceList[index];
-    if (device) {
-      identifiersFound++;
-      if (position === identifiersFound) {
-        return xinputDeviceIdentifiers[index];
-      }
-    }
-  }
 }
 
 function handleXinputJoystickListUpdate(joystickList) {
@@ -106,10 +99,10 @@ function handleXinputJoystickListUpdate(joystickList) {
     // with xinput, it's possible for device 1 to be disconnected and device 2 to be connected. the order is not always reassigned when you disconnect a controller.
     // example: [null, null, XINPUT_DEVSUBTYPE_GAMEPAD, null]. It looks like this happen when you mix x360 and one/series controllers.
     // so if we have only one controller for instance, it'll be assigned to player 1 in the emulator, but the selected device would be XInput pad #3
-    newConfig[identifier].Device = findNextConnectedXinputIdentifier(
-      joystickList,
-      position
-    );
+    newConfig[identifier].Device =
+      xinputDeviceIdentifiers[
+        findNextConnectedXinputIdentifier(joystickList, position)
+      ];
     newConfig[identifier].Handler = inputHandlers[user.settings.joystickMode];
   });
 
@@ -128,7 +121,7 @@ function handleXinputJoystickListUpdate(joystickList) {
 function handleSDLJoystickListUpdate(joystickList) {
   // updating device names to match what rpcs3 uses
   const fixedList = appendNumbersToSDLDeviceNames(
-    renamePS5Controllers(joystickList)
+    renameDLSController(joystickList)
   );
 
   const newConfig = {};
