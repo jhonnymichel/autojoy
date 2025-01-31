@@ -62,7 +62,13 @@ async function xinputHandler(xinput) {
     newDeviceList.length !== deviceList.length
   ) {
     deviceList = newDeviceList;
-    subscribers.forEach((notify) => notify([...deviceList]));
+    subscribers.forEach((notify) => {
+      try {
+        notify([...deviceList]);
+      } catch (e) {
+        console.log("[Joystick Listener] Error from subscriber:", e);
+      }
+    });
   }
 
   setTimeout(() => {
@@ -97,7 +103,13 @@ async function sdlHandler(sdl) {
     newDeviceList.length !== deviceList.length
   ) {
     deviceList = newDeviceList;
-    subscribers.forEach((notify) => notify([...deviceList]));
+    subscribers.forEach((notify) => {
+      try {
+        notify([...deviceList]);
+      } catch (e) {
+        console.log("[Joystick Listener] Error from subscriber:", e);
+      }
+    });
   }
 
   setTimeout(() => {
