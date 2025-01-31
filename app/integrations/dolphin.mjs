@@ -96,6 +96,10 @@ function handleXinputJoystickListUpdate(joystickList) {
     path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
   );
 
+  if (!newMainConfig.Core) {
+    newMainConfig.Core = {};
+  }
+
   gamecubeConstants.playerIdentifiers.forEach((identifier, position) => {
     // setting disconnected devices
     if (!trimmedList[position]) {
