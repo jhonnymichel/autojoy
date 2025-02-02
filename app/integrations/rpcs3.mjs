@@ -141,14 +141,17 @@ function handleSDLJoystickListUpdate(joystickList) {
   });
 
   savers.yml(newConfig, path.resolve(rpcs3Path, inputConfigFileName));
+  console.log(
+    "RPCS3: Input settings saved at",
+    path.resolve(rpcs3Path, inputConfigFileName)
+  );
   savers.yml(
     getActiveInputProfileObject(),
     path.resolve(rpcs3Path, activeProfileFileName)
   );
-
   console.log(
-    "RPCS3: Input settings saved at",
-    path.resolve(rpcs3Path, inputConfigFileName)
+    "RPCS3: Input profile settings saved at",
+    path.resolve(rpcs3Path, activeProfileFileName)
   );
 }
 
