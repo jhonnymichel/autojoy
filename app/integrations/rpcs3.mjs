@@ -156,6 +156,12 @@ function handleSDLJoystickListUpdate(joystickList) {
         get down() {
           return "LS Y-";
         },
+        get deadzone() {
+          return newConfig[identifier].Config["Left Stick Deadzone"];
+        },
+        set deadzone(value) {
+          newConfig[identifier].Config["Left Stick Deadzone"] = value;
+        },
       },
       right: {
         get left() {
@@ -169,6 +175,12 @@ function handleSDLJoystickListUpdate(joystickList) {
         },
         get down() {
           return "RS Y-";
+        },
+        get deadzone() {
+          return newConfig[identifier].Config["Right Stick Deadzone"];
+        },
+        set deadzone(value) {
+          newConfig[identifier].Config["Right Stick Deadzone"] = value;
         },
       },
     });
