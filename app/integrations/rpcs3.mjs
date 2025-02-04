@@ -1,7 +1,10 @@
 import { user } from "../settings.mjs";
 import { loaders, savers } from "../file.mjs";
 import path from "path";
-import { findNextConnectedXinputIdentifier } from "./shared.mjs";
+import {
+  findNextConnectedXinputIdentifier,
+  fixInvertedSDLInputs,
+} from "./shared.mjs";
 
 const configTemplates = loaders.yml("config-templates/rpcs3.yml");
 const rpcs3Path = user.paths.rpcs3;
@@ -138,6 +141,37 @@ function handleSDLJoystickListUpdate(joystickList) {
 
     newConfig[identifier].Device = fixedList[position].name;
     newConfig[identifier].Handler = inputHandlers[user.settings.joystickMode];
+
+    fixInvertedSDLInputs(joystickList[position], newConfig[identifier].Config, {
+      left: {
+        get left() {
+          return "LS X-";
+        },
+        get right() {
+          return "LS X+";
+        },
+        get up() {
+          return "LS Y+";
+        },
+        get down() {
+          return "LS Y-";
+        },
+      },
+      right: {
+        get left() {
+          return "RS X-";
+        },
+        get right() {
+          return "RS X+";
+        },
+        get up() {
+          return "RS Y+";
+        },
+        get down() {
+          return "RS Y-";
+        },
+      },
+    });
   });
 
   savers.yml(newConfig, path.resolve(rpcs3Path, inputConfigFileName));

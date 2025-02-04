@@ -86,6 +86,7 @@ function extractSDLType(device) {
 async function sdlHandler(sdl) {
   const devices = sdl.joystick.devices;
   // TODO: support "Mayflash Wiimote PC Adapter". gotta use "name", not type.
+  // TODO: support "Wii Rock Band Drums". gotta use name, not type + MMJoystick in RPCS3.
   const gameControllers = devices.filter(
     (device) => device.type === "gamecontroller"
   );

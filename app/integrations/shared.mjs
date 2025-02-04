@@ -13,3 +13,34 @@ export function findNextConnectedXinputIdentifier(deviceList, position) {
     }
   }
 }
+
+const affectedControllers = [
+  "Guitar (Solderless Kit - Default (1.1))",
+  "Guitar (Monoboard RP)",
+];
+
+// In SDL, some controllers have inverted inputs.
+// Sticks are swapped (left becomes right), and directions too (X axis becomes Y axis)
+export function fixInvertedSDLInputs(joystick, config, sticks) {
+  if (!affectedControllers.includes(joystick.name)) return;
+
+  // Mapping of old stick directions to their corrected values
+  const swapMap = new Map([
+    [sticks.left.left, sticks.right.up],
+    [sticks.left.right, sticks.right.down],
+    [sticks.left.up, sticks.right.right],
+    [sticks.left.down, sticks.right.left],
+
+    [sticks.right.left, sticks.left.up],
+    [sticks.right.right, sticks.left.down],
+    [sticks.right.up, sticks.left.right],
+    [sticks.right.down, sticks.left.left],
+  ]);
+
+  // Iterate through every value in config and swap if it's affected
+  for (const key in config) {
+    if (swapMap.has(config[key])) {
+      config[key] = swapMap.get(config[key]);
+    }
+  }
+}
