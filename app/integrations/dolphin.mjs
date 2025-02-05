@@ -48,6 +48,10 @@ function getDolphinXinputDeviceName(joystick, position) {
     return xinputDeviceIdentifiers[position];
   }
 
+  if (joystick.type === deviceType.drumKit) {
+    return xinputDeviceIdentifiers[position].replace("Gamepad", "Drum Kit");
+  }
+
   return xinputDeviceIdentifiers[position].replace("Gamepad", "Device");
 }
 
