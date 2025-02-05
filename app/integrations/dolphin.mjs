@@ -1,7 +1,10 @@
 import { loaders, savers } from "../file.mjs";
 import { user } from "../settings.mjs";
 import path from "path";
-import { findNextConnectedXinputIdentifier } from "./shared.mjs";
+import {
+  findNextConnectedXinputIdentifier,
+  fixInvertedSDLInputs,
+} from "./shared.mjs";
 import { deviceType } from "../constants.mjs";
 
 const configTemplates = {
@@ -161,20 +164,61 @@ function handleSDLJoystickListUpdate(joystickList) {
   const newConfig = {};
 
   wiiConstants.playerIdentifiers.forEach((identifier, position) => {
+    const joystick = renamedList[position];
+
     // setting disconnected devices
-    if (!renamedList[position]) {
+    if (!joystick) {
       newConfig[identifier] = configTemplates.wiimoteEmulated.GAMEPAD;
       newConfig[identifier].Source = wiiConstants.wiimoteSources.none;
       return;
     }
 
     newConfig[identifier] = {
-      ...(configTemplates.wiimoteEmulated[renamedList[position].type] ??
+      ...(configTemplates.wiimoteEmulated[joystick.type] ??
         configTemplates.wiimoteEmulated.GAMEPAD),
     };
 
-    newConfig[identifier].Device = renamedList[position].name;
+    newConfig[identifier].Device = joystick.name;
     newConfig[identifier].Source = wiiConstants.wiimoteSources.emulated;
+
+    fixInvertedSDLInputs(joystick, newConfig[identifier], {
+      left: {
+        get left() {
+          return "Left X-";
+        },
+        get right() {
+          return "Left X+";
+        },
+        get up() {
+          return "Left Y+";
+        },
+        get down() {
+          return "Left Y-";
+        },
+        get deadzone() {
+          return null;
+        },
+        set deadzone(value) {},
+      },
+      right: {
+        get left() {
+          return "Right X-";
+        },
+        get right() {
+          return "Right X+";
+        },
+        get up() {
+          return "Right Y+";
+        },
+        get down() {
+          return "Right Y-";
+        },
+        get deadzone() {
+          return null;
+        },
+        set deadzone(value) {},
+      },
+    });
   });
 
   savers.ini(

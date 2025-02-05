@@ -35,10 +35,17 @@ export function fixInvertedSDLInputs(joystick, config, sticks) {
     [sticks.right.down, sticks.left.left],
   ]);
 
-  // Iterate through every value in config and swap if it's affected
+  // Iterate through every value in config and replace affected parts globally
   for (const key in config) {
-    if (swapMap.has(config[key])) {
-      config[key] = swapMap.get(config[key]);
+    let value = config[key];
+
+    if (typeof value === "string") {
+      for (const [oldValue, newValue] of swapMap) {
+        if (value.includes(oldValue)) {
+          value = value.replaceAll(oldValue, newValue);
+        }
+      }
+      config[key] = value; // Apply the updated value back to the config
     }
   }
 
