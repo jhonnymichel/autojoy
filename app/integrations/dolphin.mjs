@@ -2,6 +2,7 @@ import { loaders, savers } from "../file.mjs";
 import { user } from "../settings.mjs";
 import path from "path";
 import { findNextConnectedXinputIdentifier } from "./shared.mjs";
+import { deviceType } from "../constants.mjs";
 
 const configTemplates = {
   gamecube: loaders.ini("config-templates/dolphin-gc.ini"),
@@ -39,6 +40,14 @@ const xinputDeviceIdentifiers = [
   "XInput/3/Gamepad",
 ];
 
+function getDolphinXinputDeviceName(joystick, position) {
+  if (joystick.type === deviceType.gamepad) {
+    return xinputDeviceIdentifiers[position];
+  }
+
+  return xinputDeviceIdentifiers[position].replace("Gamepad", "Device");
+}
+
 // Dolphin uses the format: SDL/count/deviceName
 // eg.: SDL/0/Xbox Series X Controller
 // the number is relative to how many of the same controller is connected. it's not a player/position indicator.
@@ -61,22 +70,23 @@ function handleXinputJoystickListUpdate(joystickList) {
   const newConfig = {};
 
   wiiConstants.playerIdentifiers.forEach((identifier, position) => {
+    const joystick = trimmedList[position];
     // setting disconnected devices
-    if (!trimmedList[position]) {
+    if (!joystick) {
       newConfig[identifier] = configTemplates.wiimoteEmulated.GAMEPAD;
       newConfig[identifier].Source = wiiConstants.wiimoteSources.none;
       return;
     }
 
     newConfig[identifier] = {
-      ...(configTemplates.wiimoteEmulated[trimmedList[position].type] ??
+      ...(configTemplates.wiimoteEmulated[joystick.type] ??
         configTemplates.wiimoteEmulated.GAMEPAD),
     };
 
-    newConfig[identifier].Device =
-      xinputDeviceIdentifiers[
-        findNextConnectedXinputIdentifier(joystickList, position)
-      ];
+    newConfig[identifier].Device = getDolphinXinputDeviceName(
+      joystick,
+      findNextConnectedXinputIdentifier(joystickList, position)
+    );
 
     newConfig[identifier].Source = wiiConstants.wiimoteSources.emulated;
   });
@@ -102,7 +112,9 @@ function handleXinputJoystickListUpdate(joystickList) {
 
   gamecubeConstants.playerIdentifiers.forEach((identifier, position) => {
     // setting disconnected devices
-    if (!trimmedList[position]) {
+    const joystick = trimmedList[position];
+
+    if (!joystick) {
       newGCConfig[identifier] = configTemplates.gamecube.GAMEPAD;
       newMainConfig.Core[gamecubeConstants.devices[position]] =
         gamecubeConstants.deviceModes.disabled;
@@ -110,7 +122,7 @@ function handleXinputJoystickListUpdate(joystickList) {
     }
 
     newGCConfig[identifier] = {
-      ...(configTemplates.gamecube[trimmedList[position].type] ??
+      ...(configTemplates.gamecube[joystick.type] ??
         configTemplates.gamecube.GAMEPAD),
     };
 

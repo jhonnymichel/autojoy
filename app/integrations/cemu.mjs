@@ -46,8 +46,6 @@ function handleXinputJoystickListUpdate(joystickList) {
       deviceIndex + 1
     }`;
 
-    console.log("DEVICE INDEX", deviceIndex, position);
-
     savers.xml(newConfig, path.resolve(cemuPath, filename));
     console.log(
       "CEMU: Input Settings for controller",
