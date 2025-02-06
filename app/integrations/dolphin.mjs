@@ -85,10 +85,10 @@ function handleXinputJoystickListUpdate(joystickList) {
       return;
     }
 
-    newConfig[identifier] = {
-      ...(configTemplates.wiimoteEmulated[joystick.type] ??
-        configTemplates.wiimoteEmulated.GAMEPAD),
-    };
+    newConfig[identifier] = structuredClone(
+      configTemplates.wiimoteEmulated[joystick.type] ??
+        configTemplates.wiimoteEmulated.GAMEPAD
+    );
 
     newConfig[identifier].Device = getDolphinXinputDeviceName(
       joystick,
@@ -177,10 +177,10 @@ function handleSDLJoystickListUpdate(joystickList) {
       return;
     }
 
-    newConfig[identifier] = {
-      ...(configTemplates.wiimoteEmulated[joystick.type] ??
-        configTemplates.wiimoteEmulated.GAMEPAD),
-    };
+    newConfig[identifier] = structuredClone(
+      configTemplates.wiimoteEmulated[joystick.type] ??
+        configTemplates.wiimoteEmulated.GAMEPAD
+    );
 
     newConfig[identifier].Device = joystick.name;
     newConfig[identifier].Source = wiiConstants.wiimoteSources.emulated;

@@ -97,9 +97,9 @@ function handleXinputJoystickListUpdate(joystickList) {
       return;
     }
 
-    newConfig[identifier] = {
-      ...(configTemplates[trimmedList[position].type] ?? configTemplates.Empty),
-    };
+    newConfig[identifier] = structuredClone(
+      configTemplates[trimmedList[position].type] ?? configTemplates.Empty
+    );
 
     // with xinput, it's possible for device 1 to be disconnected and device 2 to be connected. the order is not always reassigned when you disconnect a controller.
     // example: [null, null, XINPUT_DEVSUBTYPE_GAMEPAD, null]. It looks like this happen when you mix x360 and one/series controllers.
@@ -137,9 +137,9 @@ function handleSDLJoystickListUpdate(joystickList) {
       return;
     }
 
-    newConfig[identifier] = {
-      ...(configTemplates[fixedList[position].type] ?? configTemplates.Empty),
-    };
+    newConfig[identifier] = structuredClone(
+      configTemplates[fixedList[position].type] ?? configTemplates.Empty
+    );
 
     newConfig[identifier].Device = fixedList[position].name;
     newConfig[identifier].Handler = inputHandlers[user.settings.joystickMode];
