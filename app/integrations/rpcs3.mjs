@@ -1,6 +1,7 @@
 import { user } from "../settings.mjs";
 import { loaders, savers } from "../file.mjs";
 import path from "path";
+import fs from "fs";
 import {
   findNextConnectedXinputIdentifier,
   fixInvertedSDLInputs,
@@ -13,6 +14,7 @@ const inputConfigFileName = `config/input_configs/global/${inputProfile}.yml`;
 const activeProfileFileName = `config/input_configs/active_input_configurations.yml`;
 // for microphone settings
 const generalConfigFileName = `config.yml`;
+const customConfigsPath = `config/custom_configs`;
 
 const getActiveInputProfileObject = () => ({
   ["Active Configurations"]: {
@@ -236,6 +238,24 @@ function handleMicrophoneListUpdate(microphoneList) {
     "RPCS3: Microphone settings saved at",
     path.resolve(rpcs3Path, generalConfigFileName)
   );
+
+  const customConfigs = path.resolve(rpcs3Path, customConfigsPath);
+  if (fs.existsSync(customConfigs)) {
+    fs.readdirSync(customConfigs).forEach((file) => {
+      if (file.endsWith(".yml") || file.endsWith(".yaml")) {
+        const customConfigPath = path.join(customConfigs, file);
+        const customConfig = loaders.yml(customConfigPath);
+
+        customConfig[configAudioPath][configMicrophoneTypeKey] = microphoneMode;
+        customConfig[configAudioPath][configMicrophoneDevicesKey] =
+          microphoneDevices;
+
+        savers.yml(customConfig, customConfigPath);
+
+        console.log("RPCS3: Microphone settings saved at", customConfigPath);
+      }
+    });
+  }
 }
 
 const rpcs3 = {
