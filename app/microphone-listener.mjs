@@ -30,7 +30,13 @@ async function sdlMicrophoneHandler(sdl) {
     newDeviceList.length !== deviceList.length
   ) {
     deviceList = newDeviceList;
-    subscribers.forEach((notify) => notify([...deviceList]));
+    subscribers.forEach((notify) => {
+      try {
+        notify([...deviceList]);
+      } catch (e) {
+        console.log("[Microphone Listener] Error from subscriber:", e);
+      }
+    });
   }
 
   setTimeout(() => {
