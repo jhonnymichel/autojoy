@@ -1,11 +1,8 @@
 import { loaders, savers } from "../file.mjs";
 import { user } from "../settings.mjs";
 import path from "path";
-import {
-  findNextConnectedXinputIdentifier,
-  fixInvertedSDLInputs,
-} from "./shared.mjs";
-import { deviceType } from "../constants.mjs";
+import { findNextConnectedXinputIdentifier } from "./shared.mjs";
+import { joystickTypes } from "../joystick.mjs";
 
 const configTemplates = {
   gamecube: loaders.ini("config-templates/dolphin-gc.ini"),
@@ -44,11 +41,11 @@ const xinputDeviceIdentifiers = [
 ];
 
 function getDolphinXinputDeviceName(joystick, position) {
-  if (joystick.type === deviceType.gamepad) {
+  if (joystick.type === joystickTypes.gamepad) {
     return xinputDeviceIdentifiers[position];
   }
 
-  if (joystick.type === deviceType.drumKit) {
+  if (joystick.type === joystickTypes.rockBandDrumKit) {
     return xinputDeviceIdentifiers[position].replace("Gamepad", "Drum Kit");
   }
 
@@ -184,45 +181,6 @@ function handleSDLJoystickListUpdate(joystickList) {
 
     newConfig[identifier].Device = joystick.name;
     newConfig[identifier].Source = wiiConstants.wiimoteSources.emulated;
-
-    fixInvertedSDLInputs(joystick, newConfig[identifier], {
-      left: {
-        get left() {
-          return "Left X-";
-        },
-        get right() {
-          return "Left X+";
-        },
-        get up() {
-          return "Left Y+";
-        },
-        get down() {
-          return "Left Y-";
-        },
-        get deadzone() {
-          return null;
-        },
-        set deadzone(value) {},
-      },
-      right: {
-        get left() {
-          return "Right X-";
-        },
-        get right() {
-          return "Right X+";
-        },
-        get up() {
-          return "Right Y+";
-        },
-        get down() {
-          return "Right Y-";
-        },
-        get deadzone() {
-          return null;
-        },
-        set deadzone(value) {},
-      },
-    });
   });
 
   savers.ini(

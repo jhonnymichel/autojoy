@@ -2,10 +2,7 @@ import { user } from "../settings.mjs";
 import { loaders, savers } from "../file.mjs";
 import path from "path";
 import fs from "fs";
-import {
-  findNextConnectedXinputIdentifier,
-  fixInvertedSDLInputs,
-} from "./shared.mjs";
+import { findNextConnectedXinputIdentifier } from "./shared.mjs";
 
 const configTemplates = loaders.yml("config-templates/rpcs3.yml");
 const rpcs3Path = user.paths.rpcs3;
@@ -143,49 +140,6 @@ function handleSDLJoystickListUpdate(joystickList) {
 
     newConfig[identifier].Device = fixedList[position].name;
     newConfig[identifier].Handler = inputHandlers[user.settings.joystickMode];
-
-    fixInvertedSDLInputs(joystickList[position], newConfig[identifier].Config, {
-      left: {
-        get left() {
-          return "LS X-";
-        },
-        get right() {
-          return "LS X+";
-        },
-        get up() {
-          return "LS Y+";
-        },
-        get down() {
-          return "LS Y-";
-        },
-        get deadzone() {
-          return newConfig[identifier].Config["Left Stick Deadzone"];
-        },
-        set deadzone(value) {
-          newConfig[identifier].Config["Left Stick Deadzone"] = value;
-        },
-      },
-      right: {
-        get left() {
-          return "RS X-";
-        },
-        get right() {
-          return "RS X+";
-        },
-        get up() {
-          return "RS Y+";
-        },
-        get down() {
-          return "RS Y-";
-        },
-        get deadzone() {
-          return newConfig[identifier].Config["Right Stick Deadzone"];
-        },
-        set deadzone(value) {
-          newConfig[identifier].Config["Right Stick Deadzone"] = value;
-        },
-      },
-    });
   });
 
   savers.yml(newConfig, path.resolve(rpcs3Path, inputConfigFileName));

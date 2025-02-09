@@ -1,6 +1,6 @@
 import { app, Tray, Menu, nativeImage, BrowserWindow, shell } from "electron";
 import { fork } from "child_process";
-import { joystickModes } from "./app/constants.mjs";
+import { joystickModes } from "./app/joystick.mjs";
 import { user, userFolderPath, validateSettings } from "./app/settings.mjs";
 import { fileURLToPath } from "url";
 import path from "path";

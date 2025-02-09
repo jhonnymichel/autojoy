@@ -1,8 +1,4 @@
-import {
-  deviceType,
-  joystickModes,
-  xinputSubtypeToGlobalType,
-} from "./constants.mjs";
+import { createJoystick, joystickModes } from "./joystick.mjs";
 import { user } from "./settings.mjs";
 
 const subscribers = [];
@@ -44,11 +40,7 @@ async function xinputHandler(xinput) {
   ) {
     try {
       const device = await xinput.getCapabilities(position);
-      newDeviceList.push({
-        name: device.type,
-        type: xinputSubtypeToGlobalType[device.subType],
-        raw: device,
-      });
+      newDeviceList.push(createJoystick(device, mode));
     } catch (e) {
       // either the device is not connected or the xinput device could not be identified and we report it as not connected
       newDeviceList.push(null);
@@ -76,13 +68,6 @@ async function xinputHandler(xinput) {
   }, 1000);
 }
 
-function extractSDLType(device) {
-  if (device.name.includes("Guitar")) return deviceType.guitar;
-  if (device.name.includes("Drum")) return deviceType.drumKit;
-
-  return deviceType.gamepad;
-}
-
 async function sdlHandler(sdl) {
   const devices = sdl.joystick.devices;
   // TODO: support "Mayflash Wiimote PC Adapter". gotta use "name", not type.
@@ -91,11 +76,9 @@ async function sdlHandler(sdl) {
     (device) => device.type === "gamecontroller"
   );
 
-  const newDeviceList = gameControllers.map((device) => ({
-    name: device.name,
-    type: extractSDLType(device),
-    raw: device,
-  }));
+  const newDeviceList = gameControllers.map((device) =>
+    createJoystick(device, mode)
+  );
 
   if (
     newDeviceList.some(

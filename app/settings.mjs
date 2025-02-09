@@ -1,4 +1,4 @@
-import { joystickModes } from "./constants.mjs";
+import { joystickModes } from "./joystick.mjs";
 import {
   loaders,
   resolvePathFromPackagedRoot,
