@@ -4,3 +4,5 @@ user/settings.json
 autojoy-win32-x64/
 logs.*
 dist/
+# Node.js native addon builds
+build/
