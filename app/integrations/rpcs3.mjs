@@ -156,8 +156,6 @@ function handleSDLJoystickListUpdate(joystickList) {
           joystick.raw.product
         )}`;
 
-        console.log("EH NOIS");
-
         device = mmJoystickDevice;
         handler = "MMJoystick";
       }
