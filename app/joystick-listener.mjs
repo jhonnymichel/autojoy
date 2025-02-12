@@ -89,7 +89,10 @@ async function sdlHandler(sdl) {
 
   if (
     newDeviceList.some(
-      (value, position) => value?.type !== deviceList[position]?.type
+      (value, position) =>
+        value?.type !== deviceList[position]?.type ||
+        value?.raw.id !== deviceList[position]?.raw.id ||
+        value?.raw._index !== deviceList[position]?.raw._index
     ) ||
     newDeviceList.length !== deviceList.length
   ) {
