@@ -7,6 +7,7 @@ export const joystickTypes = {
   guitar: "GUITAR",
   sdlGuitar: "SDL_GUITAR",
   rockBandDrumKit: "ROCKBAND_DRUM_KIT",
+  wiiRockBandDrumKit: "WII_ROCKBAND_DRUM_KIT",
   gamepad: "GAMEPAD",
 };
 
@@ -27,8 +28,11 @@ function getSDLJoystickType(device) {
   // TODO: This is misleading. further diferentiation might be needed.
   // right now, this works well for x360 and santroller guitars only.
   if (device.name.includes("Guitar")) return joystickTypes.sdlGuitar;
+  if (device.name.includes("Harmonix Drum Controller for Nintendo Wii"))
+    return joystickTypes.wiiRockBandDrumKit;
   // TODO: This is misleading, further diferentiation might be needed.
   // right now, this works well for x360 Rock Band 2 and 3 Drum Kit.
+  // TODO: Support PS kits, similar to how we're supporting wii kits.
   if (device.name.includes("Drum")) return joystickTypes.rockBandDrumKit;
 
   return joystickTypes.gamepad;

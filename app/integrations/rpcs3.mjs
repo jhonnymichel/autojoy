@@ -3,6 +3,7 @@ import { loaders, savers } from "../file.mjs";
 import path from "path";
 import fs from "fs";
 import { findNextConnectedXinputIdentifier } from "./shared.mjs";
+import mmjoystick from "./rpcs3/mmjoystick.cjs";
 
 const configTemplates = loaders.yml("config-templates/rpcs3.yml");
 const rpcs3Path = user.paths.rpcs3;
@@ -128,18 +129,48 @@ function handleSDLJoystickListUpdate(joystickList) {
 
   const newConfig = {};
   playerIdentifiers.forEach((identifier, position) => {
+    const joystick = fixedList[position];
+
     // setting non-connected positions as empty
-    if (!fixedList[position]) {
+    if (!joystick) {
       newConfig[identifier] = configTemplates.Empty;
       return;
     }
 
     newConfig[identifier] = structuredClone(
-      configTemplates[fixedList[position].type] ?? configTemplates.Empty
+      configTemplates[joystick.type] ?? configTemplates.Empty
     );
 
-    newConfig[identifier].Device = fixedList[position].name;
-    newConfig[identifier].Handler = inputHandlers[user.settings.joystickMode];
+    try {
+      let handler = inputHandlers[user.settings.joystickMode];
+      let device = joystick.name;
+
+      if (
+        mmjoystick.shouldUseMMJoystick(
+          joystick.raw.vendor,
+          joystick.raw.product
+        )
+      ) {
+        const mmJoystickDevice = `Joystick #${mmjoystick.getMMJoystickIndex(
+          joystick.raw.vendor,
+          joystick.raw.product
+        )}`;
+
+        console.log("EH NOIS");
+
+        device = mmJoystickDevice;
+        handler = "MMJoystick";
+      }
+
+      newConfig[identifier].Device = device;
+      newConfig[identifier].Handler = handler;
+    } catch (e) {
+      console.error(
+        "RPCS3: Device couldn't be configured properly -",
+        joystick.name
+      );
+      console.error(e);
+    }
   });
 
   savers.yml(newConfig, path.resolve(rpcs3Path, inputConfigFileName));

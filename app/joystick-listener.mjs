@@ -68,12 +68,19 @@ async function xinputHandler(xinput) {
   }, 1000);
 }
 
+const sdlDevicesToInclude = [{ manufacturerId: 7085, productId: 12560 }];
+
 async function sdlHandler(sdl) {
   const devices = sdl.joystick.devices;
   // TODO: support "Mayflash Wiimote PC Adapter". gotta use "name", not type.
   // TODO: support "Wii Rock Band Drums". gotta use name, not type + MMJoystick in RPCS3.
   const gameControllers = devices.filter(
-    (device) => device.type === "gamecontroller"
+    (device) =>
+      device.type === "gamecontroller" ||
+      sdlDevicesToInclude.some(
+        (d) =>
+          d.manufacturerId === device.vendor && d.productId === device.product
+      )
   );
 
   const newDeviceList = gameControllers.map((device) =>
