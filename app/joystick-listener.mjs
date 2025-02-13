@@ -1,4 +1,9 @@
-import { createJoystick, joystickModes } from "./joystick.mjs";
+import {
+  createJoystick,
+  hardwareInfo,
+  isHardware,
+  joystickModes,
+} from "./joystick.mjs";
 import { user } from "./settings.mjs";
 
 const subscribers = [];
@@ -68,7 +73,7 @@ async function xinputHandler(xinput) {
   }, 1000);
 }
 
-const sdlDevicesToInclude = [{ manufacturerId: 7085, productId: 12560 }];
+const sdlDevicesToInclude = [hardwareInfo.harmonixDrumControllerForNintendoWii];
 
 async function sdlHandler(sdl) {
   const devices = sdl.joystick.devices;
@@ -77,9 +82,11 @@ async function sdlHandler(sdl) {
   const gameControllers = devices.filter(
     (device) =>
       device.type === "gamecontroller" ||
-      sdlDevicesToInclude.some(
-        (d) =>
-          d.manufacturerId === device.vendor && d.productId === device.product
+      sdlDevicesToInclude.some((d) =>
+        isHardware(
+          { manufacturerId: device.vendor, productId: device.product },
+          d
+        )
       )
   );
 

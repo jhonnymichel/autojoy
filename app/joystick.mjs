@@ -11,6 +11,17 @@ export const joystickTypes = {
   gamepad: "GAMEPAD",
 };
 
+export const hardwareInfo = {
+  harmonixDrumControllerForNintendoWii: {
+    manufacturerId: 7085,
+    productId: 12560,
+  },
+  harmonixDrumControllerForPS3: {
+    manufacturerId: 4794,
+    productId: 528,
+  },
+};
+
 const xinputSubtypeToGlobalType = {
   XINPUT_DEVSUBTYPE_GUITAR_BASS: joystickTypes.guitar,
   XINPUT_DEVSUBTYPE_GUITAR: joystickTypes.guitar,
@@ -24,12 +35,34 @@ function getXinputJoystickType(device) {
   return xinputSubtypeToGlobalType[device.subType];
 }
 
+export function isHardware(
+  { manufacturerId, productId } = {},
+  hardwareInfoEntry
+) {
+  return (
+    hardwareInfoEntry?.manufacturerId === manufacturerId &&
+    hardwareInfoEntry?.productId === productId
+  );
+}
+
 function getSDLJoystickType(device) {
   // TODO: This is misleading. further diferentiation might be needed.
   // right now, this works well for x360 and santroller guitars only.
   if (device.name.includes("Guitar")) return joystickTypes.sdlGuitar;
-  if (device.name.includes("Harmonix Drum Controller for Nintendo Wii"))
+  if (
+    isHardware(
+      device.vendor,
+      device.product,
+      hardwareInfo.harmonixDrumControllerForNintendoWii
+    ) ||
+    isHardware(
+      device.vendor,
+      device.product,
+      hardwareInfo.harmonixDrumControllerForPS3
+    )
+  ) {
     return joystickTypes.wiiRockBandDrumKit;
+  }
   // TODO: This is misleading, further diferentiation might be needed.
   // right now, this works well for x360 Rock Band 2 and 3 Drum Kit.
   // TODO: Support PS kits, similar to how we're supporting wii kits.
