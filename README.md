@@ -25,38 +25,42 @@ Currently only supports Windows.
 
 - Guitars\*:
   - Xbox 360 Guitar Hero and Rock Band Guitars.
-  - Wii Guitars via Wiitar thing.
+  - Wii Guitar Hero Guitars via Wiitar thing.
   - Santroller Guitars in default mode.
   - NOT SUPPORTED YET: dinput and mmjoystick guitars (such as PS3 and Raphnet adapter instruments).
   - NOT SUPPORTED YET: PS4 and Xbox One Rock Band Guitars.
   - NOT SUPPORTED YET: Riffmaster.
 - Drums:
-  - Xbox 360 Rock Band Drums.
-  - Wii Drums.\*\*
+  - Xbox 360 Rock Band 2 and 3 Rock Band Drums. \*\*\*
+  - Wii Rock Band 2 and 3 Drums.\*\* \*\*\*
+  - PS3 Rock Band 2 and 3 Drums.\*\* \*\*\*
 - Regular Controllers: Supports any Xinput device and DualSense controllers\*\*.
 - Microphones: Supports any recording device connected to the computer, including Rock Band/Guitar Hero mics.
   - It's possible to filter out connected recording devices that you don't want to use. In the tray menu, uncheck unwanted devices.
 
-\*Guitar settings were tested only in Rock Band Games. rpcs3 docs state that tilt in GH guitars will not work in RB games but the config provided in this app actually has tilt working on Rock Band. the hacky mapping results in Guitar Hero games not working that well. you can remap the settings from `config-templates/rpcs3` to what's indicated [here](https://wiki.rpcs3.net/index.php?title=Help:Peripherals_and_accessories) if you want to play Guitar Hero.
+\* Guitar settings were tested only in Rock Band Games. rpcs3 docs state that tilt in GH guitars will not work in RB games but the config provided in this app actually has tilt working on Rock Band. the hacky mapping results in Guitar Hero games not working that well. you can remap the settings from `config-templates/rpcs3` to what's indicated [here](https://wiki.rpcs3.net/index.php?title=Help:Peripherals_and_accessories) if you want to play Guitar Hero.
 
-\*\*SDL joystick mode needs to be selected for non-xinput devices to work.
+\*\* SDL joystick mode needs to be selected for non-xinput devices to work.
+
+\*\*\* Rock Band 2 and 3 drums are validated. Rock Band 1 Drums may work but they have not been tested.
 
 ### Dolphin
 
 - Guitars:
   - Xbox 360 Guitar Hero and Rock Band Guitars.
-  - Wii Guitars via Wiitar thing.
+  - Wii Guitars Hero Guitars via Wiitar thing.
   - Santroller Guitars in default mode.
-  - NOT SUPPORTED YET: dinput and mmjoystick guitars (such as PS3 and Raphnet adapter instruments).
+  - NOT SUPPORTED YET: non-xinput guitars (such as PS3 and Raphnet adapter instruments).
   - NOT SUPPORTED YET: PS4 and Xbox One Rock Band Guitars.
   - NOT SUPPORTED YET: Riffmaster.
 - Drums:
-  - Xbox 360 Rock Band Drums.
-  - Wii Drums.\* \*\*
+  - Xbox 360 Rock Band Drums. \* \*\*\*
+  - Wii Rock Band 2 and 3 Drums.\* \*\* \*\*\*
+  - PS3 Rock Band 2 and 3 Drums.\* \*\* \*\*\*
 - Regular Controllers: Supports any Xinput device and DualSense controllers\*\*.
 - Microphones: NOT SUPPORTED YET.
 
-\*Drum settings were tested in Rock Band and Guitar Hero games. Dolphin does not emulate Rock Band Drums, only Guitar Hero Drums. This causes some limitations:
+\* Drum settings were tested in Rock Band and Guitar Hero games. Dolphin does not emulate Rock Band Drums, only Guitar Hero Drums. This causes some limitations:
 
 - To play Guitar Hero, the Green Cymbal add-on is needed.
 - Pro Drums can't be played in Rock Band 3.
@@ -65,7 +69,9 @@ Currently only supports Windows.
   - Xbox 360/PS3 Guitar Hero Drums may arrive in the future.
   - Real Wiimote auto config is planned as well.
 
-\*\*SDL joystick mode needs to be selected for non-xinput devices to work.
+\*\* SDL joystick mode needs to be selected for non-xinput devices to work.
+
+\*\*\* Rock Band 2 and 3 drums are validated. Rock Band 1 Drums may work but they have not been tested.
 
 ### Cemu
 
