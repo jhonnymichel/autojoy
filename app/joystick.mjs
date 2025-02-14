@@ -46,20 +46,17 @@ export function isHardware(
 }
 
 function getSDLJoystickType(device) {
+  const deviceInfo = {
+    manufacturerId: device.vendor,
+    productId: device.product,
+  };
+
   // TODO: This is misleading. further diferentiation might be needed.
   // right now, this works well for x360 and santroller guitars only.
   if (device.name.includes("Guitar")) return joystickTypes.sdlGuitar;
   if (
-    isHardware(
-      device.vendor,
-      device.product,
-      hardwareInfo.harmonixDrumControllerForNintendoWii
-    ) ||
-    isHardware(
-      device.vendor,
-      device.product,
-      hardwareInfo.harmonixDrumControllerForPS3
-    )
+    isHardware(deviceInfo, hardwareInfo.harmonixDrumControllerForNintendoWii) ||
+    isHardware(deviceInfo, hardwareInfo.harmonixDrumControllerForPS3)
   ) {
     return joystickTypes.wiiRockBandDrumKit;
   }
