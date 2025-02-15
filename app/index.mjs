@@ -5,6 +5,7 @@ import { microphoneListener } from "./microphone-listener.mjs";
 import { getMicrophonesInUse } from "./deviceFilters.mjs";
 import dolphin from "./integrations/dolphin.mjs";
 import cemu from "./integrations/cemu.mjs";
+import ghwtde from "./integrations/ghwtde.mjs";
 
 console.log("input server started. settings:", user.settings);
 joystickListener.onListChange((joystickList) => {
@@ -15,6 +16,7 @@ joystickListener.onListChange((joystickList) => {
 joystickListener.onListChange(rpcs3.handleJoystickListUpdate);
 joystickListener.onListChange(dolphin.handleJoystickListUpdate);
 joystickListener.onListChange(cemu.handleJoystickListUpdate);
+joystickListener.onListChange(ghwtde.handleJoystickListUpdate);
 joystickListener.listen();
 
 if (user.settings.manageMicrophones === true) {
