@@ -88,10 +88,10 @@ SDL_GUITAR:
   Handler: SDL
   Device: ""
   Config:
-    Left Stick Left: LS X+
-    Left Stick Down: LS Y+
-    Left Stick Right: LS X-
-    Left Stick Up: LS Y-
+    Left Stick Left: ""
+    Left Stick Down: ""
+    Left Stick Right: ""
+    Left Stick Up: ""
     Right Stick Left: LS Y+
     Right Stick Down: LT
     Right Stick Right: LS Y-
