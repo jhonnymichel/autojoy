@@ -65,7 +65,8 @@ const store = {
         };
       }
 
-      const lastRestartAfterCrash = Date.now();
+      const lastRestartAfterCrash =
+        Date.now() + context?.serverRestartPadding ?? 0;
       return {
         lastRestartAfterCrash,
         serverStatus: "restarting",
@@ -84,7 +85,7 @@ const store = {
       }
 
       return {
-        serverStatus: "killed",
+        serverStatus: "stopped-manually",
       };
     },
     changeJoystickMode(mode) {
@@ -151,7 +152,7 @@ const store = {
     },
   },
   __state: {
-    serverStatus: "starting", // starting, restarting, running, killed, crashed
+    serverStatus: "starting", // starting, restarting, running, stopped-manually, crashed
     lastRestartAfterCrash: 0,
     joystickMode: user.settings.joystickMode,
     manageMicrophones: user.settings.manageMicrophones ?? false,
@@ -209,17 +210,24 @@ function killServer() {
 }
 
 let restartAgainTimeoutId;
+let serverRestartPaddingTimeoutId;
 
 function restartServer(context) {
   clearTimeout(restartAgainTimeoutId);
+  clearTimeout(serverRestartPaddingTimeoutId);
 
   if (appProcess) {
     killServer();
     return;
   }
 
+  // if it's an user issued restart, this function stopped previously at the killServer call above.
+  // the process exit event listener will then call restartServer a second time.
+  // in the second call, context won't exist, so we rely on store.state.serverStatus, that was defined
+  // in the process exit event listener.
+  // TODO: this could actually be simplified, context could be a required param.
   const isUserIssuedRestart =
-    context?.userAction || store.state.serverStatus === "killed";
+    context?.userAction || store.state.serverStatus === "stopped-manually";
 
   const currentTime = Date.now();
   const lastRestart = store.state.lastRestartAfterCrash;
@@ -236,14 +244,19 @@ function restartServer(context) {
 
     return;
   }
+
+  // after a crash, xinput api needs time to recover, it seems.
+  const serverRestartPadding = isUserIssuedRestart ? 0 : 3000;
   console.error("Restarting server");
   dispatch(
     actions.restartingServer({
       isUserIssuedRestart,
+      serverRestartPadding,
     })
   );
-
-  startServer();
+  serverRestartPaddingTimeoutId = setTimeout(() => {
+    startServer();
+  }, serverRestartPadding);
 }
 
 function startTray() {
