@@ -61,7 +61,7 @@ async function xinputHandler(xinput) {
     deviceList = newDeviceList;
     subscribers.forEach((notify) => {
       try {
-        notify([...deviceList]);
+        notify(structuredClone(deviceList));
       } catch (e) {
         console.log("[Joystick Listener] Error from subscriber:", e);
       }
@@ -109,7 +109,7 @@ async function sdlHandler(sdl) {
     deviceList = newDeviceList;
     subscribers.forEach((notify) => {
       try {
-        notify([...deviceList]);
+        notify(structuredClone(deviceList));
       } catch (e) {
         console.log("[Joystick Listener] Error from subscriber:", e);
       }
