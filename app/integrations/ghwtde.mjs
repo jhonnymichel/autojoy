@@ -70,37 +70,31 @@ const joystickListUpdateHandlers = {
       newConfig = {};
     }
 
-    // because gwtde's player 1 is always the keyboard and the keyboard is set as the singer,
-    // we want the other players in a full band to be the instruments.
-    const joysticksExcludingGamepads = joystickList.map((j) => {
-      if (j && j.type === joystickTypes.gamepad) {
-        return null;
-      }
-
-      return j;
-    });
-
     // updating device IDs to match what the game uses
     const fixedList = appendNumbersToSDLDeviceIds(
-      convertSDLToGameGUID(joysticksExcludingGamepads)
+      convertSDLToGameGUID(joystickList)
     );
 
     newConfig[assignedControllersKey] = { FillEmptySlots: 1 };
 
-    controllerKeys.forEach((currentPlayerIdentifier, position) => {
-      const selectedDevice = fixedList[position];
-      if (!selectedDevice) {
-        return;
-      }
-
-      const deviceType =
-        selectedDevice.type === joystickTypes.rockBandDrumKit
-          ? joystickTypes.wiiRockBandDrumKit
-          : selectedDevice.type;
-
+    // we loop the SDL joystick list instead of the player positions
+    // because in SDL mode, we won't assign players directly.
+    // we just make sure controllers are setup correctly and enable
+    // FillEmptySlots so the game fills the positions.
+    // Doing it like this because assigning two sdl devices with the same ID is broken.
+    fixedList.forEach((selectedDevice, position) => {
       newConfig[selectedDevice.ghwtdeGUID] = structuredClone(
-        configTemplates[deviceType] ?? configTemplates[joystickTypes.guitar] // since we don't want to use gamepads here as the vocal is keyboard...
+        configTemplates[selectedDevice.type] ??
+          configTemplates[joystickTypes.guitar] // since we don't want to use gamepads here as the vocal is keyboard...
       );
+
+      // we disable regular gamepads to open space for full band (2 guitars + drums).
+      // player 1 is always the keyboard and it can't be changed, and when a mic is selected,
+      // the keyboard becomes the vocals controller.
+      // TODO: this doesn't do anything. but I tried lol
+      if (selectedDevice.type === joystickTypes.gamepad) {
+        newConfig[selectedDevice.ghwtdeGUID].Enabled = 0;
+      }
 
       newConfig[selectedDevice.ghwtdeGUID].DeviceName = selectedDevice.name;
     });
