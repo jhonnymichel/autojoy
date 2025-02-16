@@ -45,6 +45,12 @@ async function init() {
           getMicrophonesInUse(list, user.settings.unusedMicrophones ?? [])
         );
       }
+
+      if (user.paths.ghwtde) {
+        ghwtde.handleMicrophoneListUpdate(
+          getMicrophonesInUse(list, user.settings.unusedMicrophones ?? [])
+        );
+      }
     });
     microphoneListener.listen();
   }

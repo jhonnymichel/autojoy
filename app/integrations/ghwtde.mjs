@@ -21,9 +21,6 @@ import path from "path";
 // MICROPHONE
 // "<User Documents Path>\My Games\Guitar Hero World Tour Definitive Edition\GHWTDE.ini"
 // {Audio: MicDevice: ""}
-// The String is capped at 31 characters for some reason.
-
-// MOCKS
 
 const configTemplates = loaders.ini("config-templates/ghwtde.ini");
 const gameSettingsPath = user.paths.ghwtde;
@@ -171,6 +168,27 @@ const joystickListUpdateHandlers = {
 const ghwtde = {
   handleJoystickListUpdate(joystickList) {
     joystickListUpdateHandlers[user.settings.joystickMode](joystickList);
+  },
+  handleMicrophoneListUpdate(microphoneList) {
+    const config = loaders.ini(
+      path.resolve(gameSettingsPath, mainConfigFileName)
+    );
+
+    // this game only supports one microphone;
+    const [firstMicrophone] = microphoneList;
+
+    if (firstMicrophone) {
+      config.Audio.MicDevice = firstMicrophone.name;
+    } else {
+      config.Audio.MicDevice = "";
+    }
+
+    savers.ini(config, path.resolve(gameSettingsPath, mainConfigFileName));
+
+    console.log(
+      "GHWTDE: Microphone settings saved at",
+      path.resolve(gameSettingsPath, mainConfigFileName)
+    );
   },
 };
 
