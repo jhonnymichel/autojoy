@@ -73,7 +73,10 @@ async function xinputHandler(xinput) {
   }, 1000);
 }
 
-const sdlDevicesToInclude = [hardwareInfo.harmonixDrumControllerForNintendoWii];
+const sdlDevicesToInclude = [
+  hardwareInfo.harmonixDrumControllerForNintendoWii,
+  hardwareInfo.harmonixDrumControllerForPS3,
+];
 
 async function sdlHandler(sdl) {
   const devices = sdl.joystick.devices;
