@@ -1,5 +1,6 @@
 {
   "rpcs3": "C:/<Path_To_Emulator>/RPCS3",
   "dolphin": "C:/<Path_To_Emulator>/Dolphin-x64",
-  "cemu": "C:/<Path_To_Emulator>/cemu"
+  "cemu": "C:/<Path_To_Emulator>/cemu",
+  "ghwtde": "<User Documents Path>/My Games/Guitar Hero World Tour Definitive Edition/"
 }

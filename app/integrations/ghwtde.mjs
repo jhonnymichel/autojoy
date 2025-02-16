@@ -1,6 +1,13 @@
-import { joystickModes, joystickTypes } from "../joystick.mjs";
+import { loaders, savers } from "../file.mjs";
+import {
+  hardwareInfo,
+  isHardware,
+  joystickModes,
+  joystickTypes,
+} from "../joystick.mjs";
 import { user } from "../settings.mjs";
 import { findNextConnectedXinputIdentifier } from "./shared.mjs";
+import path from "path";
 
 function convertSDLToGameGUID(sdlGuid) {
   return sdlGuid.substring(0, 2) + "000000" + sdlGuid.substring(8);
@@ -22,11 +29,11 @@ function convertSDLToGameGUID(sdlGuid) {
 
 // MOCKS
 
-const configTemplates = {
-  [joystickTypes.guitar]: "GUITAR SELECTED",
-  [joystickTypes.rockBandDrumKit]: "RB DRUMS SELECTED",
-  [joystickTypes.wiiRockBandDrumKit]: "WII RB DRUMS SELECTED",
-};
+const configTemplates = loaders.ini("config-templates/ghwtde.ini");
+const gameSettingsPath = user.paths.ghwtde;
+const inputConfigFileName = "GHWTDEInput.ini";
+// for microphone support
+const mainConfigFileName = "GHWTDE.ini";
 
 const assignedControllersKey = "Preferences";
 const controllerKeys = ["Device1", "Device2", "Device3"];
@@ -40,7 +47,15 @@ const xinputPlayerIdentifiers = [
 const joystickListUpdateHandlers = {
   [joystickModes.sdl](joystickList) {},
   [joystickModes.xinput](joystickList) {
-    const newConfig = {};
+    let newConfig;
+    try {
+      newConfig = loaders.ini(
+        path.resolve(gameSettingsPath, inputConfigFileName)
+      );
+    } catch (e) {
+      newConfig = {};
+    }
+
     // because gwtde's player 1 is always the keyboard and the keyboard is set as the singer,
     // we want the other players in a full band to be the instruments.
     const joysticksExcludingGamepads = joystickList.map((j) => {
@@ -57,11 +72,11 @@ const joystickListUpdateHandlers = {
       (joystick) => joystick
     );
 
-    newConfig[assignedControllersKey] = {};
+    newConfig[assignedControllersKey] = { FillEmptySlots: 0 };
 
     controllerKeys.forEach((currentPlayerIdentifier, position) => {
       const selectedXinputDevice = trimmedList[position];
-
+      4;
       if (!selectedXinputDevice) {
         newConfig[assignedControllersKey][currentPlayerIdentifier] = "";
         return;
@@ -75,13 +90,22 @@ const joystickListUpdateHandlers = {
       const xinputDeviceIdentifier =
         xinputPlayerIdentifiers[selectedXinputPosition];
 
+      // in xinput mode, we can't tell apart Guitar Hero from Rock Band Drums, so
+      // in the future there might be a feature where users can pick which drums they're using.
+      // for now, we default to RBDrums, as xinput DRUM_KIT is mapped as ROCKBAND_DRUM_KIT for compatibility.
       newConfig[assignedControllersKey][currentPlayerIdentifier] =
         xinputDeviceIdentifier;
       newConfig[xinputDeviceIdentifier] =
-        configTemplates[selectedXinputDevice.type];
+        configTemplates[selectedXinputDevice.type] ??
+        configTemplates[joystickTypes.guitar]; // since we don't want to use gamepads here as the vocal is keyboard...
     });
 
-    console.log("NEW CONFIG IS", newConfig);
+    savers.ini(newConfig, path.resolve(gameSettingsPath, inputConfigFileName));
+
+    console.log(
+      "GHWTDE: Input settings saved at",
+      path.resolve(gameSettingsPath, inputConfigFileName)
+    );
   },
 };
 
