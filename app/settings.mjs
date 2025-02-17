@@ -2,20 +2,20 @@ import { joystickModes } from "./joystick.mjs";
 import {
   loaders,
   resolvePathFromPackagedRoot,
-  resolvePathFromProjectRoot,
+  resolvePathFromUserFolder,
   savers,
 } from "./file.mjs";
 
-export const userFolderPath = resolvePathFromProjectRoot(".");
+export const userFolderPath = resolvePathFromUserFolder(".");
 export const templatesFolderPath =
-  resolvePathFromProjectRoot("config-templates");
+  resolvePathFromUserFolder("config-templates");
 
 // for first app execution after install. we create the userland settings from inside the app package.
 try {
   loaders.json("user/paths.json");
 } catch (e) {
   savers.json(
-    loaders.json(resolvePathFromPackagedRoot("user/paths.json")),
+    loaders.json(resolvePathFromPackagedRoot("user/paths.template.json")),
     "user/paths.json"
   );
 }
@@ -24,7 +24,7 @@ try {
   loaders.json("user/settings.json");
 } catch (e) {
   savers.json(
-    loaders.json(resolvePathFromPackagedRoot("user/settings.json")),
+    loaders.json(resolvePathFromPackagedRoot("user/settings.template.json")),
     "user/settings.json"
   );
 }
@@ -35,6 +35,46 @@ try {
   savers.yml(
     loaders.yml(resolvePathFromPackagedRoot("config-templates/rpcs3.yml")),
     "config-templates/rpcs3.yml"
+  );
+}
+
+try {
+  loaders.xml("config-templates/cemu.xml");
+} catch (e) {
+  savers.xml(
+    loaders.xml(resolvePathFromPackagedRoot("config-templates/cemu.xml")),
+    "config-templates/cemu.xml"
+  );
+}
+
+try {
+  loaders.ini("config-templates/dolphin-gc.ini");
+} catch (e) {
+  savers.ini(
+    loaders.ini(resolvePathFromPackagedRoot("config-templates/dolphin-gc.ini")),
+    "config-templates/dolphin-gc.ini"
+  );
+}
+
+try {
+  loaders.ini("config-templates/dolphin-wiimote-emulated.ini");
+} catch (e) {
+  savers.ini(
+    loaders.ini(
+      resolvePathFromPackagedRoot(
+        "config-templates/dolphin-wiimote-emulated.ini"
+      )
+    ),
+    "config-templates/dolphin-wiimote-emulated.ini"
+  );
+}
+
+try {
+  loaders.ini("config-templates/ghwtde.ini");
+} catch (e) {
+  savers.ini(
+    loaders.ini(resolvePathFromPackagedRoot("config-templates/ghwtde.ini")),
+    "config-templates/ghwtde.ini"
   );
 }
 

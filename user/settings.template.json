@@ -1,5 +1,5 @@
 {
-  "joystickMode": "xinput",
+  "joystickMode": "sdl",
   "manageMicrophones": true,
   "unusedMicrophones": []
 }

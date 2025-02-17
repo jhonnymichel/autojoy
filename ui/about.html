@@ -2,10 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <title>About Autojoy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Favicon -->
     <title>Document</title>
   </head>
   <body>
+    <p>App Version: <span id="app-version"></span></p>
     App Created by Jhonny Michel.
     <a
       target="_blank"
@@ -13,5 +16,12 @@
       title="joystick icons"
       >Joystick icons created by Freepik - Flaticon</a
     >
+
+    <script>
+      (async () => {
+        document.getElementById("app-version").innerText =
+          await window.electron.getAppVersion();
+      })();
+    </script>
   </body>
 </html>

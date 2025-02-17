@@ -4,12 +4,65 @@ import path from "path";
 import yaml from "yaml";
 import * as ini from "ini";
 import { XMLBuilder, XMLParser } from "fast-xml-parser";
+import { execSync } from "child_process";
 
+// Resolving user folder
 const __filename = fileURLToPath(import.meta.url);
-let __dirname = path.dirname(__filename);
-let __packagedDirname = __dirname;
-if (__dirname.includes(".asar")) {
-  __dirname = path.resolve(__dirname, "..");
+// We start with the app directory
+let userFolder = path.dirname(__filename);
+// we keep a reference to the app directory so we can grab templates from here when needed.
+let __packagedDirname = userFolder;
+// if we're in production, we set user folder to be outside of the app directory, in the root of the install
+// we go back twice: outside app.asar/app, then outside of app.asar, to land on install folder.
+if (userFolder.includes(".asar")) {
+  userFolder = path.resolve(userFolder, "..", "..");
+
+  // function getRealDocumentsPath() {
+  //   try {
+  //     const docPath = execSync(
+  //       "powershell -command \"[Environment]::GetFolderPath('MyDocuments')\"",
+  //       { encoding: "utf8" }
+  //     ).trim();
+  //     return docPath;
+  //   } catch (error) {
+  //     console.error("Failed to get Documents path:", error);
+  //     return null;
+  //   }
+  // }
+
+  // const documentsPath = getRealDocumentsPath();
+
+  // // if we have the documents path extracted, we use documents/autojoy as the user folder.
+  // if (documentsPath) {
+  //   userFolder = documentsPath + "/autojoy";
+  // }
+
+  function getLocalAppDataPath() {
+    try {
+      const localAppDataPath = execSync(
+        "powershell -command \"[System.Environment]::GetFolderPath('LocalApplicationData')\"",
+        {
+          encoding: "utf8",
+        }
+      ).trim();
+
+      return localAppDataPath;
+    } catch (error) {
+      console.error("Failed to get Local AppData path:", error);
+      return null;
+    }
+  }
+
+  const appDataFolder = getLocalAppDataPath();
+
+  // if we have the documents path extracted, we use documents/autojoy as the user folder.
+  if (appDataFolder) {
+    userFolder = path.resolve(appDataFolder, "com.jhonnymichel", "autojoy");
+  }
+} else {
+  // we go back once: outside of app/, to the root of the repository.
+  // this is for development builds.
+  userFolder = path.resolve(userFolder, "..");
 }
 
 const xmlParser = new XMLParser();
@@ -19,35 +72,42 @@ const xmlBuilder = new XMLBuilder();
  * Loaders and savers for each type of file
  */
 
-export function resolvePathFromProjectRoot(src) {
-  return path.resolve(__dirname, "..", src);
+// should be used to find files from user folder
+export function resolvePathFromUserFolder(src) {
+  return path.resolve(userFolder, src);
 }
 
+// this should only be used when trying to get the template files packaged inside the app.
+// we go back
 export function resolvePathFromPackagedRoot(src) {
   return path.resolve(__packagedDirname, "..", src);
 }
 
+console.log("PATHS:");
+console.log("User:", userFolder);
+console.log("Package:", __packagedDirname);
+
 export const loaders = {
   yml(filepath) {
-    const file = fs.readFileSync(resolvePathFromProjectRoot(filepath), {
+    const file = fs.readFileSync(resolvePathFromUserFolder(filepath), {
       encoding: "utf-8",
     });
     return yaml.parse(file);
   },
   ini(filepath) {
-    const file = fs.readFileSync(resolvePathFromPackagedRoot(filepath), {
+    const file = fs.readFileSync(resolvePathFromUserFolder(filepath), {
       encoding: "utf-8",
     });
     return ini.parse(file);
   },
   xml(filepath) {
-    const file = fs.readFileSync(resolvePathFromPackagedRoot(filepath), {
+    const file = fs.readFileSync(resolvePathFromUserFolder(filepath), {
       encoding: "utf-8",
     });
     return xmlParser.parse(file);
   },
   json(filepath) {
-    const file = fs.readFileSync(resolvePathFromProjectRoot(filepath), {
+    const file = fs.readFileSync(resolvePathFromUserFolder(filepath), {
       encoding: "utf-8",
     });
     return JSON.parse(file);
@@ -83,7 +143,7 @@ export function deleteFile(filepath) {
 }
 
 function saveFile(content, filepath) {
-  const resolvedPath = resolvePathFromProjectRoot(filepath);
+  const resolvedPath = resolvePathFromUserFolder(filepath);
   const directoryPath = path.dirname(resolvedPath);
   createDirectory(directoryPath);
   fs.writeFileSync(resolvedPath, content, { flag: "w", encoding: "utf-8" });

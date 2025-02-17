@@ -1,4 +1,12 @@
-import { app, Tray, Menu, nativeImage, BrowserWindow, shell } from "electron";
+import {
+  app,
+  Tray,
+  Menu,
+  nativeImage,
+  BrowserWindow,
+  shell,
+  ipcMain,
+} from "electron";
 import { fork } from "child_process";
 import { joystickModes } from "./app/joystick.mjs";
 import { user, userFolderPath, validateSettings } from "./app/settings.mjs";
@@ -374,12 +382,14 @@ let aboutWindow = null;
 function createAboutWindow() {
   if (!aboutWindow) {
     aboutWindow = new BrowserWindow({
-      width: 300,
-      height: 200,
-      resizable: true,
+      autoHideMenuBar: true,
+      resizable: false,
+      icon: path.resolve(__dirname, "assets/tray.png"),
       show: false, // Don't show the window immediately
       webPreferences: {
-        nodeIntegration: true,
+        preload: path.resolve(__dirname, "ui/preload.cjs"),
+        contextIsolation: true,
+        nodeIntegrationInWorker: true,
       },
     });
 
@@ -394,5 +404,9 @@ function createAboutWindow() {
   // Show the window
   aboutWindow.show();
 }
+
+ipcMain.handle("getAppVersion", () => {
+  return app.getVersion();
+});
 
 // <a href="https://www.flaticon.com/free-icons/joystick" title="joystick icons">Joystick icons created by Freepik - Flaticon (https://www.flaticon.com/free-icons/joystick)>
