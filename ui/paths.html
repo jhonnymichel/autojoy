@@ -6,6 +6,13 @@
     <title>App Configuration</title>
   </head>
   <style>
+    body {
+      background: #ddd;
+      color: #444;
+    }
+    * {
+      font-family: sans-serif;
+    }
     .form {
       visibility: hidden;
     }
@@ -15,13 +22,91 @@
     }
 
     .field {
+      background: #bbb;
       padding: 10px;
       display: flex;
       flex-direction: column;
+      gap: 5px;
+    }
+
+    .field label {
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .field .field-input {
+      width: 100%;
+      display: flex;
+      gap: 10px;
+    }
+    .buttons {
+      flex-shrink: 0;
+    }
+
+    .field .path-display {
+      width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .header {
+      padding: 10px;
+      padding-bottom: 10px;
+    }
+
+    .header h2 {
+      margin-bottom: 0px;
+      font-size: 40px;
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+    }
+
+    .tooltip {
+      font-size: 12px;
+      line-height: 0;
+      margin: 0;
+      aspect-ratio: 1/1;
+      padding: 4px;
+      border-radius: 50%;
+      font-weight: 600;
+      background: darkgoldenrod;
+      border-style: solid;
+      border: 2;
+    }
+    .tooltip:hover {
+      background: rgb(255, 255, 255);
+    }
+
+    .label-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .label-wrapper span {
+      display: flex;
+      align-items: center;
+    }
+
+    button[type="submit"] {
+      margin-top: 10px;
     }
   </style>
   <body>
-    <h2>Set Your Paths</h2>
+    <div class="header">
+      <h2>Set Your Paths</h2>
+      <p>
+        Provide the path to each software you want AutoJoy to integrate with.
+      </p>
+      <p>
+        For software you don't have or don't want to integrate with, leave it
+        blank.
+      </p>
+      <p>Click <b>Clear</b> to stop integrating with specific software.</p>
+      <p class="message"></p>
+    </div>
 
     <form
       id="form-wrapper"
@@ -29,47 +114,78 @@
       class="form"
     >
       <div class="field">
-        <label for="rpcs3">RPCS3</label>
+        <div class="label-wrapper">
+          <label>RPCS3</label>
+          <span>
+            <button type="button" class="tooltip" data-tooltip="rpcs3">
+              ?
+            </button>
+          </span>
+        </div>
         <div class="field-input">
-          <input type="text" id="rpcs3" /><button
-            type="button"
-            onclick="clearField('rpcs3')"
-          >
-            Clear
-          </button>
+          <span id="rpcs3-path" class="path-display">Not set</span>
+          <div class="buttons">
+            <button type="button" onclick="selectFolder('rpcs3')">
+              Browse
+            </button>
+            <button type="button" onclick="clearField('rpcs3')">Clear</button>
+          </div>
         </div>
       </div>
+
       <div class="field">
-        <label for="dolphin">Dolphin</label>
+        <div class="label-wrapper">
+          <label>Dolphin</label>
+          <span>
+            <button type="button" class="tooltip" data-tooltip="dolphin">
+              ?
+            </button>
+          </span>
+        </div>
         <div class="field-input">
-          <input type="text" id="dolphin" /><button
-            type="button"
-            onclick="clearField('dolphin')"
-          >
-            Clear
-          </button>
+          <span id="dolphin-path" class="path-display">Not set</span>
+          <div class="buttons">
+            <button type="button" onclick="selectFolder('dolphin')">
+              Browse
+            </button>
+            <button type="button" onclick="clearField('dolphin')">Clear</button>
+          </div>
         </div>
       </div>
+
       <div class="field">
-        <label for="cemu">Cemu:</label>
+        <div class="label-wrapper">
+          <label>Cemu</label>
+          <span>
+            <button type="button" class="tooltip" data-tooltip="cemu">?</button>
+          </span>
+        </div>
         <div class="field-input">
-          <input type="text" id="cemu" /><button
-            type="button"
-            onclick="clearField('cemu')"
-          >
-            Clear
-          </button>
+          <span id="cemu-path" class="path-display">Not set</span>
+          <div class="buttons">
+            <button type="button" onclick="selectFolder('cemu')">Browse</button>
+            <button type="button" onclick="clearField('cemu')">Clear</button>
+          </div>
         </div>
       </div>
+
       <div class="field">
-        <label for="ghwtde">Guitar Hero World Tour: Definitive Edition</label>
+        <div class="label-wrapper">
+          <label>Guitar Hero World Tour: Definitive Edition</label>
+          <span>
+            <button type="button" class="tooltip" data-tooltip="ghwtde">
+              ?
+            </button>
+          </span>
+        </div>
         <div class="field-input">
-          <input type="text" id="ghwtde" /><button
-            type="button"
-            onclick="clearField('ghwtde')"
-          >
-            Clear
-          </button>
+          <span id="ghwtde-path" class="path-display">Not set</span>
+          <div class="buttons">
+            <button type="button" onclick="selectFolder('ghwtde')">
+              Browse
+            </button>
+            <button type="button" onclick="clearField('ghwtde')">Clear</button>
+          </div>
         </div>
       </div>
 
@@ -79,31 +195,68 @@
     <script>
       (async () => {
         const user = await window.electron.getUser();
-
         Object.entries(user?.paths ?? {}).forEach(([key, value]) => {
-          const input = document.getElementById(key);
-          if (!input) {
-            return;
+          const element = document.getElementById(`${key}-path`);
+          if (element) {
+            element.textContent = value || "Not set";
           }
-          input.value = value;
         });
 
         document.querySelector("#form-wrapper").classList.add("active");
       })();
 
-      function clearField(id) {
-        document.getElementById(id).value = "";
+      async function selectFolder(key) {
+        const folderPath = await window.electron.selectFolder();
+        if (folderPath) {
+          document.getElementById(`${key}-path`).textContent = folderPath;
+        }
       }
+
+      function clearField(key) {
+        document.getElementById(`${key}-path`).textContent = "Not set";
+      }
+
+      const tooltips = {
+        rpcs3:
+          "The RPCS3 installation folder. If using EmuDeck, it's by default inside C:/[Your User]/emudeck/EmulationStation-DE/Emulators ",
+        cemu: "The Cemu installation folder. If using EmuDeck, it's by default inside C:/[Your User]/emudeck/EmulationStation-DE/Emulators ",
+        dolphin:
+          "If using EmuDeck, it's the installation folder by default inside C:/[Your User]/emudeck/EmulationStation-DE/Emulators.\nIf using standalone Dolphin, it's the Dolphin Emulator folder inside your Documents.",
+        ghwtde:
+          "It's the game settings folder by default inside your Documents/My Games folder.",
+      };
+
+      document.querySelectorAll(".tooltip").forEach((tooltip) => {
+        tooltip.addEventListener("click", () => {
+          alert(tooltips[tooltip.dataset.tooltip]);
+        });
+      });
 
       function saveConfig() {
         const paths = {
-          rpcs3: document.getElementById("rpcs3").value,
-          dolphin: document.getElementById("rpcs3").value,
-          cemu: document.getElementById("cemu").value,
-          ghwtde: document.getElementById("ghwtde").value,
+          rpcs3:
+            document.getElementById("rpcs3-path").textContent !== "Not set"
+              ? document.getElementById("rpcs3-path").textContent
+              : "",
+          dolphin:
+            document.getElementById("dolphin-path").textContent !== "Not set"
+              ? document.getElementById("dolphin-path").textContent
+              : "",
+          cemu:
+            document.getElementById("cemu-path").textContent !== "Not set"
+              ? document.getElementById("cemu-path").textContent
+              : "",
+          ghwtde:
+            document.getElementById("ghwtde-path").textContent !== "Not set"
+              ? document.getElementById("ghwtde-path").textContent
+              : "",
         };
 
         window.electron.setPaths(paths);
+
+        alert(
+          "Settings updated! You can close this configuration window and enjoy!\nThe app is running in the tray."
+        );
       }
     </script>
   </body>

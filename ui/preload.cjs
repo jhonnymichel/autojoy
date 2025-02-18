@@ -10,4 +10,7 @@ contextBridge.exposeInMainWorld("electron", {
   setPaths: (paths) => {
     return ipcRenderer.invoke("setPaths", paths);
   },
+  selectFolder: async () => {
+    return ipcRenderer.invoke("openFolderDialog"); // Calls the main process
+  },
 });

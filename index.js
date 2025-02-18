@@ -6,6 +6,7 @@ import {
   BrowserWindow,
   shell,
   ipcMain,
+  dialog,
 } from "electron";
 import { fork } from "child_process";
 import { joystickModes } from "./app/joystick.mjs";
@@ -441,6 +442,14 @@ ipcMain.handle("getUser", () => {
 
 ipcMain.handle("setPaths", (event, paths) => {
   dispatch(actions.setPaths(paths));
+});
+
+ipcMain.handle("openFolderDialog", async (event, paths) => {
+  const result = await dialog.showOpenDialog({
+    properties: ["openDirectory"], // Allow selecting folders
+  });
+
+  return result.canceled ? null : result.filePaths[0];
 });
 
 let pathsWindow;
