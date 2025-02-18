@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App Configuration</title>
+  </head>
+  <style>
+    .form {
+      visibility: hidden;
+    }
+
+    .form.active {
+      visibility: visible;
+    }
+
+    .field {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+  <body>
+    <h2>Set Your Paths</h2>
+
+    <form
+      id="form-wrapper"
+      onsubmit="event.preventDefault(); saveConfig();"
+      class="form"
+    >
+      <div class="field">
+        <label for="rpcs3">RPCS3</label>
+        <div class="field-input">
+          <input type="text" id="rpcs3" /><button
+            type="button"
+            onclick="clearField('rpcs3')"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="dolphin">Dolphin</label>
+        <div class="field-input">
+          <input type="text" id="dolphin" /><button
+            type="button"
+            onclick="clearField('dolphin')"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="cemu">Cemu:</label>
+        <div class="field-input">
+          <input type="text" id="cemu" /><button
+            type="button"
+            onclick="clearField('cemu')"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="ghwtde">Guitar Hero World Tour: Definitive Edition</label>
+        <div class="field-input">
+          <input type="text" id="ghwtde" /><button
+            type="button"
+            onclick="clearField('ghwtde')"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <button type="submit">Save</button>
+    </form>
+
+    <script>
+      (async () => {
+        const user = await window.electron.getUser();
+
+        Object.entries(user?.paths ?? {}).forEach(([key, value]) => {
+          const input = document.getElementById(key);
+          if (!input) {
+            return;
+          }
+          input.value = value;
+        });
+
+        document.querySelector("#form-wrapper").classList.add("active");
+      })();
+
+      function clearField(id) {
+        document.getElementById(id).value = "";
+      }
+
+      function saveConfig() {
+        const paths = {
+          rpcs3: document.getElementById("rpcs3").value,
+          dolphin: document.getElementById("rpcs3").value,
+          cemu: document.getElementById("cemu").value,
+          ghwtde: document.getElementById("ghwtde").value,
+        };
+
+        window.electron.setPaths(paths);
+      }
+    </script>
+  </body>
+</html>

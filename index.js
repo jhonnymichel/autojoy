@@ -158,6 +158,16 @@ const store = {
         unusedMicrophones: newUnusedList,
       };
     },
+    setPaths(paths) {
+      if (Object.values(paths).every((value) => typeof value === "string")) {
+        user.paths = paths;
+        restartServer({ userAction: true });
+      }
+
+      return {
+        paths: user.paths,
+      };
+    },
   },
   __state: {
     serverStatus: "starting", // starting, restarting, running, stopped-manually, crashed
@@ -168,6 +178,7 @@ const store = {
     joystickList: [],
     microphoneList: [],
     unusedMicrophones: user.settings.unusedMicrophones ?? [],
+    paths: user.paths,
   },
   get state() {
     return store.__state;
@@ -177,6 +188,10 @@ const store = {
 const { dispatch, actions } = store;
 
 app.on("ready", () => {
+  if (Object.values(store.state.paths).every((path) => !path)) {
+    createPathsWindow();
+  }
+
   dispatch(actions.stdout("App started, activating server"));
   startServer();
   startTray();
@@ -240,10 +255,13 @@ function restartServer(context) {
   const currentTime = Date.now();
   const lastRestart = store.state.lastRestartAfterCrash;
   if (!isUserIssuedRestart && currentTime - lastRestart <= 3000) {
-    console.error(
-      "Server died twice in",
-      currentTime - lastRestart,
-      "ms. Preventing auto restart. Waiting a minute before trying again."
+    dispatch(
+      actions.stdout(
+        "Server died twice in " +
+          currentTime -
+          lastRestart +
+          " ms. Preventing auto restart. Waiting a minute before trying again."
+      )
     );
 
     restartAgainTimeoutId = setTimeout(() => {
@@ -255,7 +273,7 @@ function restartServer(context) {
 
   // after a crash, xinput api needs time to recover, it seems.
   const serverRestartPadding = isUserIssuedRestart ? 0 : 3000;
-  console.error("Restarting server");
+  dispatch(actions.stdout("Restarting server"));
   dispatch(
     actions.restartingServer({
       isUserIssuedRestart,
@@ -282,6 +300,14 @@ function startTray() {
         label: `Autojoy controller service is ${store.state.serverStatus}`,
         type: "normal",
         enabled: false,
+      },
+      { type: "separator" },
+      {
+        label: `Config paths`,
+        type: "normal",
+        click: () => {
+          createPathsWindow();
+        },
       },
       { type: "separator" },
       {
@@ -408,5 +434,40 @@ function createAboutWindow() {
 ipcMain.handle("getAppVersion", () => {
   return app.getVersion();
 });
+
+ipcMain.handle("getUser", () => {
+  return structuredClone(user);
+});
+
+ipcMain.handle("setPaths", (event, paths) => {
+  dispatch(actions.setPaths(paths));
+});
+
+let pathsWindow;
+function createPathsWindow() {
+  if (!pathsWindow) {
+    pathsWindow = new BrowserWindow({
+      autoHideMenuBar: true,
+      resizable: false,
+      icon: path.resolve(__dirname, "assets/tray.png"),
+      show: false, // Don't show the window immediately
+      webPreferences: {
+        preload: path.resolve(__dirname, "ui/preload.cjs"),
+        contextIsolation: true,
+        nodeIntegrationInWorker: true,
+      },
+    });
+
+    pathsWindow.loadFile("ui/paths.html");
+
+    // Dereference the window object when it's closed
+    pathsWindow.on("closed", () => {
+      pathsWindow = null;
+    });
+  }
+
+  // Show the window
+  pathsWindow.show();
+}
 
 // <a href="https://www.flaticon.com/free-icons/joystick" title="joystick icons">Joystick icons created by Freepik - Flaticon (https://www.flaticon.com/free-icons/joystick)>

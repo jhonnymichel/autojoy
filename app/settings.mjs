@@ -82,6 +82,9 @@ export const user = {
   get paths() {
     return loaders.json("user/paths.json");
   },
+  set paths(paths) {
+    return savers.json(paths, "user/paths.json");
+  },
   get settings() {
     return loaders.json("user/settings.json");
   },
