@@ -258,10 +258,9 @@ function restartServer(context) {
   if (!isUserIssuedRestart && currentTime - lastRestart <= 3000) {
     dispatch(
       actions.stdout(
-        "Server died twice in " +
-          currentTime -
-          lastRestart +
-          " ms. Preventing auto restart. Waiting a minute before trying again."
+        `Server died twice in ${
+          currentTime - lastRestart
+        }ms. Preventing auto restart. Waiting a minute before trying again.`
       )
     );
 

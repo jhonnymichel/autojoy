@@ -70,6 +70,17 @@ try {
 }
 
 try {
+  loaders.ini("config-templates/dolphin-wiimote-real.ini");
+} catch (e) {
+  savers.ini(
+    loaders.ini(
+      resolvePathFromPackagedRoot("config-templates/dolphin-wiimote-real.ini")
+    ),
+    "config-templates/dolphin-wiimote-real.ini"
+  );
+}
+
+try {
   loaders.ini("config-templates/ghwtde.ini");
 } catch (e) {
   savers.ini(
