@@ -22,6 +22,7 @@
   "license": "MIT",
   "dependencies": {
     "@kmamal/sdl": "^0.10.7",
+    "autojoy": "file:",
     "bindings": "^1.5.0",
     "fast-xml-parser": "^4.5.1",
     "ini": "^5.0.0",
@@ -30,8 +31,11 @@
     "yaml": "^2.4.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.20.0",
     "electron": "^29.1.1",
     "electron-builder": "^24.13.3",
+    "eslint": "^9.20.1",
+    "globals": "^15.15.0",
     "node-gyp": "^11.1.0"
   }
 }
