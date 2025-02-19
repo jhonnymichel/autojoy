@@ -19,7 +19,7 @@ In some emulatoers, when you attach an USB peripheral such as a Microphone, you 
 
 Currently only supports Windows.
 
-## Supported Emulators, Peripherals and Features
+## Supported Emulators and Games, Peripherals and Features
 
 ### RPCS3
 
@@ -68,6 +68,30 @@ Currently only supports Windows.
 - Guitar Hero Drums are not supported, but Wii drums can work with real wiimotes and that'd be the preferred way to use Guitar Hero Drums.
   - Xbox 360/PS3 Guitar Hero Drums may arrive in the future.
   - Real Wiimote auto config is planned as well.
+
+\*\* SDL joystick mode needs to be selected for non-xinput devices to work.
+
+\*\*\* Rock Band 2 and 3 drums are validated. Rock Band 1 Drums may work but they have not been tested.
+
+### Guitar Hero World Tour Definitive Edition
+
+It's recommended to disconnect non-instrument controllers for full band gameplay. Player 1 in this game is always the singer controlled with the computer keyboard when a microphone is setup.
+
+- Guitars:
+  - Xbox 360 Guitar Hero and Rock Band Guitars.
+  - Wii Guitar Hero Guitars via Wiitar thing.
+  - Santroller Guitars in default mode.
+  - NOT SUPPORTED YET: dinput and mmjoystick guitars (such as PS3 and Raphnet adapter instruments).
+  - NOT SUPPORTED YET: PS4 and Xbox One Rock Band Guitars.
+  - NOT SUPPORTED YET: Riffmaster.
+- Drums:
+  - Xbox 360 Rock Band 2 and 3 Rock Band Drums.** \***
+  - Wii Rock Band 2 and 3 Drums.** \***
+  - PS3 Rock Band 2 and 3 Drums.** \***
+  - Guitar Hero Drums are not supported.
+- Regular Controllers: We skip supporting controllers since the singer player is controlled by the computer keyboard.
+- Microphones: Supports any recording device connected to the computer, including Rock Band/Guitar Hero mics.
+  - It's possible to filter out connected recording devices that you don't want to use. In the tray menu, uncheck unwanted devices.
 
 \*\* SDL joystick mode needs to be selected for non-xinput devices to work.
 
