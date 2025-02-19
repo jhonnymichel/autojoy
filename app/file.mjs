@@ -78,7 +78,7 @@ export function resolvePathFromUserFolder(src) {
 }
 
 // this should only be used when trying to get the template files packaged inside the app.
-// we go back
+// we go back one level, to exit the subfolder we're in (app) and reach the root.
 export function resolvePathFromPackagedRoot(src) {
   return path.resolve(__packagedDirname, "..", src);
 }
