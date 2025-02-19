@@ -2,8 +2,8 @@ import path from "path";
 import fs from "fs";
 import mmjoystick from "./rpcs3/mmjoystick.mjs";
 import { loaders, savers } from "../../common/file.mjs";
-import { user } from "../settings.mjs";
 import { findNextConnectedXinputIdentifier } from "./shared.mjs";
+import { user } from "../../common/settings.mjs";
 
 const configTemplates = loaders.yml("config-templates/rpcs3.yml");
 const rpcs3Path = user.paths.rpcs3;

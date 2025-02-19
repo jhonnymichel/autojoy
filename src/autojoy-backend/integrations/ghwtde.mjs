@@ -1,8 +1,8 @@
 import path from "path";
 import { loaders, savers } from "../../common/file.mjs";
-import { user } from "../settings.mjs";
 import { joystickModes, joystickTypes } from "../../common/joystick.mjs";
 import { findNextConnectedXinputIdentifier } from "./shared.mjs";
+import { user } from "../../common/settings.mjs";
 
 // PATH TO CONFIG:
 // INPUTS

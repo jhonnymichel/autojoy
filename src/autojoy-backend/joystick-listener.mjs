@@ -1,6 +1,6 @@
 import { hardwareInfo, joystickModes } from "../common/joystick.mjs";
+import { user } from "../common/settings.mjs";
 import { createJoystick, isHardware } from "./joystick.mjs";
-import { user } from "./settings.mjs";
 
 const subscribers = [];
 let deviceList = [];

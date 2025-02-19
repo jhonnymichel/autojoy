@@ -21,7 +21,7 @@ export function createAboutWindow() {
       },
     });
 
-    aboutWindow.loadFile("src/main/pages/about.html");
+    aboutWindow.loadFile(path.resolve(rootdir, "src/main/pages/about.html"));
 
     // Dereference the window object when it's closed
     aboutWindow.on("closed", () => {
@@ -68,7 +68,7 @@ export function createPathsWindow() {
       },
     });
 
-    pathsWindow.loadFile("src/main/pages/paths.html");
+    pathsWindow.loadFile(path.resolve(rootdir, "src/main/pages/paths.html"));
 
     // Dereference the window object when it's closed
     pathsWindow.on("closed", () => {

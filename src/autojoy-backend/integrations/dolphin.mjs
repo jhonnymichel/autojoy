@@ -1,8 +1,8 @@
 import path from "path";
 import { loaders, savers } from "../../common/file.mjs";
-import { user } from "../settings.mjs";
 import { joystickTypes } from "../../common/joystick.mjs";
 import { findNextConnectedXinputIdentifier } from "./shared.mjs";
+import { user } from "../../common/settings.mjs";
 
 const configTemplates = {
   gamecube: loaders.ini("config-templates/dolphin-gc.ini"),

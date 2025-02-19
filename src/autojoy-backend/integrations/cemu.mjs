@@ -2,7 +2,7 @@ import path from "path";
 import { deleteFile, loaders, savers } from "../../common/file.mjs";
 import { joystickModes } from "../../common/joystick.mjs";
 import { findNextConnectedXinputIdentifier } from "./shared.mjs";
-import { user } from "../settings.mjs";
+import { user } from "../../common/settings.mjs";
 
 const configTemplates = loaders.xml("config-templates/cemu.xml");
 const cemuPath = path.resolve(user.paths.cemu, "controllerProfiles");
