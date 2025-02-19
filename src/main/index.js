@@ -1,10 +1,11 @@
 import { app } from "electron";
-import { validateSettings } from "./src/autojoy-backend/settings.mjs";
-import store from "./src/main/store.mjs";
-import { createPathsWindow } from "./src/main/window.mjs";
-import { startServer } from "./src/main/joystick-server.mjs";
-import { startTray } from "./src/main/tray.mjs";
+import { validatePaths, validateSettings } from "../common/settings.mjs";
+import store from "./store.mjs";
+import { createPathsWindow } from "./window.mjs";
+import { startServer } from "./joystick-server.mjs";
+import { startTray } from "./tray.mjs";
 
+validatePaths();
 validateSettings();
 
 const { dispatch, actions } = store;

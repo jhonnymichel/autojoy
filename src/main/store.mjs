@@ -1,4 +1,4 @@
-import { user } from "../autojoy-backend/settings.mjs";
+import { user } from "../common/settings.mjs";
 import { savers } from "../common/file.mjs";
 
 const store = {

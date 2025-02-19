@@ -3,91 +3,12 @@ import {
   resolvePathFromPackagedRoot,
   resolvePathFromUserFolder,
   savers,
-} from "../common/file.mjs";
-import { joystickModes } from "../common/joystick.mjs";
+} from "./file.mjs";
+import { joystickModes } from "./joystick.mjs";
 
 export const userFolderPath = resolvePathFromUserFolder(".");
 export const templatesFolderPath =
   resolvePathFromUserFolder("config-templates");
-
-// for first app execution after install. we create the userland settings from inside the app package.
-try {
-  loaders.json("user/paths.json");
-} catch (e) {
-  savers.json(
-    loaders.json(resolvePathFromPackagedRoot("user/paths.template.json")),
-    "user/paths.json"
-  );
-}
-
-try {
-  loaders.json("user/settings.json");
-} catch (e) {
-  savers.json(
-    loaders.json(resolvePathFromPackagedRoot("user/settings.template.json")),
-    "user/settings.json"
-  );
-}
-
-try {
-  loaders.yml("config-templates/rpcs3.yml");
-} catch (e) {
-  savers.yml(
-    loaders.yml(resolvePathFromPackagedRoot("config-templates/rpcs3.yml")),
-    "config-templates/rpcs3.yml"
-  );
-}
-
-try {
-  loaders.xml("config-templates/cemu.xml");
-} catch (e) {
-  savers.xml(
-    loaders.xml(resolvePathFromPackagedRoot("config-templates/cemu.xml")),
-    "config-templates/cemu.xml"
-  );
-}
-
-try {
-  loaders.ini("config-templates/dolphin-gc.ini");
-} catch (e) {
-  savers.ini(
-    loaders.ini(resolvePathFromPackagedRoot("config-templates/dolphin-gc.ini")),
-    "config-templates/dolphin-gc.ini"
-  );
-}
-
-try {
-  loaders.ini("config-templates/dolphin-wiimote-emulated.ini");
-} catch (e) {
-  savers.ini(
-    loaders.ini(
-      resolvePathFromPackagedRoot(
-        "config-templates/dolphin-wiimote-emulated.ini"
-      )
-    ),
-    "config-templates/dolphin-wiimote-emulated.ini"
-  );
-}
-
-try {
-  loaders.ini("config-templates/dolphin-wiimote-real.ini");
-} catch (e) {
-  savers.ini(
-    loaders.ini(
-      resolvePathFromPackagedRoot("config-templates/dolphin-wiimote-real.ini")
-    ),
-    "config-templates/dolphin-wiimote-real.ini"
-  );
-}
-
-try {
-  loaders.ini("config-templates/ghwtde.ini");
-} catch (e) {
-  savers.ini(
-    loaders.ini(resolvePathFromPackagedRoot("config-templates/ghwtde.ini")),
-    "config-templates/ghwtde.ini"
-  );
-}
 
 export const user = {
   get paths() {
@@ -103,6 +24,89 @@ export const user = {
     savers.json(value, "user/settings.json");
   },
 };
+
+export function validatePaths() {
+  // for first app execution after install. we create the userland settings from inside the app package.
+  try {
+    loaders.json("user/paths.json");
+  } catch (e) {
+    savers.json(
+      loaders.json(resolvePathFromPackagedRoot("user/paths.template.json")),
+      "user/paths.json"
+    );
+  }
+
+  try {
+    loaders.json("user/settings.json");
+  } catch (e) {
+    savers.json(
+      loaders.json(resolvePathFromPackagedRoot("user/settings.template.json")),
+      "user/settings.json"
+    );
+  }
+
+  try {
+    loaders.yml("config-templates/rpcs3.yml");
+  } catch (e) {
+    savers.yml(
+      loaders.yml(resolvePathFromPackagedRoot("config-templates/rpcs3.yml")),
+      "config-templates/rpcs3.yml"
+    );
+  }
+
+  try {
+    loaders.xml("config-templates/cemu.xml");
+  } catch (e) {
+    savers.xml(
+      loaders.xml(resolvePathFromPackagedRoot("config-templates/cemu.xml")),
+      "config-templates/cemu.xml"
+    );
+  }
+
+  try {
+    loaders.ini("config-templates/dolphin-gc.ini");
+  } catch (e) {
+    savers.ini(
+      loaders.ini(
+        resolvePathFromPackagedRoot("config-templates/dolphin-gc.ini")
+      ),
+      "config-templates/dolphin-gc.ini"
+    );
+  }
+
+  try {
+    loaders.ini("config-templates/dolphin-wiimote-emulated.ini");
+  } catch (e) {
+    savers.ini(
+      loaders.ini(
+        resolvePathFromPackagedRoot(
+          "config-templates/dolphin-wiimote-emulated.ini"
+        )
+      ),
+      "config-templates/dolphin-wiimote-emulated.ini"
+    );
+  }
+
+  try {
+    loaders.ini("config-templates/dolphin-wiimote-real.ini");
+  } catch (e) {
+    savers.ini(
+      loaders.ini(
+        resolvePathFromPackagedRoot("config-templates/dolphin-wiimote-real.ini")
+      ),
+      "config-templates/dolphin-wiimote-real.ini"
+    );
+  }
+
+  try {
+    loaders.ini("config-templates/ghwtde.ini");
+  } catch (e) {
+    savers.ini(
+      loaders.ini(resolvePathFromPackagedRoot("config-templates/ghwtde.ini")),
+      "config-templates/ghwtde.ini"
+    );
+  }
+}
 
 export function validateSettings() {
   const userSettings = user.settings;

@@ -2,7 +2,7 @@ import path from "path";
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import store from "./store.mjs";
 import rootdir from "../common/rootdir.mjs";
-import { user } from "../autojoy-backend/settings.mjs";
+import { user } from "../common/settings.mjs";
 
 const { dispatch, actions } = store;
 let aboutWindow = null;

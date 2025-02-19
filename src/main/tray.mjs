@@ -3,7 +3,7 @@ import path from "path";
 import store from "./store.mjs";
 import { createAboutWindow, createPathsWindow } from "./window.mjs";
 import rootdir from "../common/rootdir.mjs";
-import { userFolderPath } from "../autojoy-backend/settings.mjs";
+import { userFolderPath } from "../common/settings.mjs";
 import { joystickModes } from "../common/joystick.mjs";
 import { isMicrophoneInUse } from "../common/device-filters.mjs";
 
