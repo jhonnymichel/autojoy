@@ -1,5 +1,5 @@
-import { savers } from "../app/file.mjs";
-import { user } from "../app/settings.mjs";
+import { user } from "../autojoy-backend/settings.mjs";
+import { savers } from "../common/file.mjs";
 
 const store = {
   __cbs: [],
@@ -55,7 +55,7 @@ const store = {
       }
 
       const lastRestartAfterCrash =
-        Date.now() + context?.serverRestartPadding ?? 0;
+        Date.now() + (context?.serverRestartPadding ?? 0);
       return {
         lastRestartAfterCrash,
         serverStatus: "restarting",

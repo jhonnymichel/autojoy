@@ -1,6 +1,6 @@
+import { hardwareInfo } from "../../../common/joystick.mjs";
+import { isHardware } from "../../joystick.mjs";
 import mmJoystick from "../../native/mmjoystick-native.cjs";
-import { hardwareInfo, isHardware } from "../../joystick.mjs";
-
 // Harmonix Wii Drums
 const mmJoystickDevices = [hardwareInfo.harmonixDrumControllerForNintendoWii];
 

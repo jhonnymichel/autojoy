@@ -1,10 +1,10 @@
-import { joystickModes } from "./joystick.mjs";
 import {
   loaders,
   resolvePathFromPackagedRoot,
   resolvePathFromUserFolder,
   savers,
-} from "./file.mjs";
+} from "../common/file.mjs";
+import { joystickModes } from "../common/joystick.mjs";
 
 export const userFolderPath = resolvePathFromUserFolder(".");
 export const templatesFolderPath =
@@ -94,13 +94,13 @@ export const user = {
     return loaders.json("user/paths.json");
   },
   set paths(paths) {
-    return savers.json(paths, "user/paths.json");
+    savers.json(paths, "user/paths.json");
   },
   get settings() {
     return loaders.json("user/settings.json");
   },
   set settings(value) {
-    return savers.json(value, "user/settings.json");
+    savers.json(value, "user/settings.json");
   },
 };
 

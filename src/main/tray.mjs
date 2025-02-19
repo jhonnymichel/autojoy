@@ -1,11 +1,11 @@
-import { Menu, nativeImage, shell, Tray } from "electron";
+import { app, Menu, nativeImage, shell, Tray } from "electron";
 import path from "path";
 import store from "./store.mjs";
-import { isMicrophoneInUse } from "../app/deviceFilters.mjs";
-import { userFolderPath } from "../app/settings.mjs";
-import { joystickModes } from "../app/joystick.mjs";
 import { createAboutWindow, createPathsWindow } from "./window.mjs";
-import rootdir from "./rootdir.mjs";
+import rootdir from "../common/rootdir.mjs";
+import { userFolderPath } from "../autojoy-backend/settings.mjs";
+import { joystickModes } from "../common/joystick.mjs";
+import { isMicrophoneInUse } from "../common/device-filters.mjs";
 
 const { actions, dispatch } = store;
 

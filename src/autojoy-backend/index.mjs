@@ -1,8 +1,7 @@
-import { user } from "./settings.mjs";
+import { getMicrophonesInUse } from "../common/device-filters.mjs";
 import { joystickListener } from "./joystick-listener.mjs";
-
 import { microphoneListener } from "./microphone-listener.mjs";
-import { getMicrophonesInUse } from "./deviceFilters.mjs";
+import { user } from "./settings.mjs";
 
 async function init() {
   console.log("input server started. settings:", user.settings);

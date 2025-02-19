@@ -2,7 +2,7 @@
   "targets": [
     {
       "target_name": "joystick",
-      "sources": [ "app/native/joystick.cpp" ],
+      "sources": [ "src/autojoy-backend/native/joystick.cpp" ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")"
       ],

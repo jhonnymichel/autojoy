@@ -1,27 +1,8 @@
-export const joystickModes = {
-  xinput: "xinput",
-  sdl: "sdl",
-};
-
-export const joystickTypes = {
-  guitar: "GUITAR",
-  sdlGuitar: "SDL_GUITAR",
-  rockBandDrumKit: "ROCKBAND_DRUM_KIT",
-  sdlRockBandDrumKit: "SDL_ROCKBAND_DRUM_KIT",
-  wiiRockBandDrumKit: "WII_ROCKBAND_DRUM_KIT",
-  gamepad: "GAMEPAD",
-};
-
-export const hardwareInfo = {
-  harmonixDrumControllerForNintendoWii: {
-    manufacturerId: 7085,
-    productId: 12560,
-  },
-  harmonixDrumControllerForPS3: {
-    manufacturerId: 4794,
-    productId: 528,
-  },
-};
+import {
+  hardwareInfo,
+  joystickModes,
+  joystickTypes,
+} from "../common/joystick.mjs";
 
 const xinputSubtypeToGlobalType = {
   XINPUT_DEVSUBTYPE_GUITAR_BASS: joystickTypes.guitar,

@@ -1,13 +1,8 @@
-import { loaders, savers } from "../file.mjs";
-import {
-  hardwareInfo,
-  isHardware,
-  joystickModes,
-  joystickTypes,
-} from "../joystick.mjs";
-import { user } from "../settings.mjs";
-import { findNextConnectedXinputIdentifier } from "./shared.mjs";
 import path from "path";
+import { loaders, savers } from "../../common/file.mjs";
+import { user } from "../settings.mjs";
+import { joystickModes, joystickTypes } from "../../common/joystick.mjs";
+import { findNextConnectedXinputIdentifier } from "./shared.mjs";
 
 // PATH TO CONFIG:
 // INPUTS

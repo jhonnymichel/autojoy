@@ -1,7 +1,7 @@
 import { fork } from "child_process";
 import store from "./store.mjs";
 import path from "path";
-import rootdir from "./rootdir.mjs";
+import rootdir from "../common/rootdir.mjs";
 
 const { dispatch, actions } = store;
 
@@ -9,9 +9,13 @@ let appProcess;
 
 export function startServer() {
   // Spawn the child process
-  appProcess = fork(path.resolve(rootdir, "app/index.mjs"), [], {
-    stdio: ["pipe", "pipe", "pipe", "ipc"], // Ensure stdout is piped
-  });
+  appProcess = fork(
+    path.resolve(rootdir, "src/autojoy-backend/index.mjs"),
+    [],
+    {
+      stdio: ["pipe", "pipe", "pipe", "ipc"], // Ensure stdout is piped
+    }
+  );
 
   // Forward messages from child process to main process
   appProcess.on("message", (message) => {

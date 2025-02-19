@@ -1,8 +1,8 @@
 import path from "path";
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
-import { user } from "../app/settings.mjs";
 import store from "./store.mjs";
-import rootdir from "./rootdir.mjs";
+import rootdir from "../common/rootdir.mjs";
+import { user } from "../autojoy-backend/settings.mjs";
 
 const { dispatch, actions } = store;
 let aboutWindow = null;
@@ -15,13 +15,13 @@ export function createAboutWindow() {
       icon: path.resolve(rootdir, "assets/tray.png"),
       show: false, // Don't show the window immediately
       webPreferences: {
-        preload: path.resolve(rootdir, "main/pages/preload.cjs"),
+        preload: path.resolve(rootdir, "src/main/pages/preload.cjs"),
         contextIsolation: true,
         nodeIntegrationInWorker: true,
       },
     });
 
-    aboutWindow.loadFile("main/pages/about.html");
+    aboutWindow.loadFile("src/main/pages/about.html");
 
     // Dereference the window object when it's closed
     aboutWindow.on("closed", () => {
@@ -62,13 +62,13 @@ export function createPathsWindow() {
       icon: path.resolve(rootdir, "assets/tray.png"),
       show: false, // Don't show the window immediately
       webPreferences: {
-        preload: path.resolve(rootdir, "main/pages/preload.cjs"),
+        preload: path.resolve(rootdir, "src/main/pages/preload.cjs"),
         contextIsolation: true,
         nodeIntegrationInWorker: true,
       },
     });
 
-    pathsWindow.loadFile("main/pages/paths.html");
+    pathsWindow.loadFile("src/main/pages/paths.html");
 
     // Dereference the window object when it's closed
     pathsWindow.on("closed", () => {

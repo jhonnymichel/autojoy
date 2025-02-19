@@ -1,9 +1,9 @@
 import { app } from "electron";
-import { validateSettings } from "./app/settings.mjs";
-import store from "./main/store.mjs";
-import { startServer } from "./main/joystick-server.mjs";
-import { createPathsWindow } from "./main/window.mjs";
-import { startTray } from "./main/tray.mjs";
+import { validateSettings } from "./src/autojoy-backend/settings.mjs";
+import store from "./src/main/store.mjs";
+import { createPathsWindow } from "./src/main/window.mjs";
+import { startServer } from "./src/main/joystick-server.mjs";
+import { startTray } from "./src/main/tray.mjs";
 
 validateSettings();
 
