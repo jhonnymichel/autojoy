@@ -23,7 +23,7 @@ Currently only supports Windows.
 
 ### RPCS3
 
-- Guitars\*:
+- Guitars:
   - Xbox 360 Guitar Hero and Rock Band Guitars.
   - Wii Guitar Hero Guitars via Wiitar thing.
   - Santroller Guitars in default mode.
@@ -37,9 +37,7 @@ Currently only supports Windows.
 - Regular Controllers: Supports any Xinput device and DualSense controllers\*\*.
 - Microphones: Supports any recording device connected to the computer, including Rock Band/Guitar Hero mics.
   - It's possible to filter out connected recording devices that you don't want to use. In the tray menu, uncheck unwanted devices.
-
-\* Guitar settings were tested only in Rock Band Games. rpcs3 docs state that tilt in GH guitars will not work in RB games but the config provided in this app actually has tilt working on Rock Band. the hacky mapping results in Guitar Hero games not working that well. you can remap the settings from `config-templates/rpcs3` to what's indicated [here](https://wiki.rpcs3.net/index.php?title=Help:Peripherals_and_accessories) if you want to play Guitar Hero.
-
+    
 \*\* SDL joystick mode needs to be selected for non-xinput devices to work.
 
 \*\*\* Rock Band 2 and 3 drums are validated. Rock Band 1 Drums may work but they have not been tested.
