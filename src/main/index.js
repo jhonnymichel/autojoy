@@ -1,11 +1,10 @@
 import { app } from "electron";
-import { validatePaths, validateSettings } from "../common/settings.mjs";
+import { validateSettings } from "../common/settings.mjs";
 import store from "./store.mjs";
 import { createPathsWindow } from "./window.mjs";
 import { startServer } from "./joystick-server.mjs";
 import { startTray } from "./tray.mjs";
 
-validatePaths();
 validateSettings();
 
 const { dispatch, actions } = store;

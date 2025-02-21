@@ -55,8 +55,6 @@ if (settingsFolder.includes(".asar")) {
   // if we have the documents path extracted, we use documents/autojoy as the user folder.
   if (appDataFolder) {
     settingsFolder = path.resolve(appDataFolder, "com.jhonnymichel", "autojoy");
-    // creating the folder if it doesn't exist
-    createDirectory(settingsFolder);
   }
 }
 

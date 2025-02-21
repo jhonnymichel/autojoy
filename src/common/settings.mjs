@@ -10,6 +10,9 @@ export const userFolderPath = resolvePathFromUserFolder(".");
 export const templatesFolderPath =
   resolvePathFromUserFolder("config-templates");
 
+// must validate paths before allowing user object to be used.
+validatePaths();
+
 export const user = {
   get paths() {
     return loaders.json("user/paths.json");
@@ -25,7 +28,7 @@ export const user = {
   },
 };
 
-export function validatePaths() {
+function validatePaths() {
   // for first app execution after install. we create the userland settings from inside the app package.
   try {
     loaders.json("user/paths.json");
