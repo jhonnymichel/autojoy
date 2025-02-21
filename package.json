@@ -1,7 +1,8 @@
 {
   "name": "autojoy",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "Automatically update emulators and games input settings based on what's connected to your computer!",
+  "main": "src/main/index.js",
   "entry": "src/main/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
