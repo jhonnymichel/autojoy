@@ -32,6 +32,8 @@ const store = {
           return {
             microphoneList: data.filter((d) => d),
           };
+        case "issueRestart":
+          return { serverStatus: "pending-issued-restart" };
         default:
           break;
       }
@@ -153,7 +155,7 @@ const store = {
     },
   },
   __state: {
-    serverStatus: "starting", // starting, restarting, running, stopped-manually, crashed
+    serverStatus: "starting", // starting, restarting, running, stopped-manually, crashed, pending-user-issued-restart, pending-issued-restart
     lastRestartAfterCrash: 0,
     joystickMode: user.settings.joystickMode,
     manageMicrophones: user.settings.manageMicrophones ?? false,

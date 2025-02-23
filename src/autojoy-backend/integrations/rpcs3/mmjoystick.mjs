@@ -16,7 +16,10 @@ export default {
       isHardware({ manufacturerId, productId }, mmJoystickDevice)
     );
     if (!joystick) {
-      throw new Error("[RPCS3 MMJoystick Handler]: joystick not found.");
+      console.error(
+        "[RPCS3 MMJoystick Handler]: joystick not found. Restarting server to refresh list"
+      );
+      process.send(JSON.stringify({ type: "issueRestart" }));
     }
 
     return joystick.id + 1;
