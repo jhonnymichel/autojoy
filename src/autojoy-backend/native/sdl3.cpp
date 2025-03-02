@@ -2,21 +2,30 @@
 #include <windows.h>
 #include <iostream>
 #include <string>
+#include <iomanip>
+#include <sstream>
 
+// Define Uint8 since we're not using SDL headers
+typedef unsigned char Uint8;
+
+// SDL_GUID structure with correct C++ syntax
+struct SDL_GUID {
+    Uint8 data[16];
+};
+
+// Function types
 typedef bool (*SDL_Init_Func)(uint32_t);
 typedef const char* (*SDL_GetError_Func)();
 typedef void (*SDL_ClearError_Func)();
 typedef void (*SDL_Quit_Func)();
-
-// Add new function types for joystick handling
 typedef int* (*SDL_GetJoysticks_Func)(int*);
 typedef void* (*SDL_OpenJoystick_Func)(int);
 typedef const char* (*SDL_GetJoystickName_Func)(void*);
 typedef uint16_t (*SDL_GetJoystickVendor_Func)(void*);
 typedef uint16_t (*SDL_GetJoystickProduct_Func)(void*);
 typedef int (*SDL_GetJoystickType_Func)(void*);
-typedef void* (*SDL_GetJoystickGUID_Func)(void*);
-typedef void (*SDL_GUIDToString_Func)(void*, char*, int);
+typedef SDL_GUID (*SDL_GetJoystickGUID_Func)(void*);
+typedef void (*SDL_GUIDToString_Func)(SDL_GUID, char*, int);
 typedef void (*SDL_CloseJoystick_Func)(void*);
 
 // Helper function to convert SDL_JoystickType to string
@@ -27,6 +36,15 @@ const char* JoystickTypeToString(int type) {
         // Add other types as needed
         default: return "unknown";
     }
+}
+
+// Helper function to format GUID
+std::string FormatGUID(SDL_GUID guid) {
+    std::stringstream ss;
+    for (int i = 0; i < 16; i++) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(guid.data[i]);
+    }
+    return ss.str();
 }
 
 Napi::Array GetJoysticks(const Napi::CallbackInfo& info) {
@@ -104,10 +122,14 @@ Napi::Array GetJoysticks(const Napi::CallbackInfo& info) {
         device.Set("type", Napi::String::New(env, JoystickTypeToString(SDL_GetJoystickType(joystick))));
         device.Set("name", Napi::String::New(env, SDL_GetJoystickName(joystick)));
         
-        // Get GUID as string
-        char guidStr[33];
-        SDL_GUIDToString(SDL_GetJoystickGUID(joystick), guidStr, sizeof(guidStr));
+        // Get and format GUID
+        SDL_GUID guid = SDL_GetJoystickGUID(joystick);
+        char guidStr[33] = {0};  // Ensure null termination
+        SDL_GUIDToString(guid, guidStr, sizeof(guidStr));
         device.Set("guid", Napi::String::New(env, guidStr));
+
+        // Add debug output
+        std::cout << "Joystick " << i << " GUID: " << guidStr << std::endl;
         
         device.Set("vendor", Napi::Number::New(env, SDL_GetJoystickVendor(joystick)));
         device.Set("product", Napi::Number::New(env, SDL_GetJoystickProduct(joystick)));
