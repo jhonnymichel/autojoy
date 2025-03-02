@@ -66,7 +66,6 @@ Napi::Array GetJoysticks(const Napi::CallbackInfo& info) {
     }
 
     std::string sdlPath = path + "SDL3.dll";
-    std::cout << "Loading SDL3.dll from: " << sdlPath << std::endl;
 
     HMODULE sdl = LoadLibraryA(sdlPath.c_str());
     if (!sdl) {
@@ -127,9 +126,6 @@ Napi::Array GetJoysticks(const Napi::CallbackInfo& info) {
         char guidStr[33] = {0};  // Ensure null termination
         SDL_GUIDToString(guid, guidStr, sizeof(guidStr));
         device.Set("guid", Napi::String::New(env, guidStr));
-
-        // Add debug output
-        std::cout << "Joystick " << i << " GUID: " << guidStr << std::endl;
         
         device.Set("vendor", Napi::Number::New(env, SDL_GetJoystickVendor(joystick)));
         device.Set("product", Napi::Number::New(env, SDL_GetJoystickProduct(joystick)));

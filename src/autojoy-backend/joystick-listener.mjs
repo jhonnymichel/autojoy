@@ -10,7 +10,7 @@ const mode = user.settings.joystickMode; // sdl or xinput
 
 async function getApi() {
   if (mode === joystickModes.sdl) {
-    return (await import("@kmamal/sdl")).default;
+    return new SDL3Controller();
   }
 
   if (mode === joystickModes.xinput) {
@@ -74,12 +74,8 @@ const sdlDevicesToInclude = [
   hardwareInfo.harmonixDrumControllerForNintendoWii,
   hardwareInfo.harmonixDrumControllerForPS3,
 ];
-
-const newSdl = new SDL3Controller();
-
 async function sdlHandler(sdl) {
-  console.log(newSdl.getJoysticks());
-  const devices = sdl.joystick.devices;
+  const devices = sdl.getJoysticks();
   // TODO: support "Mayflash Wiimote PC Adapter". gotta use "name", not type.
   // TODO: support "Wii Rock Band Drums". gotta use name, not type + MMJoystick in RPCS3.
   const gameControllers = devices.filter(
