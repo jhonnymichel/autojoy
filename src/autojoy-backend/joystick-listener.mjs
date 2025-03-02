@@ -1,6 +1,7 @@
 import { hardwareInfo, joystickModes } from "../common/joystick.mjs";
 import { user } from "../common/settings.mjs";
 import { createJoystick, isHardware } from "./joystick.mjs";
+import { SDL3Controller } from "./native/sdl3-native.mjs";
 
 const subscribers = [];
 let deviceList = [];
@@ -74,7 +75,10 @@ const sdlDevicesToInclude = [
   hardwareInfo.harmonixDrumControllerForPS3,
 ];
 
+const newSdl = new SDL3Controller();
+
 async function sdlHandler(sdl) {
+  console.log(newSdl.getJoysticks());
   const devices = sdl.joystick.devices;
   // TODO: support "Mayflash Wiimote PC Adapter". gotta use "name", not type.
   // TODO: support "Wii Rock Band Drums". gotta use name, not type + MMJoystick in RPCS3.
