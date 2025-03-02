@@ -16,7 +16,10 @@
     "appId": "com.jhonnymichel.autojoy",
     "directories": {
       "buildResources": "electron-builder"
-    }
+    },
+    "asarUnpack": [
+      "build/Release/SDL3.dll"
+    ]
   },
   "type": "module",
   "author": "Jhonny Michel <jhonnymichel@outlook.com>",

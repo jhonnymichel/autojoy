@@ -54,25 +54,24 @@ Napi::Array GetJoysticks(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     Napi::Array devices = Napi::Array::New(env);
 
-    // Get the current module's path
-    char modulePath[MAX_PATH];
-    HMODULE hModule = NULL;
-    GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                      GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                      (LPCSTR)&GetJoysticks, &hModule);
-    GetModuleFileNameA(hModule, modulePath, sizeof(modulePath));
+    char cwd[MAX_PATH];
+    GetCurrentDirectoryA(MAX_PATH, cwd);
 
-    std::string path = modulePath;
-    size_t lastBackslash = path.find_last_of("\\");
-    if (lastBackslash != std::string::npos) {
-        path = path.substr(0, lastBackslash + 1);
+    // Try development location first
+    std::string sdlPath = ".\\build\\Release\\SDL3.dll";
+    
+    // If that fails, try the unpacked location
+    if (FILE* file = fopen(sdlPath.c_str(), "r")) {
+        fclose(file);
+    } else {
+        sdlPath = std::string(cwd) + "\\resources\\app.asar.unpacked\\build\\Release\\SDL3.dll";
     }
 
-    std::string sdlPath = path + "SDL3.dll";
-
     HMODULE sdl = LoadLibraryA(sdlPath.c_str());
+    
     if (!sdl) {
-        std::cout << "Failed to load SDL3.dll: " << GetLastError() << std::endl;
+        DWORD error = GetLastError();
+        std::cout << "Failed to load SDL3.dll. Error: " << error << std::endl;
         return devices;
     }
 
@@ -151,25 +150,41 @@ Napi::Array GetJoysticks(const Napi::CallbackInfo& info) {
 Napi::Array GetAudioDevices(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     Napi::Array devices = Napi::Array::New(env);
-
+    
     // Get the current module's path
     char modulePath[MAX_PATH];
     HMODULE hModule = NULL;
-    GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                      GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                      (LPCSTR)&GetAudioDevices, &hModule);
-    GetModuleFileNameA(hModule, modulePath, sizeof(modulePath));
+    
+    if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                          GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                          (LPCSTR)&GetAudioDevices, &hModule)) {
+        std::cout << "Failed to get module handle. Error: " << GetLastError() << std::endl;
+        return devices;
+    }
+    
+    if (!GetModuleFileNameA(hModule, modulePath, sizeof(modulePath))) {
+        std::cout << "Failed to get module filename. Error: " << GetLastError() << std::endl;
+        return devices;
+    }
+    
+    char cwd[MAX_PATH];
+    GetCurrentDirectoryA(MAX_PATH, cwd);
 
-    std::string path = modulePath;
-    size_t lastBackslash = path.find_last_of("\\");
-    if (lastBackslash != std::string::npos) {
-        path = path.substr(0, lastBackslash + 1);
+    // Try development location first
+    std::string sdlPath = ".\\build\\Release\\SDL3.dll";
+    
+    // If that fails, try the unpacked location
+    if (FILE* file = fopen(sdlPath.c_str(), "r")) {
+        fclose(file);
+    } else {
+        sdlPath = std::string(cwd) + "\\resources\\app.asar.unpacked\\build\\Release\\SDL3.dll";
     }
 
-    std::string sdlPath = path + "SDL3.dll";
     HMODULE sdl = LoadLibraryA(sdlPath.c_str());
+    
     if (!sdl) {
-        std::cout << "Failed to load SDL3.dll: " << GetLastError() << std::endl;
+        DWORD error = GetLastError();
+        std::cout << "Failed to load SDL3.dll. Error: " << error << std::endl;
         return devices;
     }
 
