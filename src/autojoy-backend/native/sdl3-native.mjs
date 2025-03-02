@@ -10,4 +10,8 @@ export class SDL3Controller {
   getJoysticks() {
     return this.native.getJoysticks();
   }
+
+  getAudioDevices() {
+    return this.native.getAudioDevices();
+  }
 }

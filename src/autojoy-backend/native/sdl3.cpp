@@ -27,6 +27,9 @@ typedef int (*SDL_GetJoystickType_Func)(void*);
 typedef SDL_GUID (*SDL_GetJoystickGUID_Func)(void*);
 typedef void (*SDL_GUIDToString_Func)(SDL_GUID, char*, int);
 typedef void (*SDL_CloseJoystick_Func)(void*);
+typedef uint32_t SDL_AudioDeviceID;
+typedef SDL_AudioDeviceID* (*SDL_GetAudioRecordingDevices_Func)(int*);
+typedef const char* (*SDL_GetAudioDeviceName_Func)(SDL_AudioDeviceID);
 
 // Helper function to convert SDL_JoystickType to string
 const char* JoystickTypeToString(int type) {
@@ -145,8 +148,84 @@ Napi::Array GetJoysticks(const Napi::CallbackInfo& info) {
     return devices;
 }
 
+Napi::Array GetAudioDevices(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    Napi::Array devices = Napi::Array::New(env);
+
+    // Get the current module's path
+    char modulePath[MAX_PATH];
+    HMODULE hModule = NULL;
+    GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                      GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                      (LPCSTR)&GetAudioDevices, &hModule);
+    GetModuleFileNameA(hModule, modulePath, sizeof(modulePath));
+
+    std::string path = modulePath;
+    size_t lastBackslash = path.find_last_of("\\");
+    if (lastBackslash != std::string::npos) {
+        path = path.substr(0, lastBackslash + 1);
+    }
+
+    std::string sdlPath = path + "SDL3.dll";
+    HMODULE sdl = LoadLibraryA(sdlPath.c_str());
+    if (!sdl) {
+        std::cout << "Failed to load SDL3.dll: " << GetLastError() << std::endl;
+        return devices;
+    }
+
+    // Get all the SDL functions we need
+    SDL_Init_Func SDL_Init = (SDL_Init_Func)GetProcAddress(sdl, "SDL_Init");
+    SDL_GetError_Func SDL_GetError = (SDL_GetError_Func)GetProcAddress(sdl, "SDL_GetError");
+    SDL_Quit_Func SDL_Quit = (SDL_Quit_Func)GetProcAddress(sdl, "SDL_Quit");
+    SDL_GetAudioRecordingDevices_Func SDL_GetAudioRecordingDevices = 
+        (SDL_GetAudioRecordingDevices_Func)GetProcAddress(sdl, "SDL_GetAudioRecordingDevices");
+    SDL_GetAudioDeviceName_Func SDL_GetAudioDeviceName = 
+        (SDL_GetAudioDeviceName_Func)GetProcAddress(sdl, "SDL_GetAudioDeviceName");
+
+    if (!SDL_Init || !SDL_GetError || !SDL_Quit || !SDL_GetAudioRecordingDevices || !SDL_GetAudioDeviceName) {
+        std::cout << "Failed to load one or more SDL functions. Last error: " << GetLastError() << std::endl;
+        FreeLibrary(sdl);
+        return devices;
+    }
+
+    if (!SDL_Init(0x00000010)) {  // SDL_INIT_AUDIO
+        const char* error = SDL_GetError();
+        std::cout << "Audio init failed: " << (error ? error : "No error message") << std::endl;
+        FreeLibrary(sdl);
+        return devices;
+    }
+
+    int numDevices = 0;
+    SDL_AudioDeviceID* deviceIds = SDL_GetAudioRecordingDevices(&numDevices);
+    
+    if (deviceIds) {
+        for (int i = 0; i < numDevices; i++) {
+            const char* deviceName = SDL_GetAudioDeviceName(deviceIds[i]);
+            if (deviceName) {
+                Napi::Object device = Napi::Object::New(env);
+                device.Set("name", Napi::String::New(env, deviceName));
+                device.Set("type", Napi::String::New(env, "recording"));
+                
+                Napi::Object raw = Napi::Object::New(env);
+                raw.Set("name", Napi::String::New(env, deviceName));
+                raw.Set("type", Napi::String::New(env, "recording"));
+                raw.Set("id", Napi::Number::New(env, deviceIds[i]));
+                device.Set("raw", raw);
+                
+                devices[i] = device;
+            }
+        }
+        free(deviceIds);
+    }
+
+    SDL_Quit();
+    FreeLibrary(sdl);
+    return devices;
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set("getJoysticks", Napi::Function::New(env, GetJoysticks));
+    exports.Set("getAudioDevices", Napi::Function::New(env, GetAudioDevices));
     return exports;
 }
 

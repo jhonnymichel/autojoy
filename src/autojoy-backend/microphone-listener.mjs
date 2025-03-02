@@ -1,8 +1,10 @@
+import { SDL3Controller } from "./native/sdl3-native.mjs";
+
 const subscribers = [];
 let deviceList = [];
 
 async function getApi() {
-  return (await import("@kmamal/sdl")).default;
+  return new SDL3Controller();
 }
 
 export const microphoneListener = {
@@ -15,7 +17,7 @@ export const microphoneListener = {
 };
 
 async function sdlMicrophoneHandler(sdl) {
-  const devices = sdl.audio.devices;
+  const devices = sdl.getAudioDevices();
   const microphones = devices.filter((device) => device.type === "recording");
 
   const newDeviceList = microphones.map((device) => ({
