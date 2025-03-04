@@ -101,7 +101,7 @@ function handleXinputJoystickListUpdate(joystickList) {
   );
 
   console.log(
-    "DOLPHIN: Wii Input settings saved at",
+    "DOLPHIN - Wii Input settings saved at",
     path.resolve(dolphinPath, wiiConstants.inputConfigFilePath)
   );
 
@@ -145,7 +145,7 @@ function handleXinputJoystickListUpdate(joystickList) {
   );
 
   console.log(
-    "DOLPHIN: GC Input settings saved at",
+    "DOLPHIN - GC Input settings saved at",
     path.resolve(dolphinPath, gamecubeConstants.inputConfigFilePath)
   );
 
@@ -155,7 +155,7 @@ function handleXinputJoystickListUpdate(joystickList) {
   );
 
   console.log(
-    "DOLPHIN: Main settings saved at",
+    "DOLPHIN - Main settings saved at",
     path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
   );
 }
@@ -189,7 +189,7 @@ function handleSDLJoystickListUpdate(joystickList) {
   );
 
   console.log(
-    "DOLPHIN: Wii Input settings saved at",
+    "DOLPHIN - Wii Input settings saved at",
     path.resolve(dolphinPath, wiiConstants.inputConfigFilePath)
   );
 
@@ -224,7 +224,7 @@ function handleSDLJoystickListUpdate(joystickList) {
   );
 
   console.log(
-    "DOLPHIN: GC Input settings saved at",
+    "DOLPHIN - GC Input settings saved at",
     path.resolve(dolphinPath, gamecubeConstants.inputConfigFilePath)
   );
 
@@ -234,7 +234,7 @@ function handleSDLJoystickListUpdate(joystickList) {
   );
 
   console.log(
-    "DOLPHIN: Main settings saved at",
+    "DOLPHIN - Main settings saved at",
     path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
   );
 }

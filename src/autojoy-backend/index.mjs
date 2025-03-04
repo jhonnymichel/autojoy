@@ -4,9 +4,9 @@ import { joystickListener } from "./joystick-listener.mjs";
 import { microphoneListener } from "./microphone-listener.mjs";
 
 async function init() {
-  console.log("input server started. settings:", user.settings);
+  console.log("Input server started. Using settings:\n", user.settings);
   joystickListener.onListChange((joystickList) => {
-    console.log("joystick list changed: ", joystickList);
+    console.log("Joystick list changed: ", joystickList);
     process.send(JSON.stringify({ type: "joystickList", data: joystickList }));
   });
 
@@ -32,7 +32,7 @@ async function init() {
 
   if (user.settings.manageMicrophones === true) {
     microphoneListener.onListChange((microphoneList) => {
-      console.log("microphone list changed: ", microphoneList);
+      console.log("Microphone list changed: ", microphoneList);
       process.send(
         JSON.stringify({ type: "microphoneList", data: microphoneList })
       );

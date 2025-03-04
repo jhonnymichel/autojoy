@@ -59,7 +59,7 @@ async function xinputHandler(xinput) {
       try {
         notify(structuredClone(deviceList));
       } catch (e) {
-        console.log("[Joystick Listener] Error from subscriber:", e);
+        console.log("Joystick Listener - Error from subscriber:", e);
       }
     });
   }
@@ -107,7 +107,7 @@ async function sdlHandler(sdl) {
       try {
         notify(structuredClone(deviceList));
       } catch (e) {
-        console.log("[Joystick Listener] Error from subscriber:", e);
+        console.log("Joystick Listener - Error from subscriber:", e);
       }
     });
   }

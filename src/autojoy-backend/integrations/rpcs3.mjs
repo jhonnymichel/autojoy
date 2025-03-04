@@ -116,7 +116,7 @@ function handleXinputJoystickListUpdate(joystickList) {
   );
 
   console.log(
-    "RPCS3: Input settings saved at",
+    "RPCS3 - Input settings saved at",
     path.resolve(rpcs3Path, inputConfigFileName)
   );
 }
@@ -164,7 +164,7 @@ function handleSDLJoystickListUpdate(joystickList) {
       newConfig[identifier].Handler = handler;
     } catch (e) {
       console.error(
-        "RPCS3: Device couldn't be configured properly -",
+        "RPCS3 - Device couldn't be configured properly -",
         joystick.name
       );
       console.error(e);
@@ -173,7 +173,7 @@ function handleSDLJoystickListUpdate(joystickList) {
 
   savers.yml(newConfig, path.resolve(rpcs3Path, inputConfigFileName));
   console.log(
-    "RPCS3: Input settings saved at",
+    "RPCS3 - Input settings saved at",
     path.resolve(rpcs3Path, inputConfigFileName)
   );
   savers.yml(
@@ -181,7 +181,7 @@ function handleSDLJoystickListUpdate(joystickList) {
     path.resolve(rpcs3Path, activeProfileFileName)
   );
   console.log(
-    "RPCS3: Input profile settings saved at",
+    "RPCS3 - Input profile settings saved at",
     path.resolve(rpcs3Path, activeProfileFileName)
   );
 }
@@ -218,7 +218,7 @@ function handleMicrophoneListUpdate(microphoneList) {
   savers.yml(currentConfig, path.resolve(rpcs3Path, generalConfigFileName));
 
   console.log(
-    "RPCS3: Microphone settings saved at",
+    "RPCS3 - Microphone settings saved at",
     path.resolve(rpcs3Path, generalConfigFileName)
   );
 
@@ -235,7 +235,7 @@ function handleMicrophoneListUpdate(microphoneList) {
 
         savers.yml(customConfig, customConfigPath);
 
-        console.log("RPCS3: Microphone settings saved at", customConfigPath);
+        console.log("RPCS3 - Microphone settings saved at", customConfigPath);
       }
     });
   }

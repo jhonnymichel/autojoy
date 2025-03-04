@@ -2,8 +2,10 @@ import { fork } from "child_process";
 import store from "./store.mjs";
 import path from "path";
 import rootdir from "../common/rootdir.mjs";
+import { createLogger, logFromApp } from "./logger.mjs";
 
 const { dispatch, actions } = store;
+const logFromJoystickServer = createLogger("Joystick Server", null);
 
 let appProcess;
 
@@ -24,11 +26,11 @@ export function startServer() {
 
   // Handle output from the child process
   appProcess.stdout.on("data", (data) => {
-    dispatch(actions.stdout(data));
+    logFromJoystickServer(data);
   });
 
   appProcess.stderr.on("data", (data) => {
-    dispatch(actions.stdout(data));
+    logFromJoystickServer(data);
   });
 
   appProcess.on("exit", (exitCode) => {
@@ -69,12 +71,10 @@ export function restartServer(context) {
   const currentTime = Date.now();
   const lastRestart = store.state.lastRestartAfterCrash;
   if (!isIntentionalRestart && currentTime - lastRestart <= 3000) {
-    dispatch(
-      actions.stdout(
-        `Server died twice in ${
-          currentTime - lastRestart
-        }ms. Preventing auto restart. Waiting a minute before trying again.`
-      )
+    logFromApp(
+      `Server died twice in ${
+        currentTime - lastRestart
+      }ms. Preventing auto restart. Waiting a minute before trying again.`
     );
 
     restartAgainTimeoutId = setTimeout(() => {
@@ -86,7 +86,7 @@ export function restartServer(context) {
 
   // after a crash, xinput api needs time to recover, it seems.
   const serverRestartPadding = isIntentionalRestart ? 0 : 3000;
-  dispatch(actions.stdout("Restarting server"));
+  logFromApp("Restarting server");
   dispatch(
     actions.restartingServer({
       isUserIssuedRestart: isIntentionalRestart,

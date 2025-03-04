@@ -94,7 +94,7 @@ const joystickListUpdateHandlers = {
     savers.ini(newConfig, path.resolve(gameSettingsPath, inputConfigFileName));
 
     console.log(
-      "GHWTDE: Input settings saved at",
+      "GHWTDE - Input settings saved at",
       path.resolve(gameSettingsPath, inputConfigFileName)
     );
   },
@@ -154,7 +154,7 @@ const joystickListUpdateHandlers = {
     savers.ini(newConfig, path.resolve(gameSettingsPath, inputConfigFileName));
 
     console.log(
-      "GHWTDE: Input settings saved at",
+      "GHWTDE - Input settings saved at",
       path.resolve(gameSettingsPath, inputConfigFileName)
     );
   },
@@ -181,7 +181,7 @@ const ghwtde = {
     savers.ini(config, path.resolve(gameSettingsPath, mainConfigFileName));
 
     console.log(
-      "GHWTDE: Microphone settings saved at",
+      "GHWTDE - Microphone settings saved at",
       path.resolve(gameSettingsPath, mainConfigFileName)
     );
   },

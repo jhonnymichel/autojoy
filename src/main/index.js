@@ -4,17 +4,17 @@ import store from "./store.mjs";
 import { createPathsWindow } from "./window.mjs";
 import { startServer } from "./joystick-server.mjs";
 import { startTray } from "./tray.mjs";
+import { logFromApp, resetLogFile } from "./logger.mjs";
 
-validateSettings();
-
-const { dispatch, actions } = store;
+resetLogFile();
+validateSettings(logFromApp);
 
 app.on("ready", () => {
   if (Object.values(store.state.paths).every((path) => !path)) {
     createPathsWindow();
   }
 
-  dispatch(actions.stdout("App started, activating server"));
+  logFromApp("App started, activating server");
   startServer();
   startTray();
 });

@@ -1,5 +1,4 @@
 import { user } from "../common/settings.mjs";
-import { savers } from "../common/file.mjs";
 
 const store = {
   __cbs: [],
@@ -37,17 +36,6 @@ const store = {
         default:
           break;
       }
-    },
-    stdout(msg) {
-      const newLogs = [...store.__state.msg, msg.toString()];
-
-      savers.txt(newLogs.join("\n"), "logs.txt");
-
-      console.log(msg.toString());
-
-      return {
-        msg: newLogs,
-      };
     },
     restartingServer(context) {
       if (context?.isUserIssuedRestart) {
@@ -159,7 +147,6 @@ const store = {
     lastRestartAfterCrash: 0,
     joystickMode: user.settings.joystickMode,
     manageMicrophones: user.settings.manageMicrophones ?? false,
-    msg: [],
     joystickList: [],
     microphoneList: [],
     unusedMicrophones: user.settings.unusedMicrophones ?? [],

@@ -26,6 +26,11 @@ function handleXinputJoystickListUpdate(joystickList) {
   inputConfigFileNames.forEach((filename, position) => {
     // deleting file if there is no controller to use
     if (!trimmedList[position]) {
+      console.log(
+        "CEMU - Deleting input Settings for controller",
+        position + 1,
+        path.resolve(cemuPath, filename)
+      );
       deleteFile(path.resolve(cemuPath, filename));
       return;
     }
@@ -48,7 +53,7 @@ function handleXinputJoystickListUpdate(joystickList) {
 
     savers.xml(newConfig, path.resolve(cemuPath, filename));
     console.log(
-      "CEMU: Input Settings for controller",
+      "CEMU - Input Settings for controller",
       position + 1,
       "saved at",
       path.resolve(cemuPath, filename)

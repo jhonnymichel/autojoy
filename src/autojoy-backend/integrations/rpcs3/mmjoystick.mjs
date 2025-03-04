@@ -17,7 +17,7 @@ export default {
     );
     if (!joystick) {
       console.error(
-        "[RPCS3 MMJoystick Handler]: joystick not found. Restarting server to refresh list"
+        "RPCS3 MMJoystick Handler - joystick not found. Restarting server to refresh list"
       );
       process.send(JSON.stringify({ type: "issueRestart" }));
     }

@@ -111,11 +111,11 @@ function validatePaths() {
   }
 }
 
-export function validateSettings() {
+export function validateSettings(log = (...msg) => console.log(...msg)) {
   const userSettings = user.settings;
 
   if (!Object.values(joystickModes).includes(userSettings.joystickMode)) {
-    console.log(
+    log(
       `user settings.joystickMode invalid value. can be ${Object.values(
         joystickModes
       )}. found '${user.settings.joystickMode}'. Resetting it to xinput.`
@@ -129,7 +129,7 @@ export function validateSettings() {
 
   if (userSettings.unusedMicrophones) {
     if (!Array.isArray(userSettings.unusedMicrophones)) {
-      console.log(
+      log(
         `user settings.unusedMicrophones invalid value. Should be an array. found '${typeof userSettings.unusedMicrophones}'. Resetting it.`
       );
 
@@ -143,7 +143,7 @@ export function validateSettings() {
           !entry.hasOwnProperty("name") || !entry.hasOwnProperty("position")
       )
     ) {
-      console.log(
+      log(
         "Invalid user settings.unusedMicrophones entries found. Resetting it."
       );
 
@@ -155,7 +155,7 @@ export function validateSettings() {
 
     if (userSettings.hasOwnProperty("manageMicrophones")) {
       if (typeof userSettings.manageMicrophones !== "boolean") {
-        console.log(
+        log(
           `user settings.manageMicrophones invalid value. Should true of false. found '${userSettings.manageMicrophones}'. Resetting it.`
         );
         user.settings = {

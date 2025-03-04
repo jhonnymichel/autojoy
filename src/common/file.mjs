@@ -75,9 +75,9 @@ export function resolvePathFromPackagedRoot(src) {
   return path.resolve(__packagedDirname, src);
 }
 
-console.log("PATHS:");
-console.log("User:", settingsFolder);
-console.log("Package:", __packagedDirname);
+console.log(`PATHS:
+  User: ${settingsFolder}
+  Package: ${__packagedDirname}`);
 
 export const loaders = {
   yml(filepath) {

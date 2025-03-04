@@ -34,7 +34,7 @@ async function sdlMicrophoneHandler(sdl) {
       try {
         notify(structuredClone(deviceList));
       } catch (e) {
-        console.log("[Microphone Listener] Error from subscriber:", e);
+        console.log("Microphone Listener - Error from subscriber:", e);
       }
     });
   }
