@@ -1,6 +1,6 @@
 {
   "name": "autojoy",
-  "version": "1.9.5",
+  "version": "1.9.0",
   "description": "Automatically update emulators and games input settings based on what's connected to your computer!",
   "main": "src/main/index.js",
   "entry": "src/main/index.js",
