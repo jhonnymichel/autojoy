@@ -13,7 +13,15 @@ async function init() {
   let rpcs3;
   if (user.paths.rpcs3) {
     rpcs3 = (await import("./integrations/rpcs3.mjs")).default;
-    joystickListener.onListChange(rpcs3.handleJoystickListUpdate);
+    const metadata = rpcs3.getMetadata();
+    joystickListener.onListChange({
+      name: metadata.name,
+      callback: rpcs3.handleJoystickListUpdate,
+    });
+
+    process.send(
+      JSON.stringify({ type: "integrationRegistered", data: metadata })
+    );
   }
   if (user.paths.dolphin) {
     const dolphin = (await import("./integrations/dolphin.mjs")).default;

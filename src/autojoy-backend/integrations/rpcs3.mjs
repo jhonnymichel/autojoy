@@ -4,6 +4,7 @@ import mmjoystick from "./rpcs3/mmjoystick.mjs";
 import { loaders, savers } from "../../common/file.mjs";
 import { findNextConnectedXinputIdentifier } from "./shared.mjs";
 import { user } from "../../common/settings.mjs";
+import { joystickModes } from "../../common/joystick.mjs";
 
 const configTemplates = loaders.yml("config-templates/rpcs3.yml");
 const rpcs3Path = user.paths.rpcs3;
@@ -246,6 +247,12 @@ const rpcs3 = {
     joystickListUpdateHandlers[user.settings.joystickMode](joystickList);
   },
   handleMicrophoneListUpdate,
+  getMetadata() {
+    return {
+      name: "RPCS3",
+      supports: [joystickModes.sdl, joystickModes.xinput],
+    };
+  },
 };
 
 export default rpcs3;
