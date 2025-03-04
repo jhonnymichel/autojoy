@@ -3,6 +3,7 @@ import { deleteFile, loaders, savers } from "../../common/file.mjs";
 import { joystickModes } from "../../common/joystick.mjs";
 import { findNextConnectedXinputIdentifier } from "./shared.mjs";
 import { user } from "../../common/settings.mjs";
+import { createJoystick } from "../joystick.mjs";
 
 const configTemplates = loaders.xml("config-templates/cemu.xml");
 const cemuPath = path.resolve(user.paths.cemu, "controllerProfiles");
@@ -61,8 +62,27 @@ function handleXinputJoystickListUpdate(joystickList) {
   });
 }
 
-function handleSDLJoystickListUpdate() {
-  console.log("CEMU: SDL Not supported yet");
+async function handleSDLJoystickListUpdate() {
+  // we don't actually support SDL, so we'll just spin up xinput here real quick to support cemu while in SDL mode lol.
+
+  const xinput = await import("xinput-ffi");
+  const deviceList = [];
+
+  for (
+    let position = 0;
+    position < xinput.constants.XUSER_MAX_COUNT;
+    position++
+  ) {
+    try {
+      const device = await xinput.getCapabilities(position);
+      deviceList.push(createJoystick(device, joystickModes.xinput));
+    } catch (e) {
+      // either the device is not connected or the xinput device could not be identified and we report it as not connected
+      deviceList.push(null);
+    }
+  }
+
+  return handleXinputJoystickListUpdate(deviceList);
 }
 
 const joystickListUpdateHandlers = {
