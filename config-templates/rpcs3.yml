@@ -99,10 +99,10 @@ SDL_GUITAR:
     Start: Start
     Select: Back
     PS Button: Guide
-    Square: X
-    Cross: A
-    Circle: B
-    Triangle: Y
+    Square: West
+    Cross: South
+    Circle: East
+    Triangle: North
     Left: Left
     Down: Down
     Right: Right
@@ -185,10 +185,10 @@ SDL_ROCKBAND_DRUM_KIT:
     Start: Start
     Select: Back
     PS Button: Guide
-    Square: X
-    Cross: A
-    Circle: B
-    Triangle: Y
+    Square: West
+    Cross: South
+    Circle: East
+    Triangle: North
     Left: Left
     Down: Down
     Right: Right
