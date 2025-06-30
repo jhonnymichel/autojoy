@@ -101,6 +101,14 @@ export function startTray() {
         type: "separator",
       },
       {
+        type: "checkbox",
+        label: "Open at startup",
+        checked: store.state.openAtLogin,
+        click: () => {
+          dispatch(actions.toggleOpenAtLogin(!store.state.openAtLogin));
+        },
+      },
+      {
         type: "normal",
         label: "About",
         click: () => {
@@ -117,6 +125,19 @@ export function startTray() {
     ]);
 
     tray.setContextMenu(contextMenu);
+
+    contextMenu.on("menu-will-show", function beforeMenuOpen(e) {
+      // idiotic hack to update Open at startup value before opening tray.
+      e.preventDefault();
+      contextMenu.items.find(
+        (item) => item.label === "Open at startup"
+      ).checked = store.state.openAtLogin;
+      contextMenu.removeAllListeners("menu-will-show");
+      setTimeout(() => {
+        tray.popUpContextMenu();
+        contextMenu.on("menu-will-show", beforeMenuOpen);
+      });
+    });
   };
 
   setTrayMenu();

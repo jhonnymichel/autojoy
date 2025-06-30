@@ -1,4 +1,5 @@
 import { user } from "../common/settings.mjs";
+import { getSystemSettings, updateSystemSettings } from "./system.mjs";
 
 const store = {
   __cbs: [],
@@ -6,14 +7,12 @@ const store = {
     store.__cbs.push(cb);
   },
   dispatch(changes) {
-    if (!changes) {
-      return;
+    if (changes) {
+      Object.defineProperties(
+        store.__state,
+        Object.getOwnPropertyDescriptors(changes)
+      );
     }
-
-    store.__state = {
-      ...store.__state,
-      ...changes,
-    };
 
     store.__cbs.forEach((cb) => {
       cb();
@@ -77,6 +76,11 @@ const store = {
         joystickMode: user.settings.joystickMode,
         serverStatus: "pending-user-issued-restart",
       };
+    },
+    toggleOpenAtLogin(openAtLogin = false) {
+      updateSystemSettings({
+        openAtLogin,
+      });
     },
     toggleMicrophoneManagement(enabled) {
       user.settings = {
@@ -144,6 +148,11 @@ const store = {
   },
   __state: {
     serverStatus: "starting", // starting, restarting, running, stopped-manually, crashed, pending-user-issued-restart, pending-issued-restart
+    get openAtLogin() {
+      const settings = getSystemSettings();
+
+      return settings.executableWillLaunchAtLogin && settings.openAtLogin;
+    },
     lastRestartAfterCrash: 0,
     joystickMode: user.settings.joystickMode,
     manageMicrophones: user.settings.manageMicrophones ?? false,
