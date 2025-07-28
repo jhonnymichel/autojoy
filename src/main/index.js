@@ -4,7 +4,7 @@ import store from "./store.mjs";
 import { createPathsWindow } from "./window.mjs";
 import { startServer } from "./joystick-server.mjs";
 import { startTray } from "./tray.mjs";
-import { logFromApp, resetLogFile } from "./logger.mjs";
+import { logFromApp, resetLogFile } from "../common/logger.mjs";
 
 resetLogFile();
 validateSettings(logFromApp);

@@ -72,6 +72,7 @@ async function xinputHandler(xinput) {
 const sdlDevicesToInclude = [
   hardwareInfo.harmonixDrumControllerForNintendoWii,
   hardwareInfo.harmonixDrumControllerForPS3,
+  hardwareInfo.guitarHeroGuitarForPS3,
 ];
 
 async function sdlHandler(sdl) {

@@ -33,6 +33,10 @@ function getSDLJoystickType(device) {
     productId: device.product,
   };
 
+  if (isHardware(deviceInfo, hardwareInfo.guitarHeroGuitarForPS3)) {
+    return joystickTypes.ps3GuitarHeroGuitar;
+  }
+
   // TODO: This is misleading. further diferentiation might be needed.
   // right now, this works well for x360 and santroller guitars only.
   if (device.name.includes("Guitar")) return joystickTypes.sdlGuitar;

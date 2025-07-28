@@ -1,3 +1,4 @@
+import { logFromApp } from "./logger.mjs";
 import {
   loaders,
   resolvePathFromPackagedRoot,
@@ -10,8 +11,8 @@ export const userFolderPath = resolvePathFromUserFolder(".");
 export const templatesFolderPath =
   resolvePathFromUserFolder("config-templates");
 
-// must validate paths before allowing user object to be used.
-validatePaths();
+// must validate and migrate paths before allowing user object to be used.
+migrateUserSettings();
 
 export const user = {
   get paths() {
@@ -28,87 +29,57 @@ export const user = {
   },
 };
 
-function validatePaths() {
-  // for first app execution after install. we create the userland settings from inside the app package.
-  try {
-    loaders.json("user/paths.json");
-  } catch (e) {
-    savers.json(
-      loaders.json(resolvePathFromPackagedRoot("user/paths.template.json")),
-      "user/paths.json"
-    );
+function amendNewDefaults(filePath, loader, saver) {
+  const userFile = loader(filePath);
+  const appBaseFile = loader(resolvePathFromPackagedRoot(filePath));
+
+  let itemsToAmend = [];
+  for (const [key, value] of Object.entries(appBaseFile)) {
+    if (!userFile[key] && !key.includes("?xml")) {
+      itemsToAmend.push(key);
+      userFile[key] = value;
+    }
   }
 
-  try {
-    loaders.json("user/settings.json");
-  } catch (e) {
-    savers.json(
-      loaders.json(resolvePathFromPackagedRoot("user/settings.template.json")),
-      "user/settings.json"
+  if (itemsToAmend.length) {
+    logFromApp(
+      `Amending new defaults (${itemsToAmend.join(", ")}) for:`,
+      filePath
     );
+    saver(userFile, filePath);
   }
+}
 
+function migrateUserFile(filePath, loader, saver) {
   try {
-    loaders.yml("config-templates/rpcs3.yml");
+    loader(filePath);
+    amendNewDefaults(filePath, loader, saver);
   } catch (e) {
-    savers.yml(
-      loaders.yml(resolvePathFromPackagedRoot("config-templates/rpcs3.yml")),
-      "config-templates/rpcs3.yml"
-    );
+    logFromApp("Creating not found user file: ", filePath);
+    saver(loader(resolvePathFromPackagedRoot(filePath)), filePath);
   }
+}
 
-  try {
-    loaders.xml("config-templates/cemu.xml");
-  } catch (e) {
-    savers.xml(
-      loaders.xml(resolvePathFromPackagedRoot("config-templates/cemu.xml")),
-      "config-templates/cemu.xml"
-    );
-  }
-
-  try {
-    loaders.ini("config-templates/dolphin-gc.ini");
-  } catch (e) {
-    savers.ini(
-      loaders.ini(
-        resolvePathFromPackagedRoot("config-templates/dolphin-gc.ini")
-      ),
-      "config-templates/dolphin-gc.ini"
-    );
-  }
-
-  try {
-    loaders.ini("config-templates/dolphin-wiimote-emulated.ini");
-  } catch (e) {
-    savers.ini(
-      loaders.ini(
-        resolvePathFromPackagedRoot(
-          "config-templates/dolphin-wiimote-emulated.ini"
-        )
-      ),
-      "config-templates/dolphin-wiimote-emulated.ini"
-    );
-  }
-
-  try {
-    loaders.ini("config-templates/dolphin-wiimote-real.ini");
-  } catch (e) {
-    savers.ini(
-      loaders.ini(
-        resolvePathFromPackagedRoot("config-templates/dolphin-wiimote-real.ini")
-      ),
-      "config-templates/dolphin-wiimote-real.ini"
-    );
-  }
-
-  try {
-    loaders.ini("config-templates/ghwtde.ini");
-  } catch (e) {
-    savers.ini(
-      loaders.ini(resolvePathFromPackagedRoot("config-templates/ghwtde.ini")),
-      "config-templates/ghwtde.ini"
-    );
-  }
+function migrateUserSettings() {
+  // for first app execution after install or update.
+  // we create the userland settings from inside the app package.
+  // and amend new settings if needed.
+  migrateUserFile("user/paths.json", loaders.json, savers.json);
+  migrateUserFile("user/settings.json", loaders.json, savers.json);
+  migrateUserFile("config-templates/rpcs3.yml", loaders.yml, savers.yml);
+  migrateUserFile("config-templates/cemu.xml", loaders.xml, savers.xml);
+  migrateUserFile("config-templates/dolphin-gc.ini", loaders.ini, savers.ini);
+  migrateUserFile(
+    "config-templates/dolphin-wiimote-emulated.ini",
+    loaders.ini,
+    savers.ini
+  );
+  migrateUserFile(
+    "config-templates/dolphin-wiimote-real.ini",
+    loaders.ini,
+    savers.ini
+  );
+  migrateUserFile("config-templates/ghwtde.ini", loaders.ini, savers.ini);
 }
 
 export function validateSettings(log = (...msg) => console.log(...msg)) {

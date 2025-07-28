@@ -1,5 +1,5 @@
 import fs from "fs";
-import { resolvePathFromUserFolder, savers } from "../common/file.mjs";
+import { resolvePathFromUserFolder, savers } from "./file.mjs";
 
 const logsPath = resolvePathFromUserFolder("logs.txt");
 

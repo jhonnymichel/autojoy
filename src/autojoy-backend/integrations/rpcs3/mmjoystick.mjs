@@ -2,7 +2,11 @@ import { hardwareInfo } from "../../../common/joystick.mjs";
 import { isHardware } from "../../joystick.mjs";
 import mmJoystick from "../../native/mmjoystick-native.cjs";
 // Harmonix Wii Drums
-const mmJoystickDevices = [hardwareInfo.harmonixDrumControllerForNintendoWii];
+const mmJoystickDevices = [
+  hardwareInfo.harmonixDrumControllerForNintendoWii,
+  hardwareInfo.harmonixDrumControllerForPS3,
+  hardwareInfo.guitarHeroGuitarForPS3,
+];
 
 export default {
   shouldUseMMJoystick(manufacturerId, productId) {

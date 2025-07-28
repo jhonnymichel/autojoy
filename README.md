@@ -27,7 +27,8 @@ Currently only supports Windows.
   - Xbox 360 Guitar Hero and Rock Band Guitars.
   - Wii Guitar Hero Guitars via Wiitar thing.
   - Santroller Guitars in default mode.
-  - NOT SUPPORTED YET: dinput and mmjoystick guitars (such as PS3 and Raphnet adapter instruments).
+  - PS3 Guitar Hero guitar (incl. CRKD Les Paul in P3 mode) -- No Tilt
+  - NOT SUPPORTED YET: other dinput and mmjoystick guitars (such as Wii Rock Band and Raphnet adapter instruments).
   - NOT SUPPORTED YET: PS4 and Xbox One Rock Band Guitars.
   - NOT SUPPORTED YET: Riffmaster.
 - Drums:
@@ -37,7 +38,7 @@ Currently only supports Windows.
 - Regular Controllers: Supports any Xinput device and DualSense controllers\*\*.
 - Microphones: Supports any recording device connected to the computer, including Rock Band/Guitar Hero mics.
   - It's possible to filter out connected recording devices that you don't want to use. In the tray menu, uncheck unwanted devices.
-    
+
 \*\* SDL joystick mode needs to be selected for non-xinput devices to work.
 
 \*\*\* Rock Band 2 and 3 drums are validated. Rock Band 1 Drums may work but they have not been tested.
@@ -48,7 +49,8 @@ Currently only supports Windows.
   - Xbox 360 Guitar Hero and Rock Band Guitars.
   - Wii Guitars Hero Guitars via Wiitar thing.
   - Santroller Guitars in default mode.
-  - NOT SUPPORTED YET: non-xinput guitars (such as PS3 and Raphnet adapter instruments).
+  - PS3 Guitar Hero guitar (incl. CRKD Les Paul in P3 mode) -- No Tilt
+  - NOT SUPPORTED YET: other non-xinput guitars (such as Wii Rock Band and Raphnet adapter instruments).
   - NOT SUPPORTED YET: PS4 and Xbox One Rock Band Guitars.
   - NOT SUPPORTED YET: Riffmaster.
 - Drums:
@@ -79,7 +81,8 @@ It's recommended to disconnect non-instrument controllers for full band gameplay
   - Xbox 360 Guitar Hero and Rock Band Guitars.
   - Wii Guitar Hero Guitars via Wiitar thing.
   - Santroller Guitars in default mode.
-  - NOT SUPPORTED YET: dinput and mmjoystick guitars (such as PS3 and Raphnet adapter instruments).
+  - PS3 Guitar Hero guitar (incl. CRKD Les Paul in P3 mode) -- No Tilt
+  - NOT SUPPORTED YET: dinput and mmjoystick guitars (such as Wii Rock Band and Raphnet adapter instruments).
   - NOT SUPPORTED YET: PS4 and Xbox One Rock Band Guitars.
   - NOT SUPPORTED YET: Riffmaster.
 - Drums:

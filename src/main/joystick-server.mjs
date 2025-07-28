@@ -2,7 +2,7 @@ import { fork } from "child_process";
 import store from "./store.mjs";
 import path from "path";
 import rootdir from "../common/rootdir.mjs";
-import { createLogger, logFromApp } from "./logger.mjs";
+import { createLogger, logFromApp } from "../common/logger.mjs";
 
 const { dispatch, actions } = store;
 const logFromJoystickServer = createLogger("Joystick Server", null);
