@@ -72,7 +72,7 @@ function getSDLJoystickType(device, hardwareInfo) {
 
 function createJoystickFromSDLDevice(device, hardwareInfo) {
   return {
-    name: hardwareInfo.name ?? device.name,
+    name: hardwareInfo?.name ?? device.name,
     type: getSDLJoystickType(device, hardwareInfo),
     raw: device,
   };
