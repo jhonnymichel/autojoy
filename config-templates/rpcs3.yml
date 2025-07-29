@@ -170,6 +170,98 @@ SDL_GUITAR:
     Vendor ID: 4794
     Product ID: 512
   Buddy Device: "Null"
+CRKD_GUITAR_PC_MODE:
+  Handler: SDL
+  Device: Xbox 360 Controller 1
+  Config:
+    Left Stick Left: ""
+    Left Stick Down: ""
+    Left Stick Right: ""
+    Left Stick Up: ""
+    Right Stick Left: ""
+    Right Stick Down: ""
+    Right Stick Right: LT
+    Right Stick Up: ""
+    Start: Start
+    Select: Back
+    PS Button: Guide
+    Square: North
+    Cross: South
+    Circle: East
+    Triangle: West
+    Left: Left
+    Down: Down
+    Right: Right
+    Up: Up
+    R1: RB
+    R2: RT
+    R3: RS
+    L1: LB
+    L2: ""
+    L3: LS
+    IR Nose: ""
+    IR Tail: ""
+    IR Left: ""
+    IR Right: ""
+    Tilt Left: ""
+    Tilt Right: ""
+    Motion Sensor X:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Motion Sensor Y:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Motion Sensor Z:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Motion Sensor G:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Orientation Reset Button: ""
+    Orientation Enabled: false
+    Pressure Intensity Button: ""
+    Pressure Intensity Percent: 50
+    Pressure Intensity Toggle Mode: false
+    Pressure Intensity Deadzone: 0
+    Analog Limiter Button: ""
+    Analog Limiter Toggle Mode: false
+    Left Stick Multiplier: 100
+    Right Stick Multiplier: 100
+    Left Stick Deadzone: 4183
+    Right Stick Deadzone: 4532
+    Left Stick Anti-Deadzone: 1743
+    Right Stick Anti-Deadzone: 2092
+    Left Trigger Threshold: 0
+    Right Trigger Threshold: 0
+    Left Pad Squircling Factor: 8000
+    Right Pad Squircling Factor: 8000
+    Color Value R: 0
+    Color Value G: 0
+    Color Value B: 0
+    Blink LED when battery is below 20%: true
+    Use LED as a battery indicator: false
+    LED battery indicator brightness: 50
+    Player LED enabled: true
+    Large Vibration Motor Multiplier: 100
+    Small Vibration Motor Multiplier: 100
+    Switch Vibration Motors: false
+    Mouse Movement Mode: Relative
+    Mouse Deadzone X Axis: 60
+    Mouse Deadzone Y Axis: 60
+    Mouse Acceleration X Axis: 200
+    Mouse Acceleration Y Axis: 250
+    Left Stick Lerp Factor: 100
+    Right Stick Lerp Factor: 100
+    Analog Button Lerp Factor: 100
+    Trigger Lerp Factor: 100
+    Device Class Type: 1
+    Vendor ID: 4794
+    Product ID: 256
+  Buddy Device: "Null"
 SDL_ROCKBAND_DRUM_KIT:
   Handler: XInput
   Device: "XInput Pad #1"
@@ -255,6 +347,98 @@ SDL_ROCKBAND_DRUM_KIT:
     Device Class Type: 2
     Vendor ID: 4794
     Product ID: 536
+  Buddy Device: "Null"
+PS3_GUITARHERO_GUITAR:
+  Handler: MMJoystick
+  Device: "Joystick #1"
+  Config:
+    Left Stick Left: X-
+    Left Stick Down: Y+
+    Left Stick Right: X+
+    Left Stick Up: Y-
+    Right Stick Left: ""
+    Right Stick Down: Button 8
+    Right Stick Right: Z+
+    Right Stick Up: Button 8
+    Start: Button 10
+    Select: Button 9
+    PS Button: Button 13
+    Square: Button 1
+    Cross: Button 2
+    Circle: Button 3
+    Triangle: Button 4
+    Left: POV Left
+    Down: POV Down
+    Right: POV Right
+    Up: POV Up
+    R1: Button 6
+    R2: Button 8
+    R3: Button 10
+    L1: Button 5
+    L2: Button 7
+    L3: Button 11
+    IR Nose: ""
+    IR Tail: ""
+    IR Left: ""
+    IR Right: ""
+    Tilt Left: ""
+    Tilt Right: ""
+    Motion Sensor X:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Motion Sensor Y:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Motion Sensor Z:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Motion Sensor G:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Orientation Reset Button: ""
+    Orientation Enabled: false
+    Pressure Intensity Button: ""
+    Pressure Intensity Percent: 50
+    Pressure Intensity Toggle Mode: false
+    Pressure Intensity Deadzone: 0
+    Analog Limiter Button: ""
+    Analog Limiter Toggle Mode: false
+    Left Stick Multiplier: 100
+    Right Stick Multiplier: 100
+    Left Stick Deadzone: 33
+    Right Stick Deadzone: 35
+    Left Stick Anti-Deadzone: 33
+    Right Stick Anti-Deadzone: 33
+    Left Trigger Threshold: 30
+    Right Trigger Threshold: 30
+    Left Pad Squircling Factor: 8000
+    Right Pad Squircling Factor: 8000
+    Color Value R: 0
+    Color Value G: 0
+    Color Value B: 0
+    Blink LED when battery is below 20%: true
+    Use LED as a battery indicator: false
+    LED battery indicator brightness: 50
+    Player LED enabled: true
+    Large Vibration Motor Multiplier: 100
+    Small Vibration Motor Multiplier: 100
+    Switch Vibration Motors: false
+    Mouse Movement Mode: Relative
+    Mouse Deadzone X Axis: 60
+    Mouse Deadzone Y Axis: 60
+    Mouse Acceleration X Axis: 200
+    Mouse Acceleration Y Axis: 250
+    Left Stick Lerp Factor: 100
+    Right Stick Lerp Factor: 100
+    Analog Button Lerp Factor: 100
+    Trigger Lerp Factor: 100
+    Device Class Type: 1
+    Vendor ID: 4794
+    Product ID: 256
   Buddy Device: "Null"
 ROCKBAND_DRUM_KIT:
   Handler: XInput
@@ -433,98 +617,6 @@ WII_ROCKBAND_DRUM_KIT:
     Device Class Type: 2
     Vendor ID: 4794
     Product ID: 536
-  Buddy Device: "Null"
-PS3_GUITARHERO_GUITAR:
-  Handler: MMJoystick
-  Device: "Joystick #1"
-  Config:
-    Left Stick Left: X-
-    Left Stick Down: Y+
-    Left Stick Right: X+
-    Left Stick Up: Y-
-    Right Stick Left: ""
-    Right Stick Down: Button 8
-    Right Stick Right: Z+
-    Right Stick Up: Button 8
-    Start: Button 10
-    Select: Button 9
-    PS Button: Button 13
-    Square: Button 1
-    Cross: Button 2
-    Circle: Button 3
-    Triangle: Button 4
-    Left: POV Left
-    Down: POV Down
-    Right: POV Right
-    Up: POV Up
-    R1: Button 6
-    R2: Button 8
-    R3: Button 10
-    L1: Button 5
-    L2: Button 7
-    L3: Button 11
-    IR Nose: ""
-    IR Tail: ""
-    IR Left: ""
-    IR Right: ""
-    Tilt Left: ""
-    Tilt Right: ""
-    Motion Sensor X:
-      Axis: ""
-      Mirrored: false
-      Shift: 0
-    Motion Sensor Y:
-      Axis: ""
-      Mirrored: false
-      Shift: 0
-    Motion Sensor Z:
-      Axis: ""
-      Mirrored: false
-      Shift: 0
-    Motion Sensor G:
-      Axis: ""
-      Mirrored: false
-      Shift: 0
-    Orientation Reset Button: ""
-    Orientation Enabled: false
-    Pressure Intensity Button: ""
-    Pressure Intensity Percent: 50
-    Pressure Intensity Toggle Mode: false
-    Pressure Intensity Deadzone: 0
-    Analog Limiter Button: ""
-    Analog Limiter Toggle Mode: false
-    Left Stick Multiplier: 100
-    Right Stick Multiplier: 100
-    Left Stick Deadzone: 33
-    Right Stick Deadzone: 35
-    Left Stick Anti-Deadzone: 33
-    Right Stick Anti-Deadzone: 33
-    Left Trigger Threshold: 30
-    Right Trigger Threshold: 30
-    Left Pad Squircling Factor: 8000
-    Right Pad Squircling Factor: 8000
-    Color Value R: 0
-    Color Value G: 0
-    Color Value B: 0
-    Blink LED when battery is below 20%: true
-    Use LED as a battery indicator: false
-    LED battery indicator brightness: 50
-    Player LED enabled: true
-    Large Vibration Motor Multiplier: 100
-    Small Vibration Motor Multiplier: 100
-    Switch Vibration Motors: false
-    Mouse Movement Mode: Relative
-    Mouse Deadzone X Axis: 60
-    Mouse Deadzone Y Axis: 60
-    Mouse Acceleration X Axis: 200
-    Mouse Acceleration Y Axis: 250
-    Left Stick Lerp Factor: 100
-    Right Stick Lerp Factor: 100
-    Analog Button Lerp Factor: 100
-    Trigger Lerp Factor: 100
-    Device Class Type: 1
-    Vendor ID: 4794
-    Product ID: 256
   Buddy Device: "Null"
 GAMEPAD:
   Handler: XInput
