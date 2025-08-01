@@ -1,7 +1,6 @@
 import path from "path";
 import { loaders, savers } from "../../common/file.mjs";
-import { joystickModes, joystickTypes } from "../../common/joystick.mjs";
-import { findNextConnectedXinputIdentifier } from "./shared.mjs";
+import { joystickTypes } from "../../common/joystick.mjs";
 import { user } from "../../common/settings.mjs";
 
 // PATH TO CONFIG:
@@ -24,7 +23,6 @@ const inputConfigFileName = "GHWTDEInput.ini";
 const mainConfigFileName = "GHWTDE.ini";
 
 const assignedControllersKey = "Preferences";
-const controllerKeys = ["Device1", "Device2", "Device3"];
 const xinputPlayerIdentifiers = [
   "XINPUT_DEVICE_0",
   "XINPUT_DEVICE_1",
@@ -51,125 +49,63 @@ function appendNumbersToSDLDeviceIds(arr) {
   });
 }
 
-const joystickListUpdateHandlers = {
-  [joystickModes.sdl](joystickList) {
-    let newConfig;
-    try {
-      newConfig = loaders.ini(
-        path.resolve(gameSettingsPath, inputConfigFileName)
-      );
-    } catch (e) {
-      newConfig = {};
-    }
-
-    // updating device IDs to match what the game uses
-    const fixedList = appendNumbersToSDLDeviceIds(
-      convertSDLToGameGUID(joystickList)
-    );
-
-    newConfig[assignedControllersKey] = { FillEmptySlots: 1 };
-
-    // we loop the SDL joystick list instead of the player positions
-    // because in SDL mode, we won't assign players directly.
-    // we just make sure controllers are setup correctly and enable
-    // FillEmptySlots so the game fills the positions.
-    // Doing it like this because assigning two sdl devices with the same ID is broken.
-    fixedList.forEach((selectedDevice, position) => {
-      newConfig[selectedDevice.ghwtdeGUID] = structuredClone(
-        configTemplates[selectedDevice.type] ??
-          configTemplates[joystickTypes.guitar] // since we don't want to use gamepads here as the vocal is keyboard...
-      );
-
-      // we disable regular gamepads to open space for full band (2 guitars + drums).
-      // player 1 is always the keyboard and it can't be changed, and when a mic is selected,
-      // the keyboard becomes the vocals controller.
-      // FIXME: this doesn't do anything. but I tried lol
-      if (selectedDevice.type === joystickTypes.gamepad) {
-        newConfig[selectedDevice.ghwtdeGUID].Enabled = 0;
-      }
-
-      newConfig[selectedDevice.ghwtdeGUID].DeviceName = selectedDevice.name;
-    });
-
-    // deactivating all xinput positions to avoid xinput devices to be enabled twice (one as SDL once as Xinput), causing double inputs
-    xinputPlayerIdentifiers.forEach((xinputIdentifier) => {
-      // FIXME: this doesnt work although it should. set type to gamepad instead
-      // newConfig[xinputIdentifier].Enabled = 0;
-      newConfig[xinputIdentifier].Type = "Gamepad";
-    });
-
-    savers.ini(newConfig, path.resolve(gameSettingsPath, inputConfigFileName));
-
-    console.log(
-      "GHWTDE - Input settings saved at",
+function handleSDLJoystickListUpdate(joystickList) {
+  let newConfig;
+  try {
+    newConfig = loaders.ini(
       path.resolve(gameSettingsPath, inputConfigFileName)
     );
-  },
-  [joystickModes.xinput](joystickList) {
-    let newConfig;
-    try {
-      newConfig = loaders.ini(
-        path.resolve(gameSettingsPath, inputConfigFileName)
-      );
-    } catch (e) {
-      newConfig = {};
+  } catch (e) {
+    newConfig = {};
+  }
+
+  // updating device IDs to match what the game uses
+  const fixedList = appendNumbersToSDLDeviceIds(
+    convertSDLToGameGUID(joystickList)
+  );
+
+  newConfig[assignedControllersKey] = { FillEmptySlots: 1 };
+
+  // we loop the SDL joystick list instead of the player positions
+  // because in SDL mode, we won't assign players directly.
+  // we just make sure controllers are setup correctly and enable
+  // FillEmptySlots so the game fills the positions.
+  // Doing it like this because assigning two sdl devices with the same ID is broken.
+  fixedList.forEach((selectedDevice, position) => {
+    newConfig[selectedDevice.ghwtdeGUID] = structuredClone(
+      configTemplates[selectedDevice.type] ??
+        configTemplates[joystickTypes.xinputGuitar] // since we don't want to use gamepads here as the vocal is keyboard...
+    );
+
+    // we disable regular gamepads to open space for full band (2 guitars + drums).
+    // player 1 is always the keyboard and it can't be changed, and when a mic is selected,
+    // the keyboard becomes the vocals controller.
+    // FIXME: this doesn't do anything. but I tried lol
+    if (selectedDevice.type === joystickTypes.gamepad) {
+      newConfig[selectedDevice.ghwtdeGUID].Enabled = 0;
     }
 
-    // because gwtde's player 1 is always the keyboard and the keyboard is set as the singer,
-    // we want the other players in a full band to be the instruments.
-    const joysticksExcludingGamepads = joystickList.map((j) => {
-      if (j && j.type === joystickTypes.gamepad) {
-        return null;
-      }
+    newConfig[selectedDevice.ghwtdeGUID].DeviceName = selectedDevice.name;
+  });
 
-      return j;
-    });
+  // deactivating all xinput positions to avoid xinput devices to be enabled twice (one as SDL once as Xinput), causing double inputs
+  xinputPlayerIdentifiers.forEach((xinputIdentifier) => {
+    // FIXME: this doesnt work although it should. set type to gamepad instead
+    // newConfig[xinputIdentifier].Enabled = 0;
+    newConfig[xinputIdentifier].Type = "Gamepad";
+  });
 
-    // trimming the list because with xinput, it's possible for device 1 to be disconnected and device 2 to be connected.
-    // we want to select connected devices.
-    const trimmedList = joysticksExcludingGamepads.filter(
-      (joystick) => joystick
-    );
+  savers.ini(newConfig, path.resolve(gameSettingsPath, inputConfigFileName));
 
-    newConfig[assignedControllersKey] = { FillEmptySlots: 0 };
-
-    controllerKeys.forEach((currentPlayerIdentifier, position) => {
-      const selectedXinputDevice = trimmedList[position];
-      if (!selectedXinputDevice) {
-        newConfig[assignedControllersKey][currentPlayerIdentifier] = "";
-        return;
-      }
-
-      const selectedXinputPosition = findNextConnectedXinputIdentifier(
-        joysticksExcludingGamepads,
-        position
-      );
-
-      const xinputDeviceIdentifier =
-        xinputPlayerIdentifiers[selectedXinputPosition];
-
-      // in xinput mode, we can't tell apart Guitar Hero from Rock Band Drums, so
-      // in the future there might be a feature where users can pick which drums they're using.
-      // for now, we default to RBDrums, as xinput DRUM_KIT is mapped as ROCKBAND_DRUM_KIT for compatibility.
-      newConfig[assignedControllersKey][currentPlayerIdentifier] =
-        xinputDeviceIdentifier;
-      newConfig[xinputDeviceIdentifier] =
-        configTemplates[selectedXinputDevice.type] ??
-        configTemplates[joystickTypes.guitar]; // since we don't want to use gamepads here as the vocal is keyboard...
-    });
-
-    savers.ini(newConfig, path.resolve(gameSettingsPath, inputConfigFileName));
-
-    console.log(
-      "GHWTDE - Input settings saved at",
-      path.resolve(gameSettingsPath, inputConfigFileName)
-    );
-  },
-};
+  console.log(
+    "GHWTDE - Input settings saved at",
+    path.resolve(gameSettingsPath, inputConfigFileName)
+  );
+}
 
 const ghwtde = {
   handleJoystickListUpdate(joystickList) {
-    joystickListUpdateHandlers[user.settings.joystickMode](joystickList);
+    handleSDLJoystickListUpdate(joystickList);
   },
   handleMicrophoneListUpdate(microphoneList) {
     const config = loaders.ini(

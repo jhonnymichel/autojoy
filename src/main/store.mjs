@@ -66,17 +66,6 @@ const store = {
         serverStatus: "stopped-manually",
       };
     },
-    changeJoystickMode(mode) {
-      user.settings = {
-        ...user.settings,
-        joystickMode: mode,
-      };
-
-      return {
-        joystickMode: user.settings.joystickMode,
-        serverStatus: "pending-user-issued-restart",
-      };
-    },
     toggleOpenAtLogin(openAtLogin = false) {
       updateSystemSettings({
         openAtLogin,
@@ -154,7 +143,6 @@ const store = {
       return settings.executableWillLaunchAtLogin && settings.openAtLogin;
     },
     lastRestartAfterCrash: 0,
-    joystickMode: user.settings.joystickMode,
     manageMicrophones: user.settings.manageMicrophones ?? false,
     joystickList: [],
     microphoneList: [],

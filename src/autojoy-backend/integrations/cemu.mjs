@@ -1,9 +1,8 @@
 import path from "path";
 import { deleteFile, loaders, savers } from "../../common/file.mjs";
-import { joystickModes } from "../../common/joystick.mjs";
 import { findNextConnectedXinputIdentifier } from "./shared.mjs";
 import { user } from "../../common/settings.mjs";
-import { createJoystick } from "../joystick.mjs";
+import { createJoystickFromXinputDevice } from "../joystick.mjs";
 
 const configTemplates = loaders.xml("config-templates/cemu.xml");
 const cemuPath = path.resolve(user.paths.cemu, "controllerProfiles");
@@ -14,10 +13,7 @@ const inputConfigFileNames = [
   "controller3.xml",
 ];
 
-const apiValues = {
-  [joystickModes.sdl]: "SDLController",
-  [joystickModes.xinput]: "XInput",
-};
+const xinputApiValue = "XInput";
 
 const xinputDisplayNamePrefix = "Controller";
 
@@ -45,8 +41,7 @@ function handleXinputJoystickListUpdate(joystickList) {
 
     const newConfig = configTemplates[device.type] ?? configTemplates.GAMEPAD;
 
-    newConfig.emulated_controller.controller.api =
-      apiValues[joystickModes.xinput];
+    newConfig.emulated_controller.controller.api = xinputApiValue;
     newConfig.emulated_controller.controller.uuid = deviceIndex;
     newConfig.emulated_controller.controller.display_name = `${xinputDisplayNamePrefix} ${
       deviceIndex + 1
@@ -63,8 +58,7 @@ function handleXinputJoystickListUpdate(joystickList) {
 }
 
 async function handleSDLJoystickListUpdate() {
-  // we don't actually support SDL, so we'll just spin up xinput here real quick to support cemu while in SDL mode lol.
-
+  // we don't actually support SDL, so we'll just spin up xinput here real quick to support cemu.
   const xinput = await import("xinput-ffi");
   const deviceList = [];
 
@@ -75,7 +69,7 @@ async function handleSDLJoystickListUpdate() {
   ) {
     try {
       const device = await xinput.getCapabilities(position);
-      deviceList.push(createJoystick(device, joystickModes.xinput));
+      deviceList.push(createJoystickFromXinputDevice(device));
     } catch (e) {
       // either the device is not connected or the xinput device could not be identified and we report it as not connected
       deviceList.push(null);
@@ -85,14 +79,9 @@ async function handleSDLJoystickListUpdate() {
   return handleXinputJoystickListUpdate(deviceList);
 }
 
-const joystickListUpdateHandlers = {
-  xinput: handleXinputJoystickListUpdate,
-  sdl: handleSDLJoystickListUpdate,
-};
-
 const cemu = {
   handleJoystickListUpdate(joystickList) {
-    joystickListUpdateHandlers[user.settings.joystickMode](joystickList);
+    handleSDLJoystickListUpdate(joystickList);
   },
 };
 

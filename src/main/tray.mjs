@@ -4,7 +4,6 @@ import store from "./store.mjs";
 import { createAboutWindow, createPathsWindow } from "./window.mjs";
 import rootdir from "../common/rootdir.mjs";
 import { userFolderPath } from "../common/settings.mjs";
-import { joystickModes } from "../common/joystick.mjs";
 import { isMicrophoneInUse } from "../common/device-filters.mjs";
 
 const { actions, dispatch } = store;
@@ -42,18 +41,6 @@ export function startTray() {
         },
       },
       { type: "separator" },
-      {
-        label: "Joystick mode",
-        type: "submenu",
-        submenu: Object.values(joystickModes).map((mode) => ({
-          label: mode,
-          type: "checkbox",
-          checked: store.state.joystickMode === mode,
-          click: () => {
-            dispatch(actions.changeJoystickMode(mode));
-          },
-        })),
-      },
       ...(store.state.joystickList.length
         ? store.state.joystickList.map((d) => ({
             type: "normal",

@@ -1,7 +1,5 @@
 import path from "path";
 import { loaders, savers } from "../../common/file.mjs";
-import { joystickTypes } from "../../common/joystick.mjs";
-import { findNextConnectedXinputIdentifier } from "./shared.mjs";
 import { user } from "../../common/settings.mjs";
 
 const configTemplates = {
@@ -33,25 +31,6 @@ const wiiConstants = {
   },
 };
 
-const xinputDeviceIdentifiers = [
-  "XInput/0/Gamepad",
-  "XInput/1/Gamepad",
-  "XInput/2/Gamepad",
-  "XInput/3/Gamepad",
-];
-
-function getDolphinXinputDeviceName(joystick, position) {
-  if (joystick.type === joystickTypes.gamepad) {
-    return xinputDeviceIdentifiers[position];
-  }
-
-  if (joystick.type === joystickTypes.rockBandDrumKit) {
-    return xinputDeviceIdentifiers[position].replace("Gamepad", "Drum Kit");
-  }
-
-  return xinputDeviceIdentifiers[position].replace("Gamepad", "Device");
-}
-
 // Dolphin uses the format: SDL/count/deviceName
 // eg.: SDL/0/Xbox Series X Controller
 // the number is relative to how many of the same controller is connected. it's not a player/position indicator.
@@ -65,99 +44,6 @@ function prependNumbersToSDLDeviceNames(arr) {
     }
     return { ...item, name: `SDL/${counts[item.name]}/${item.name}` };
   });
-}
-
-function handleXinputJoystickListUpdate(joystickList) {
-  // trimming the list because with xinput, it's possible for device 1 to be disconnected and device 2 to be connected.
-  let trimmedList = joystickList.filter((joystick) => joystick);
-
-  const newConfig = {};
-
-  wiiConstants.playerIdentifiers.forEach((identifier, position) => {
-    const joystick = trimmedList[position];
-    // setting disconnected devices
-    if (!joystick) {
-      newConfig[identifier] = configTemplates.wiimoteEmulated.GAMEPAD;
-      newConfig[identifier].Source = wiiConstants.wiimoteSources.none;
-      return;
-    }
-
-    newConfig[identifier] = structuredClone(
-      configTemplates.wiimoteEmulated[joystick.type] ??
-        configTemplates.wiimoteEmulated.GAMEPAD
-    );
-
-    newConfig[identifier].Device = getDolphinXinputDeviceName(
-      joystick,
-      findNextConnectedXinputIdentifier(joystickList, position)
-    );
-
-    newConfig[identifier].Source = wiiConstants.wiimoteSources.emulated;
-  });
-
-  savers.ini(
-    newConfig,
-    path.resolve(dolphinPath, wiiConstants.inputConfigFilePath)
-  );
-
-  console.log(
-    "DOLPHIN - Wii Input settings saved at",
-    path.resolve(dolphinPath, wiiConstants.inputConfigFilePath)
-  );
-
-  const newGCConfig = {};
-  const newMainConfig = loaders.ini(
-    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
-  );
-
-  if (!newMainConfig.Core) {
-    newMainConfig.Core = {};
-  }
-
-  gamecubeConstants.playerIdentifiers.forEach((identifier, position) => {
-    // setting disconnected devices
-    const joystick = trimmedList[position];
-
-    if (!joystick) {
-      newGCConfig[identifier] = configTemplates.gamecube.GAMEPAD;
-      newMainConfig.Core[gamecubeConstants.devices[position]] =
-        gamecubeConstants.deviceModes.disabled;
-      return;
-    }
-
-    newGCConfig[identifier] = {
-      ...(configTemplates.gamecube[joystick.type] ??
-        configTemplates.gamecube.GAMEPAD),
-    };
-
-    newGCConfig[identifier].Device =
-      xinputDeviceIdentifiers[
-        findNextConnectedXinputIdentifier(joystickList, position)
-      ];
-
-    newMainConfig.Core[gamecubeConstants.devices[position]] =
-      gamecubeConstants.deviceModes.enabled;
-  });
-
-  savers.ini(
-    newGCConfig,
-    path.resolve(dolphinPath, gamecubeConstants.inputConfigFilePath)
-  );
-
-  console.log(
-    "DOLPHIN - GC Input settings saved at",
-    path.resolve(dolphinPath, gamecubeConstants.inputConfigFilePath)
-  );
-
-  savers.ini(
-    newMainConfig,
-    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
-  );
-
-  console.log(
-    "DOLPHIN - Main settings saved at",
-    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
-  );
 }
 
 function handleSDLJoystickListUpdate(joystickList) {
@@ -239,14 +125,9 @@ function handleSDLJoystickListUpdate(joystickList) {
   );
 }
 
-const joystickListUpdateHandlers = {
-  xinput: handleXinputJoystickListUpdate,
-  sdl: handleSDLJoystickListUpdate,
-};
-
 const dolphin = {
   handleJoystickListUpdate(joystickList) {
-    joystickListUpdateHandlers[user.settings.joystickMode](joystickList);
+    handleSDLJoystickListUpdate(joystickList);
   },
 };
 

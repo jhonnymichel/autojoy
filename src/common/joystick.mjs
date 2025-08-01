@@ -1,16 +1,9 @@
-export const joystickModes = {
-  xinput: "xinput",
-  sdl: "sdl",
-};
-
 export const joystickTypes = {
-  guitar: "GUITAR",
-  sdlGuitar: "SDL_GUITAR",
+  xinputGuitar: "XINPUT_GUITAR",
   ps3GuitarHeroGuitar: "PS3_GUITARHERO_GUITAR",
   crkdGuitarPCMode: "CRKD_GUITAR_PC_MODE",
-  rockBandDrumKit: "ROCKBAND_DRUM_KIT",
-  sdlRockBandDrumKit: "SDL_ROCKBAND_DRUM_KIT",
-  wiiRockBandDrumKit: "WII_ROCKBAND_DRUM_KIT",
+  xinputRockBandDrumKit: "XINPUT_ROCKBAND_DRUM_KIT",
+  wiiAndPs3RockBandDrumKit: "WII_PS3_ROCKBAND_DRUM_KIT",
   gamepad: "GAMEPAD",
 };
 
@@ -18,12 +11,12 @@ export const hardwareInfo = {
   harmonixDrumControllerForNintendoWii: {
     manufacturerId: 7085,
     productId: 12560,
-    type: joystickTypes.wiiRockBandDrumKit,
+    type: joystickTypes.wiiAndPs3RockBandDrumKit,
   },
   harmonixDrumControllerForPS3: {
     manufacturerId: 4794,
     productId: 528,
-    type: joystickTypes.wiiRockBandDrumKit,
+    type: joystickTypes.wiiAndPs3RockBandDrumKit,
   },
   guitarHeroGuitarForPS3: {
     manufacturerId: 4794,

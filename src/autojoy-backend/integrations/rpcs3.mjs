@@ -2,7 +2,6 @@ import path from "path";
 import fs from "fs";
 import mmjoystick from "./rpcs3/mmjoystick.mjs";
 import { loaders, savers } from "../../common/file.mjs";
-import { findNextConnectedXinputIdentifier } from "./shared.mjs";
 import { user } from "../../common/settings.mjs";
 
 const configTemplates = loaders.yml("config-templates/rpcs3.yml");
@@ -31,18 +30,10 @@ const playerIdentifiers = [
   "Player 7 Input",
 ];
 
-// that's how rpcs3 calls the devices when using xinput handler (when using SDL handler, it uses the SDL device names)
-const xinputDeviceIdentifiers = [
-  "XInput Pad #1",
-  "XInput Pad #2",
-  "XInput Pad #3",
-  "XInput Pad #4",
-];
-
 // the input setting "Handler" option
 const inputHandlers = {
-  xinput: "XInput",
   sdl: "SDL",
+  mmJoystick: "MMJoystick",
 };
 
 // Microphone
@@ -83,44 +74,6 @@ function appendNumbersToSDLDeviceNames(arr) {
   });
 }
 
-function handleXinputJoystickListUpdate(joystickList) {
-  // trimming the list because with xinput, it's possible for device 1 to be disconnected and device 2 to be connected. right now we don't want to deal with disconnected positions.
-  let trimmedList = joystickList.filter((joystick) => joystick);
-  const newConfig = {};
-
-  playerIdentifiers.forEach((identifier, position) => {
-    // setting all positions above player 4 as empty (xinput api only lists 4 devices)
-    if (!trimmedList[position]) {
-      newConfig[identifier] = configTemplates.Empty;
-      return;
-    }
-
-    newConfig[identifier] = structuredClone(
-      configTemplates[trimmedList[position].type] ?? configTemplates.Empty
-    );
-
-    // with xinput, it's possible for device 1 to be disconnected and device 2 to be connected. the order is not always reassigned when you disconnect a controller.
-    // example: [null, null, XINPUT_DEVSUBTYPE_GAMEPAD, null]. It looks like this happen when you mix x360 and one/series controllers.
-    // so if we have only one controller for instance, it'll be assigned to player 1 in the emulator, but the selected device would be XInput pad #3
-    newConfig[identifier].Device =
-      xinputDeviceIdentifiers[
-        findNextConnectedXinputIdentifier(joystickList, position)
-      ];
-    newConfig[identifier].Handler = inputHandlers[user.settings.joystickMode];
-  });
-
-  savers.yml(newConfig, path.resolve(rpcs3Path, inputConfigFileName));
-  savers.yml(
-    getActiveInputProfileObject(),
-    path.resolve(rpcs3Path, activeProfileFileName)
-  );
-
-  console.log(
-    "RPCS3 - Input settings saved at",
-    path.resolve(rpcs3Path, inputConfigFileName)
-  );
-}
-
 function handleSDLJoystickListUpdate(joystickList) {
   // updating device names to match what rpcs3 uses
   const fixedList = appendNumbersToSDLDeviceNames(
@@ -142,7 +95,7 @@ function handleSDLJoystickListUpdate(joystickList) {
     );
 
     try {
-      let handler = inputHandlers[user.settings.joystickMode];
+      let handler = inputHandlers.sdl;
       let device = joystick.name;
 
       if (
@@ -157,7 +110,7 @@ function handleSDLJoystickListUpdate(joystickList) {
         )}`;
 
         device = mmJoystickDevice;
-        handler = "MMJoystick";
+        handler = inputHandlers.mmJoystick;
       }
 
       newConfig[identifier].Device = device;
@@ -185,11 +138,6 @@ function handleSDLJoystickListUpdate(joystickList) {
     path.resolve(rpcs3Path, activeProfileFileName)
   );
 }
-
-const joystickListUpdateHandlers = {
-  xinput: handleXinputJoystickListUpdate,
-  sdl: handleSDLJoystickListUpdate,
-};
 
 function handleMicrophoneListUpdate(microphoneList) {
   const currentConfig = loaders.yml(
@@ -243,7 +191,7 @@ function handleMicrophoneListUpdate(microphoneList) {
 
 const rpcs3 = {
   handleJoystickListUpdate(joystickList) {
-    joystickListUpdateHandlers[user.settings.joystickMode](joystickList);
+    handleSDLJoystickListUpdate(joystickList);
   },
   handleMicrophoneListUpdate,
 };

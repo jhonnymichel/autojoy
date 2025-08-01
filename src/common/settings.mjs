@@ -5,7 +5,6 @@ import {
   resolvePathFromUserFolder,
   savers,
 } from "./file.mjs";
-import { joystickModes } from "./joystick.mjs";
 
 export const userFolderPath = resolvePathFromUserFolder(".");
 export const templatesFolderPath =
@@ -84,19 +83,6 @@ function migrateUserSettings() {
 
 export function validateSettings(log = (...msg) => console.log(...msg)) {
   const userSettings = user.settings;
-
-  if (!Object.values(joystickModes).includes(userSettings.joystickMode)) {
-    log(
-      `user settings.joystickMode invalid value. can be ${Object.values(
-        joystickModes
-      )}. found '${user.settings.joystickMode}'. Resetting it to xinput.`
-    );
-
-    user.settings = {
-      ...user.settings,
-      joystickMode: "xinput",
-    };
-  }
 
   if (userSettings.unusedMicrophones) {
     if (!Array.isArray(userSettings.unusedMicrophones)) {
