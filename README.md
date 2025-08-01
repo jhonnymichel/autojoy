@@ -24,6 +24,7 @@ Currently only supports Windows.
 ### RPCS3
 
 - Guitars:
+  - CRKD Les Paul PC Mode
   - Xbox 360 Guitar Hero and Rock Band Guitars.
   - Wii Guitar Hero Guitars via Wiitar thing.
   - Santroller Guitars in default mode.
@@ -46,6 +47,7 @@ Currently only supports Windows.
 ### Dolphin
 
 - Guitars:
+  - CRKD Les Paul PC Mode
   - Xbox 360 Guitar Hero and Rock Band Guitars.
   - Wii Guitars Hero Guitars via Wiitar thing.
   - Santroller Guitars in default mode.
@@ -78,6 +80,7 @@ Currently only supports Windows.
 It's recommended to disconnect non-instrument controllers for full band gameplay. Player 1 in this game is always the singer controlled with the computer keyboard when a microphone is setup.
 
 - Guitars:
+  - CRKD Les Paul PC Mode
   - Xbox 360 Guitar Hero and Rock Band Guitars.
   - Wii Guitar Hero Guitars via Wiitar thing.
   - Santroller Guitars in default mode.

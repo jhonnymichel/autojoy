@@ -83,12 +83,19 @@ const joystickListUpdateHandlers = {
       // we disable regular gamepads to open space for full band (2 guitars + drums).
       // player 1 is always the keyboard and it can't be changed, and when a mic is selected,
       // the keyboard becomes the vocals controller.
-      // TODO: this doesn't do anything. but I tried lol
+      // FIXME: this doesn't do anything. but I tried lol
       if (selectedDevice.type === joystickTypes.gamepad) {
         newConfig[selectedDevice.ghwtdeGUID].Enabled = 0;
       }
 
       newConfig[selectedDevice.ghwtdeGUID].DeviceName = selectedDevice.name;
+    });
+
+    // deactivating all xinput positions to avoid xinput devices to be enabled twice (one as SDL once as Xinput), causing double inputs
+    xinputPlayerIdentifiers.forEach((xinputIdentifier) => {
+      // FIXME: this doesnt work although it should. set type to gamepad instead
+      // newConfig[xinputIdentifier].Enabled = 0;
+      newConfig[xinputIdentifier].Type = "Gamepad";
     });
 
     savers.ini(newConfig, path.resolve(gameSettingsPath, inputConfigFileName));
