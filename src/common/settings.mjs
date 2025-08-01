@@ -5,6 +5,7 @@ import {
   resolvePathFromUserFolder,
   savers,
 } from "./file.mjs";
+import migrations from "../migrations.mjs";
 
 export const userFolderPath = resolvePathFromUserFolder(".");
 export const templatesFolderPath =
@@ -28,13 +29,15 @@ export const user = {
   },
 };
 
-function amendNewDefaults(filePath, loader, saver) {
+function amendNewDefaults({ filePath, templatePath, loader, saver }) {
   const userFile = loader(filePath);
-  const appBaseFile = loader(resolvePathFromPackagedRoot(filePath));
+  const appBaseFile = loader(
+    resolvePathFromPackagedRoot(templatePath ?? filePath)
+  );
 
   let itemsToAmend = [];
   for (const [key, value] of Object.entries(appBaseFile)) {
-    if (!userFile[key] && !key.includes("?xml")) {
+    if (!Object.hasOwn(userFile, key) && !key.includes("?xml")) {
       itemsToAmend.push(key);
       userFile[key] = value;
     }
@@ -49,13 +52,16 @@ function amendNewDefaults(filePath, loader, saver) {
   }
 }
 
-function migrateUserFile(filePath, loader, saver) {
+function migrateUserFile({ filePath, templatePath, loader, saver }) {
   try {
     loader(filePath);
-    amendNewDefaults(filePath, loader, saver);
+    amendNewDefaults({ filePath, templatePath, loader, saver });
   } catch (e) {
     logFromApp("Creating not found user file: ", filePath);
-    saver(loader(resolvePathFromPackagedRoot(filePath)), filePath);
+    saver(
+      loader(resolvePathFromPackagedRoot(templatePath ?? filePath)),
+      filePath
+    );
   }
 }
 
@@ -63,22 +69,68 @@ function migrateUserSettings() {
   // for first app execution after install or update.
   // we create the userland settings from inside the app package.
   // and amend new settings if needed.
-  migrateUserFile("user/paths.json", loaders.json, savers.json);
-  migrateUserFile("user/settings.json", loaders.json, savers.json);
-  migrateUserFile("config-templates/rpcs3.yml", loaders.yml, savers.yml);
-  migrateUserFile("config-templates/cemu.xml", loaders.xml, savers.xml);
-  migrateUserFile("config-templates/dolphin-gc.ini", loaders.ini, savers.ini);
-  migrateUserFile(
-    "config-templates/dolphin-wiimote-emulated.ini",
-    loaders.ini,
-    savers.ini
-  );
-  migrateUserFile(
-    "config-templates/dolphin-wiimote-real.ini",
-    loaders.ini,
-    savers.ini
-  );
-  migrateUserFile("config-templates/ghwtde.ini", loaders.ini, savers.ini);
+  migrateUserFile({
+    filePath: "user/migrations.json",
+    templatePath: "user/migrations.template.json",
+    loader: loaders.json,
+    saver: savers.json,
+  });
+  migrateUserFile({
+    filePath: "user/paths.json",
+    templatePath: "user/paths.template.json",
+    loader: loaders.json,
+    saver: savers.json,
+  });
+  migrateUserFile({
+    filePath: "user/settings.json",
+    templatePath: "user/settings.template.json",
+    loader: loaders.json,
+    saver: savers.json,
+  });
+  migrateUserFile({
+    filePath: "config-templates/rpcs3.yml",
+    loader: loaders.yml,
+    saver: savers.yml,
+  });
+  migrateUserFile({
+    filePath: "config-templates/cemu.xml",
+    loader: loaders.xml,
+    saver: savers.xml,
+  });
+  migrateUserFile({
+    filePath: "config-templates/dolphin-gc.ini",
+    loader: loaders.ini,
+    saver: savers.ini,
+  });
+  migrateUserFile({
+    filePath: "config-templates/dolphin-wiimote-emulated.ini",
+    loader: loaders.ini,
+    saver: savers.ini,
+  });
+  migrateUserFile({
+    filePath: "config-templates/dolphin-wiimote-real.ini",
+    loader: loaders.ini,
+    saver: savers.ini,
+  });
+  migrateUserFile({
+    filePath: "config-templates/ghwtde.ini",
+    loader: loaders.ini,
+    saver: savers.ini,
+  });
+
+  const migrationsRan = loaders.json("user/migrations.json");
+  migrations.forEach((migration) => {
+    if (!migrationsRan[migration.name]) {
+      try {
+        migration.execute();
+        logFromApp(`Migration "${migration.name}" applied!`);
+        migrationsRan[migration.name] = new Date().toLocaleDateString();
+      } catch (e) {
+        logFromApp(`Migration "${migration.name}" failed: `, e.message);
+      }
+    }
+  });
+  savers.json(migrationsRan, "user/migrations.json");
 }
 
 export function validateSettings(log = (...msg) => console.log(...msg)) {

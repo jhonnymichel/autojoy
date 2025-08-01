@@ -1,6 +1,7 @@
 node_modules/
 user/paths.json
 user/settings.json
+user/migrations.json
 autojoy-win32-x64/
 logs.*
 dist/
