@@ -90,9 +90,8 @@ function handleSDLJoystickListUpdate(joystickList) {
 
   // deactivating all xinput positions to avoid xinput devices to be enabled twice (one as SDL once as Xinput), causing double inputs
   xinputPlayerIdentifiers.forEach((xinputIdentifier) => {
-    // FIXME: this doesnt work although it should. set type to gamepad instead
-    // newConfig[xinputIdentifier].Enabled = 0;
-    newConfig[xinputIdentifier].Type = "Gamepad";
+    // FIXME: The "Enabled" key just doesn't work in the game.
+    newConfig[xinputIdentifier] = structuredClone(configTemplates.Empty);
   });
 
   savers.ini(newConfig, path.resolve(gameSettingsPath, inputConfigFileName));
