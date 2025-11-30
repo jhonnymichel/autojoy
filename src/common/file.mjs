@@ -34,8 +34,9 @@ if (settingsFolder.includes(".asar")) {
   //   userFolder = documentsPath + "/autojoy";
   // }
 
-  function getLocalAppDataPath() {
+  function getSettingsBaseFolderByPlatform() {
     try {
+      if (process.platform === "win32") {
       const localAppDataPath = execSync(
         "powershell -command \"[System.Environment]::GetFolderPath('LocalApplicationData')\"",
         {
@@ -44,17 +45,25 @@ if (settingsFolder.includes(".asar")) {
       ).trim();
 
       return localAppDataPath;
+      }
+      
+      // linux: use XDG config home or ~/.config
+      const xdg = process.env.XDG_CONFIG_HOME;
+      if (xdg && xdg.length) {
+        return xdg;
+      }
+
+      const home = process.env.HOME || process.env.USERPROFILE;
+      return path.resolve(home, ".config");
     } catch (error) {
-      console.error("Failed to get Local AppData path:", error);
+      console.error("Failed to resolve settings base folder:", error);
       return null;
     }
   }
 
-  const appDataFolder = getLocalAppDataPath();
-
-  // if we have the documents path extracted, we use documents/autojoy as the user folder.
-  if (appDataFolder) {
-    settingsFolder = path.resolve(appDataFolder, "com.jhonnymichel", "autojoy");
+  const platformBaseSettingsFolder = getSettingsBaseFolderByPlatform();
+  if (platformBaseSettingsFolder) {
+    settingsFolder = path.resolve(platformBaseSettingsFolder, "com.jhonnymichel", "autojoy");
   }
 }
 
