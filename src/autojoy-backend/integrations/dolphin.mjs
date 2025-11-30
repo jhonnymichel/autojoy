@@ -1,4 +1,5 @@
 import path from "path";
+import fs from "fs"
 import { loaders, savers } from "../../common/file.mjs";
 import { user } from "../../common/settings.mjs";
 
@@ -8,7 +9,7 @@ const configTemplates = {
   wiimoteReal: loaders.ini("config-templates/dolphin-wiimote-real.ini"),
 };
 
-const dolphinPath = path.resolve(user.paths.dolphin, "User/Config");
+const dolphinPath = resolveDolphinPath();
 
 const gamecubeConstants = {
   inputConfigFilePath: "GCPadNew.ini",
@@ -30,6 +31,21 @@ const wiiConstants = {
     none: "0",
   },
 };
+
+function resolveDolphinPath() {
+  const dolphinPortablePath = path.resolve(user.paths.dolphin, "User/Config")
+  if (fs.existsSync(dolphinPortablePath)) {
+    return dolphinPortablePath
+  }
+
+  const dolphinFlatpackPath = path.resolve(user.paths.dolphin, "config/dolphin-emu")
+  if (fs.existsSync(dolphinFlatpackPath)) {
+    return dolphinFlatpackPath
+  }
+
+  // TODO: Dolphin installed via regular installer on Windows, folder is on My Documents. check structure and add case.
+  return path.resolve(user.paths.dolphin)
+}
 
 // Dolphin uses the format: SDL/count/deviceName
 // eg.: SDL/0/Xbox Series X Controller
@@ -62,7 +78,7 @@ function handleSDLJoystickListUpdate(joystickList) {
 
     newConfig[identifier] = structuredClone(
       configTemplates.wiimoteEmulated[joystick.type] ??
-        configTemplates.wiimoteEmulated.GAMEPAD
+      configTemplates.wiimoteEmulated.GAMEPAD
     );
 
     newConfig[identifier].Device = joystick.name;
