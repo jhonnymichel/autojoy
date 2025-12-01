@@ -177,7 +177,7 @@ CRKD_GUITAR_PC_MODE:
     Product ID: 256
   Buddy Device: "Null"
 XINPUT_ROCKBAND_DRUM_KIT:
-  Handler: XInput
+  Handler: SDL
   Device: "XInput Pad #1"
   Config:
     Left Stick Left: LS X-
@@ -263,34 +263,34 @@ XINPUT_ROCKBAND_DRUM_KIT:
     Product ID: 536
   Buddy Device: "Null"
 PS3_GUITARHERO_GUITAR:
-  Handler: MMJoystick
-  Device: "Joystick #1"
+  Handler: Evdev
+  Device: ""
   Config:
-    Left Stick Left: X-
-    Left Stick Down: Y+
-    Left Stick Right: X+
-    Left Stick Up: Y-
+    Left Stick Left: ""
+    Left Stick Down: ""
+    Left Stick Right: ""
+    Left Stick Up: ""
     Right Stick Left: ""
-    Right Stick Down: Button 8
-    Right Stick Right: Z+
-    Right Stick Up: Button 8
-    Start: Button 10
-    Select: Button 9
-    PS Button: Button 13
-    Square: Button 1
-    Cross: Button 2
-    Circle: Button 3
-    Triangle: Button 4
-    Left: POV Left
-    Down: POV Down
-    Right: POV Right
-    Up: POV Up
-    R1: Button 6
-    R2: Button 8
-    R3: Button 10
-    L1: Button 5
-    L2: Button 7
-    L3: Button 11
+    Right Stick Down: ""
+    Right Stick Right: LZ+
+    Right Stick Up: ""
+    Start: TR 2
+    Select: TL 2,Z
+    PS Button: ""
+    Square: A
+    Cross: B
+    Circle: C
+    Triangle: X
+    Left: Hat0 X-
+    Down: Hat0 Y+
+    Right: Hat0 X+
+    Up: Hat0 Y-
+    R1: ""
+    R2: ""
+    R3: Thumb R
+    L1: Y
+    L2: ""
+    L3: Thumb L
     IR Nose: ""
     IR Tail: ""
     IR Left: ""
@@ -298,19 +298,19 @@ PS3_GUITARHERO_GUITAR:
     Tilt Left: ""
     Tilt Right: ""
     Motion Sensor X:
-      Axis: ""
+      Axis: X
       Mirrored: false
       Shift: 0
     Motion Sensor Y:
-      Axis: ""
+      Axis: Y
       Mirrored: false
       Shift: 0
     Motion Sensor Z:
-      Axis: ""
+      Axis: Z
       Mirrored: false
       Shift: 0
     Motion Sensor G:
-      Axis: ""
+      Axis: RY
       Mirrored: false
       Shift: 0
     Orientation Reset Button: ""
@@ -323,14 +323,14 @@ PS3_GUITARHERO_GUITAR:
     Analog Limiter Toggle Mode: false
     Left Stick Multiplier: 100
     Right Stick Multiplier: 100
-    Left Stick Deadzone: 33
-    Right Stick Deadzone: 35
+    Left Stick Deadzone: 36
+    Right Stick Deadzone: 140
     Left Stick Anti-Deadzone: 33
     Right Stick Anti-Deadzone: 33
-    Left Trigger Threshold: 30
-    Right Trigger Threshold: 30
-    Left Pad Squircling Factor: 8000
-    Right Pad Squircling Factor: 8000
+    Left Trigger Threshold: 0
+    Right Trigger Threshold: 0
+    Left Pad Squircling Factor: 4000
+    Right Pad Squircling Factor: 4000
     Color Value R: 0
     Color Value G: 0
     Color Value B: 0
@@ -341,6 +341,7 @@ PS3_GUITARHERO_GUITAR:
     Large Vibration Motor Multiplier: 100
     Small Vibration Motor Multiplier: 100
     Switch Vibration Motors: false
+    Vibration Threshold: 63
     Mouse Movement Mode: Relative
     Mouse Deadzone X Axis: 60
     Mouse Deadzone Y Axis: 60
