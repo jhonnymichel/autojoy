@@ -6,10 +6,11 @@ import { XMLBuilder, XMLParser } from "fast-xml-parser";
 import { execSync } from "child_process";
 import rootdir from "./rootdir.mjs";
 
-// Resolving user folder. in development mode, it'll be root of the repository (user and config-templates folders).
-let settingsFolder = rootdir;
+
 // we keep a reference to the app directory so we can grab templates from here when needed. applies in production where the app dir is packaged.
-let __packagedDirname = settingsFolder;
+let __packagedDirname = rootdir;
+// Resolving user folder. in development mode, it'll be placed in the local copy of the repository (user and config-templates folders).
+let settingsFolder = path.join(rootdir, "dev-app-data");
 // if we're in production, we set user folder to be outside of the app directory, in the root of the install first.
 if (settingsFolder.includes(".asar")) {
   settingsFolder = path.resolve(settingsFolder, "..");
@@ -37,16 +38,16 @@ if (settingsFolder.includes(".asar")) {
   function getSettingsBaseFolderByPlatform() {
     try {
       if (process.platform === "win32") {
-      const localAppDataPath = execSync(
-        "powershell -command \"[System.Environment]::GetFolderPath('LocalApplicationData')\"",
-        {
-          encoding: "utf8",
-        }
-      ).trim();
+        const localAppDataPath = execSync(
+          "powershell -command \"[System.Environment]::GetFolderPath('LocalApplicationData')\"",
+          {
+            encoding: "utf8",
+          }
+        ).trim();
 
-      return localAppDataPath;
+        return localAppDataPath;
       }
-      
+
       // linux: use XDG config home or ~/.config
       const xdg = process.env.XDG_CONFIG_HOME;
       if (xdg && xdg.length) {
