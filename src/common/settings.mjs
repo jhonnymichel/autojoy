@@ -1,4 +1,5 @@
 import { logFromApp } from "./logger.mjs";
+import path from "path"
 import {
   loaders,
   resolvePathFromPackagedRoot,
@@ -10,7 +11,7 @@ import migrations from "../migrations.mjs";
 export const userFolderPath = resolvePathFromUserFolder(".");
 
 const packagedRootConfigTemplatesPath =
-  path.join(process.platform === "win32" ? "win32" : "linux", "config-templates");
+  path.join("config-templates", process.platform === "win32" ? "win32" : "linux");
 
 // must validate and migrate paths before allowing user object to be used.
 migrateUserSettings();
