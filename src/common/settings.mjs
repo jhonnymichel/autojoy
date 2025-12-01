@@ -8,8 +8,9 @@ import {
 import migrations from "../migrations.mjs";
 
 export const userFolderPath = resolvePathFromUserFolder(".");
-export const templatesFolderPath =
-  resolvePathFromUserFolder("config-templates");
+
+const packagedRootConfigTemplatesPath =
+  path.join(process.platform === "win32" ? "win32" : "linux", "config-templates");
 
 // must validate and migrate paths before allowing user object to be used.
 migrateUserSettings();
@@ -89,31 +90,37 @@ function migrateUserSettings() {
   });
   migrateUserFile({
     filePath: "config-templates/rpcs3.yml",
+    templatePath: path.join(packagedRootConfigTemplatesPath, "rpcs3.yml"),
     loader: loaders.yml,
     saver: savers.yml,
   });
   migrateUserFile({
     filePath: "config-templates/cemu.xml",
+    templatePath: path.join(packagedRootConfigTemplatesPath, "cemu.xml"),
     loader: loaders.xml,
     saver: savers.xml,
   });
   migrateUserFile({
     filePath: "config-templates/dolphin-gc.ini",
+    templatePath: path.join(packagedRootConfigTemplatesPath, "dolphin-gc.ini"),
     loader: loaders.ini,
     saver: savers.ini,
   });
   migrateUserFile({
     filePath: "config-templates/dolphin-wiimote-emulated.ini",
+    templatePath: path.join(packagedRootConfigTemplatesPath, "dolphin-wiimote-emulated.ini"),
     loader: loaders.ini,
     saver: savers.ini,
   });
   migrateUserFile({
     filePath: "config-templates/dolphin-wiimote-real.ini",
+    templatePath: path.join(packagedRootConfigTemplatesPath, "dolphin-wiimote-real.ini"),
     loader: loaders.ini,
     saver: savers.ini,
   });
   migrateUserFile({
     filePath: "config-templates/ghwtde.ini",
+    templatePath: path.join(packagedRootConfigTemplatesPath, "ghwtde.ini"),
     loader: loaders.ini,
     saver: savers.ini,
   });
