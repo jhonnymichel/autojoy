@@ -3,6 +3,8 @@ import fs from "fs";
 import mmjoystick from "./rpcs3/mmjoystick.mjs";
 import { loaders, savers } from "../../common/file.mjs";
 import { user } from "../../common/settings.mjs";
+import { hardwareInfo } from "../../common/joystick.mjs";
+import { isHardware } from "../joystick.mjs";
 
 const configTemplates = loaders.yml("config-templates/rpcs3.yml");
 const rpcs3Path = user.paths.rpcs3;
@@ -33,6 +35,7 @@ const playerIdentifiers = [
 const inputHandlers = {
   sdl: "SDL",
   mmJoystick: "MMJoystick",
+  evdev: "Evdev",
 };
 
 // Microphone
@@ -92,10 +95,63 @@ function appendNumbersToSDLDeviceNames(arr) {
   });
 }
 
+/*
+Wii and PS3 peripherals only work via evdev on Linux.
+
+NAME FIXES AND PREFIXES
+- rpcs3 uses the Evdev device names with a "n. " prefix.
+- eg.: 2. Xbox Series X Controller, 2. DualSense Wireless Controller
+- the number is relative to how many of the same controller is connected.
+- only 2nd + devices get the prefix.
+- there are also some name fixes needed for certain devices.
+*/
+
+const evdevDevices = [
+  hardwareInfo.harmonixDrumControllerForNintendoWii,
+  hardwareInfo.harmonixDrumControllerForPS3,
+  hardwareInfo.guitarHeroGuitarForPS3,
+];
+
+function shouldUseEvdev(manufacturerId, productId) {
+  if (process.platform !== "linux") {
+    return false;
+  }
+
+  return evdevDevices.some((mmJoystickDevice) =>
+    isHardware({ manufacturerId, productId }, mmJoystickDevice)
+  );
+}
+
+function addEvdevInfo(arr) {
+  if (process.platform !== "linux") {
+    return arr;
+  }
+
+  const counts = {};
+  return arr.map((item) => {
+    counts[item.name] = (counts[item.name] || 0) + 1;
+
+    const isEvdev = shouldUseEvdev(item.raw.vendor, item.raw.product);
+
+    if (!isEvdev) { return item }
+
+    let evdevName = item.name;
+    if (evdevName === "Licensed by Nintendo of America Harmonix Drum Controller for Nintendo Wii") {
+      // yes, it's the double space after America.
+      evdevName = "Licensed by Nintendo of America  Harmonix Drum Controller for Nintendo Wii"
+    }
+    if (counts[item.name] > 1) {
+      evdevName = `${counts[item.name]}. ${evdevName}`;
+    }
+
+    return { ...item, evdevMode: isEvdev, evdevName };
+  });
+}
+
 function handleSDLJoystickListUpdate(joystickList) {
   // updating device names to match what rpcs3 uses
   const fixedList = appendNumbersToSDLDeviceNames(
-    renameDLSController(joystickList)
+    renameDLSController(addEvdevInfo(joystickList))
   );
 
   const newConfig = {};
@@ -129,6 +185,9 @@ function handleSDLJoystickListUpdate(joystickList) {
 
         device = mmJoystickDevice;
         handler = inputHandlers.mmJoystick;
+      } else if (joystick.evdevMode) {
+        device = joystick.evdevName;
+        handler = inputHandlers.evdev;
       }
 
       newConfig[identifier].Device = device;
