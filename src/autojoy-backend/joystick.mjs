@@ -31,8 +31,8 @@ export function getHardwareInfo(deviceInfo) {
 function getSDLJoystickType(device, hardwareInfo) {
   // Device-specific handlers.
   // not all devices need this. a generic joystick type exists further down this function.
-  if (hardwareInfo) {
-    return hardwareInfo.type;
+  if (hardwareInfo?.getType) {
+    return hardwareInfo.getType(device);
   }
 
   // TODO: This is a catch-all generic matcher. further diferentiation might be needed.
