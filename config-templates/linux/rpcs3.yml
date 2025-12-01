@@ -355,34 +355,34 @@ PS3_GUITARHERO_GUITAR:
     Product ID: 256
   Buddy Device: "Null"
 WII_PS3_ROCKBAND_DRUM_KIT:
-  Handler: MMJoystick
-  Device: "Joystick #7"
+  Handler: Evdev
+  Device: "XInput Pad #1"
   Config:
-    Left Stick Left: LS X-
-    Left Stick Down: LS Y-
-    Left Stick Right: LS X+
-    Left Stick Up: LS Y+
-    Right Stick Left: RS X-
-    Right Stick Down: RS Y-
-    Right Stick Right: RS X+
-    Right Stick Up: RS Y+
-    Start: Button 10
-    Select: Button 9
-    PS Button: Button 13
-    Square: Button 1
-    Cross: Button 2
-    Circle: Button 3
-    Triangle: Button 4
-    Left: POV Left
-    Down: POV Down
-    Right: POV Right
-    Up: POV Up
-    R1: LT
-    R2: RT
-    R3: Button 12
-    L1: Button 5
-    L2: LT
-    L3: Button 11
+    Left Stick Left: LX-
+    Left Stick Down: LY+
+    Left Stick Right: LX+
+    Left Stick Up: LY-
+    Right Stick Left: RX-
+    Right Stick Down: RY+
+    Right Stick Right: RX+
+    Right Stick Up: RY-
+    Start: TR 2
+    Select: TL 2
+    PS Button: Mode
+    Square: A
+    Cross: B
+    Circle: C
+    Triangle: X
+    Left: Hat0 X-
+    Down: Hat0 Y+
+    Right: Hat0 X+
+    Up: Hat0 Y-
+    R1: TR
+    R2: RZ+
+    R3: Start
+    L1: Y
+    L2: LZ+
+    L3: Select
     IR Nose: ""
     IR Tail: ""
     IR Left: ""
@@ -390,19 +390,19 @@ WII_PS3_ROCKBAND_DRUM_KIT:
     Tilt Left: ""
     Tilt Right: ""
     Motion Sensor X:
-      Axis: ""
+      Axis: X
       Mirrored: false
       Shift: 0
     Motion Sensor Y:
-      Axis: ""
+      Axis: Y
       Mirrored: false
       Shift: 0
     Motion Sensor Z:
-      Axis: ""
+      Axis: Z
       Mirrored: false
       Shift: 0
     Motion Sensor G:
-      Axis: ""
+      Axis: RY
       Mirrored: false
       Shift: 0
     Orientation Reset Button: ""
@@ -415,14 +415,14 @@ WII_PS3_ROCKBAND_DRUM_KIT:
     Analog Limiter Toggle Mode: false
     Left Stick Multiplier: 100
     Right Stick Multiplier: 100
-    Left Stick Deadzone: 255
-    Right Stick Deadzone: 255
+    Left Stick Deadzone: 30
+    Right Stick Deadzone: 30
     Left Stick Anti-Deadzone: 33
     Right Stick Anti-Deadzone: 33
-    Left Trigger Threshold: 30
-    Right Trigger Threshold: 30
-    Left Pad Squircling Factor: 8000
-    Right Pad Squircling Factor: 8000
+    Left Trigger Threshold: 0
+    Right Trigger Threshold: 0
+    Left Pad Squircling Factor: 4000
+    Right Pad Squircling Factor: 4000
     Color Value R: 0
     Color Value G: 0
     Color Value B: 0
@@ -433,6 +433,7 @@ WII_PS3_ROCKBAND_DRUM_KIT:
     Large Vibration Motor Multiplier: 100
     Small Vibration Motor Multiplier: 100
     Switch Vibration Motors: false
+    Vibration Threshold: 63
     Mouse Movement Mode: Relative
     Mouse Deadzone X Axis: 60
     Mouse Deadzone Y Axis: 60
