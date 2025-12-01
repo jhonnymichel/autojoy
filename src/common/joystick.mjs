@@ -26,7 +26,7 @@ export const hardwareInfo = {
   crkdGuitarPCMode: {
     manufacturerId: 1118,
     productId: 654,
-    getgetType: () => joystickTypes.crkdGuitarPCMode,
+    getType: () => joystickTypes.crkdGuitarPCMode,
     name: "CRKD Guitar (PC Mode)",
   },
   wirelessGuitarHeroGuitarForXbox360: {

@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs"
 import { loaders, savers } from "../../common/file.mjs";
 import { user } from "../../common/settings.mjs";
+import { joystickTypes } from "../../common/joystick.mjs";
 
 const configTemplates = {
   gamecube: loaders.ini("config-templates/dolphin-gc.ini"),
@@ -47,6 +48,24 @@ function resolveDolphinPath() {
   return path.resolve(user.paths.dolphin)
 }
 
+function renameSDLControllers(arr) {
+  if (process.platform !== "linux") { return arr }
+  return arr.map((item) => {
+    let name = item.name;
+
+    switch (item.type) {
+      case joystickTypes.crkdGuitarPCMode:
+        name = `Atari Xbox 360 Game Controller`
+        break;
+      default:
+        break;
+    }
+
+    return { ...item, name };
+  });
+}
+
+
 // Dolphin uses the format: SDL/count/deviceName
 // eg.: SDL/0/Xbox Series X Controller
 // the number is relative to how many of the same controller is connected. it's not a player/position indicator.
@@ -63,7 +82,7 @@ function prependNumbersToSDLDeviceNames(arr) {
 }
 
 function handleSDLJoystickListUpdate(joystickList) {
-  const renamedList = prependNumbersToSDLDeviceNames(joystickList);
+  const renamedList = prependNumbersToSDLDeviceNames(renameSDLControllers(joystickList));
   const newConfig = {};
 
   wiiConstants.playerIdentifiers.forEach((identifier, position) => {
