@@ -2,13 +2,13 @@ XINPUT_GUITAR:
   Handler: SDL
   Device: ""
   Config:
-    Left Stick Left: ""
-    Left Stick Down: ""
-    Left Stick Right: ""
-    Left Stick Up: ""
-    Right Stick Left: LS Y+
+    Left Stick Left: LS X-
+    Left Stick Down: LS Y-
+    Left Stick Right: LS X+
+    Left Stick Up: LS Y+
+    Right Stick Left: RS X-
     Right Stick Down: LT
-    Right Stick Right: LS Y-
+    Right Stick Right: RS X+
     Right Stick Up: LT
     Start: Start
     Select: Back
@@ -21,7 +21,7 @@ XINPUT_GUITAR:
     Down: Down
     Right: Right
     Up: Up
-    R1: LS X+
+    R1: RS Y+
     R2: RT
     R3: RS
     L1: LB
@@ -55,8 +55,8 @@ XINPUT_GUITAR:
     Pressure Intensity Deadzone: 0
     Left Stick Multiplier: 100
     Right Stick Multiplier: 100
-    Left Stick Deadzone: 27244
-    Right Stick Deadzone: 7849
+    Left Stick Deadzone: 7849
+    Right Stick Deadzone: 27244
     Left Trigger Threshold: 30
     Right Trigger Threshold: 30
     Left Pad Squircling Factor: 8000
