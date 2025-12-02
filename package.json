@@ -15,6 +15,13 @@
     "appId": "com.jhonnymichel.autojoy",
     "directories": {
       "buildResources": "electron-builder"
+    },
+    "linux": {
+      "artifactName": "autojoy-v${version}-linux.${ext}",
+      "category": "Utility",
+      "target": [
+        "AppImage"
+      ]
     }
   },
   "type": "module",
