@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App Configuration</title>
+</head>
+<style>
+    body {
+        background: #ddd;
+        color: #444;
+    }
+
+    * {
+        font-family: sans-serif;
+    }
+
+    .form {
+        visibility: hidden;
+    }
+
+    .form.active {
+        visibility: visible;
+    }
+
+    .field {
+        background: #bbb;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .field label {
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .field .field-input {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+    }
+
+    .buttons {
+        flex-shrink: 0;
+    }
+
+    .field .path-display {
+        width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .header {
+        padding: 10px;
+        padding-bottom: 10px;
+    }
+
+    .header h2 {
+        margin-bottom: 0px;
+        font-size: 40px;
+        font-weight: 600;
+        color: #555;
+        text-transform: uppercase;
+    }
+
+    .tooltip {
+        font-size: 12px;
+        line-height: 0;
+        margin: 0;
+        aspect-ratio: 1/1;
+        padding: 4px;
+        border-radius: 50%;
+        font-weight: 600;
+        background: darkgoldenrod;
+        border-style: solid;
+        border: 2;
+    }
+
+    .tooltip:hover {
+        background: rgb(255, 255, 255);
+    }
+
+    .label-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .label-wrapper span {
+        display: flex;
+        align-items: center;
+    }
+
+    button[type="submit"] {
+        margin-top: 10px;
+    }
+</style>
+
+<body>
+    <div class="header">
+        <h2>Install AutoJoy Backend Service</h2>
+        <p>
+            We need to install the autojoy backend service to watch for when controllers are connected and
+            disconnected, and update settings based on them. </p>
+        </p>
+        <p class="message"></p>
+    </div>
+
+    <div id="form-wrapper" class="form">
+        <button type="button">Install Service</button>
+    </div>
+
+    <script>
+        (async () => {
+            const user = await window.electron.getUser();
+            Object.entries(user?.paths ?? {}).forEach(([key, value]) => {
+                const element = document.getElementById(`${key}-path`);
+                if (element) {
+                    element.textContent = value || "Not set";
+                }
+            });
+
+            document.querySelector("#form-wrapper").classList.add("active");
+        })();
+
+        async function selectFolder(key) {
+            const folderPath = await window.electron.selectFolder();
+            if (folderPath) {
+                document.getElementById(`${key}-path`).textContent = folderPath;
+            }
+        }
+
+        function clearField(key) {
+            document.getElementById(`${key}-path`).textContent = "Not set";
+        }
+
+        const tooltips = {
+            rpcs3:
+                "The RPCS3 installation folder. If using EmuDeck, it's by default inside %AppData%/emudeck/Emulators ",
+            cemu: "The Cemu installation folder. If using EmuDeck, it's by default inside %AppData%/emudeck/Emulators ",
+            dolphin:
+                "If using EmuDeck, it's the installation folder by default inside %AppData%/emudeck/Emulators.\nIf using standalone Dolphin, it's the Dolphin Emulator folder inside your Documents.",
+            ghwtde:
+                "It's the game settings folder by default inside your Documents/My Games folder.",
+        };
+
+        document.querySelectorAll(".tooltip").forEach((tooltip) => {
+            tooltip.addEventListener("click", () => {
+                alert(tooltips[tooltip.dataset.tooltip]);
+            });
+        });
+
+        function saveConfig() {
+            const paths = {
+                rpcs3:
+                    document.getElementById("rpcs3-path").textContent !== "Not set"
+                        ? document.getElementById("rpcs3-path").textContent
+                        : "",
+                dolphin:
+                    document.getElementById("dolphin-path").textContent !== "Not set"
+                        ? document.getElementById("dolphin-path").textContent
+                        : "",
+                cemu:
+                    document.getElementById("cemu-path").textContent !== "Not set"
+                        ? document.getElementById("cemu-path").textContent
+                        : "",
+                ghwtde:
+                    document.getElementById("ghwtde-path").textContent !== "Not set"
+                        ? document.getElementById("ghwtde-path").textContent
+                        : "",
+            };
+
+            window.electron.setPaths(paths);
+
+            alert(
+                "Settings updated! You can close this configuration window and enjoy!\nThe app is running in the tray."
+            );
+        }
+    </script>
+</body>
+
+</html>

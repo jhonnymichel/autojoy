@@ -1,7 +1,7 @@
 import { app, Menu, nativeImage, shell, Tray } from "electron";
 import path from "path";
 import store from "./store.mjs";
-import { createAboutWindow, createPathsWindow } from "./window.mjs";
+import { createAboutWindow, openPathsPage, } from "./window.mjs";
 import rootdir from "../common/rootdir.mjs";
 import { userFolderPath } from "../common/settings.mjs";
 import { isMicrophoneInUse } from "../common/device-filters.mjs";
@@ -29,7 +29,7 @@ export function startTray() {
         label: `Config paths`,
         type: "normal",
         click: () => {
-          createPathsWindow();
+          openPathsPage();
         },
       },
       { type: "separator" },
@@ -43,13 +43,13 @@ export function startTray() {
       { type: "separator" },
       ...(store.state.joystickList.length
         ? store.state.joystickList.map((d) => ({
-            type: "normal",
-            enabled: false,
-            label: `${d.name} (${d.type})`,
-          }))
+          type: "normal",
+          enabled: false,
+          label: `${d.name} (${d.type})`,
+        }))
         : [
-            { type: "normal", enabled: false, label: "No joysticks detected." },
-          ]),
+          { type: "normal", enabled: false, label: "No joysticks detected." },
+        ]),
       {
         type: "separator",
       },
@@ -66,24 +66,24 @@ export function startTray() {
       },
       ...(store.state.microphoneList.length
         ? store.state.microphoneList.map((d, index) => ({
-            type: "checkbox",
-            checked: isMicrophoneInUse(
-              d,
-              store.state.microphoneList,
-              store.state.unusedMicrophones
-            ),
-            click: () => {
-              dispatch(actions.toggleMicrophoneUse(d));
-            },
-            label: `${d.name}`,
-          }))
+          type: "checkbox",
+          checked: isMicrophoneInUse(
+            d,
+            store.state.microphoneList,
+            store.state.unusedMicrophones
+          ),
+          click: () => {
+            dispatch(actions.toggleMicrophoneUse(d));
+          },
+          label: `${d.name}`,
+        }))
         : [
-            {
-              type: "normal",
-              enabled: false,
-              label: "No Microphones detected.",
-            },
-          ]),
+          {
+            type: "normal",
+            enabled: false,
+            label: "No Microphones detected.",
+          },
+        ]),
       {
         type: "separator",
       },

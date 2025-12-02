@@ -33,6 +33,7 @@
     "fast-xml-parser": "^4.5.1",
     "ini": "^5.0.0",
     "node-addon-api": "^8.3.0",
+    "petite-vue": "^0.4.1",
     "xinput-ffi": "^4.0.0",
     "yaml": "^2.4.0"
   },
