@@ -1,0 +1,13 @@
+[Unit]
+Description=Autojoy Backend Daemon
+After=network.target
+
+[Service]
+Type=simple
+Environment=XDG_CONFIG_HOME=%h/.config
+ExecStart=/usr/bin/env node %h/.config/com.jhonnymichel/autojoy/src/autojoy-backend/index.mjs --daemon
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=default.target

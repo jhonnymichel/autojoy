@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Autojoy uninstaller (.run) for user systemd backend
+# This script stops and removes the autojoy backend service.
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+UNINSTALL_SH="$SCRIPT_DIR/autojoy-daemon-uninstall.sh"
+
+if [[ ! -x "$UNINSTALL_SH" ]]; then
+  chmod +x "$UNINSTALL_SH"
+fi
+
+"$UNINSTALL_SH"
+
+notify() {
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send "Autojoy" "Backend service uninstalled"
+  fi
+}
+
+notify
+
+echo "Autojoy backend service uninstalled."
