@@ -1,5 +1,5 @@
 const { contextBridge, ipcRenderer } = require("electron");
-const petiteVue = require("petite-vue");
+
 
 contextBridge.exposeInMainWorld("electron", {
   getAppVersion: () => {
@@ -21,5 +21,3 @@ contextBridge.exposeInMainWorld("electron", {
     return ipcRenderer.invoke("uninstallAutojoyService", { removeNode }); // Calls the main process
   },
 });
-
-contextBridge.exposeInMainWorld("petiteVue", petiteVue);

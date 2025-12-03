@@ -47,6 +47,14 @@ ipcMain.handle("setPaths", (event, paths) => {
   dispatch(actions.setPaths(paths));
 });
 
+ipcMain.handle("openFolderDialog", async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ["openDirectory"], // Allow selecting folders
+  });
+
+  return result.canceled ? null : result.filePaths[0];
+});
+
 ipcMain.handle("installAutojoyService", async () => {
   if (process.platform !== "linux") {
     return { ok: false, message: "Service install is supported on Linux only." };
@@ -97,9 +105,6 @@ ipcMain.handle("uninstallAutojoyService", (event, { removeNode } = { removeNode:
     });
   });
 });
-
-
-
 
 let mainWindow;
 
