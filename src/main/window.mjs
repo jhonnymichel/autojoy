@@ -4,7 +4,8 @@ import { execFile, spawn } from "child_process";
 import { promisify } from "util";
 import store from "./store.mjs";
 import rootdir from "../common/rootdir.mjs";
-import { user } from "../common/settings.mjs";
+import { user, userFolderPath } from "../common/settings.mjs";
+import { ensureDir, copyDir } from "../common/file.mjs";
 
 const { dispatch, actions } = store;
 let aboutWindow = null;
@@ -61,6 +62,15 @@ ipcMain.handle("installAutojoyService", async () => {
   }
   const execFileAsync = promisify(execFile);
   try {
+    // Copy backend runtime sources to user config folder so the service can run them.
+    const targetSrc = path.resolve(userFolderPath, "src");
+    const srcBackend = path.resolve(rootdir, "src/autojoy-backend");
+    const srcCommon = path.resolve(rootdir, "src/common");
+
+    await ensureDir(targetSrc);
+    await copyDir(srcBackend, path.resolve(targetSrc, "autojoy-backend"));
+    await copyDir(srcCommon, path.resolve(targetSrc, "common"));
+
     const installer = path.resolve(rootdir, "scripts/autojoy-service-install.run");
     const { stdout } = await execFileAsync(installer, { cwd: rootdir });
     dispatch(actions.serverStarted());
