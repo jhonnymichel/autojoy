@@ -1,11 +1,9 @@
 import path from "path";
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
-import { execFile, spawn } from "child_process";
-import { promisify } from "util";
 import store from "./store.mjs";
 import rootdir from "../common/rootdir.mjs";
-import { user, userFolderPath } from "../common/settings.mjs";
-import { ensureDir, copyDir } from "../common/file.mjs";
+import { user } from "../common/settings.mjs";
+import { getSystemServiceStatus, installSystemService, uninstallSystemService } from "./joystick-server.mjs";
 
 const { dispatch, actions } = store;
 let aboutWindow = null;
@@ -57,63 +55,16 @@ ipcMain.handle("openFolderDialog", async () => {
 });
 
 ipcMain.handle("installAutojoyService", async () => {
-  if (process.platform !== "linux") {
-    return { ok: false, message: "Service install is supported on Linux only." };
-  }
-  const execFileAsync = promisify(execFile);
-  try {
-    // Copy backend runtime sources to user config folder so the service can run them.
-    const targetSrc = path.resolve(userFolderPath, "src");
-    const srcBackend = path.resolve(rootdir, "src/autojoy-backend");
-    const srcCommon = path.resolve(rootdir, "src/common");
-
-    await ensureDir(targetSrc);
-    await copyDir(srcBackend, path.resolve(targetSrc, "autojoy-backend"));
-    await copyDir(srcCommon, path.resolve(targetSrc, "common"));
-
-    const installer = path.resolve(rootdir, "scripts/autojoy-service-install.run");
-    const { stdout } = await execFileAsync(installer, { cwd: rootdir });
-    dispatch(actions.serverStarted());
-    return { ok: true, message: stdout?.toString() || "Service installed" };
-  } catch (error) {
-    const message = error?.stderr?.toString?.() || error?.message || "Failed to install service";
-    return { ok: false, message };
-  }
+  return installSystemService()
 });
 
 
 ipcMain.handle("uninstallAutojoyService", (event, { removeNode } = { removeNode: false }) => {
-  if (process.platform !== "linux") {
-    return { ok: false, message: "Service uninstall is supported on Linux only." };
-  }
-  return new Promise((resolve) => {
-    const scriptPath = path.resolve(rootdir, "scripts/autojoy-service-uninstall.sh");
-    const child = spawn(scriptPath, { cwd: rootdir, stdio: ["pipe", "pipe", "pipe"] });
+  return uninstallSystemService(removeNode)
+});
 
-    // Pipe decision programmatically: 'y' to remove Node/NVM, otherwise 'n'
-    const response = removeNode === true ? "y\n" : "n\n";
-    try {
-      child.stdin.write(response);
-      child.stdin.end();
-    } catch (e) {
-      console.error("Failed to write to uninstall script stdin:", e.message);
-    }
-
-    let stdout = "";
-    let stderr = "";
-    child.stdout.on("data", (d) => { stdout += d.toString(); });
-    child.stderr.on("data", (d) => { stderr += d.toString(); });
-    child.on("error", (error) => {
-      resolve({ ok: false, message: error.message });
-    });
-    child.on("close", (code) => {
-      if (code === 0) {
-        resolve({ ok: true, message: stdout || "Service uninstalled" });
-      } else {
-        resolve({ ok: false, message: stderr || `Uninstall exited with code ${code}` });
-      }
-    });
-  });
+ipcMain.handle("getSystemServiceStatus", () => {
+  return getSystemServiceStatus();
 });
 
 let mainWindow;

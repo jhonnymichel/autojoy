@@ -101,7 +101,6 @@
 </style>
 
 <body>
-  <script src="./petite-vue.iife.js"></script>
   <div class="header">
     <h2>Set Your Paths</h2>
     <p>
@@ -115,6 +114,7 @@
     <p class="message"></p>
   </div>
 
+  <script src="./petite-vue.iife.js"></script>
   <div v-scope @vue:mounted="mounted">
     <form class="form" :class="{ active: ready }" @submit.prevent="saveConfig">
       <template v-for="field in fields">

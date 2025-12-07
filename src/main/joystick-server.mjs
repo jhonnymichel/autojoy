@@ -1,8 +1,11 @@
-import { fork } from "child_process";
+import { fork, execFile, spawn } from "child_process";
 import store from "./store.mjs";
 import path from "path";
 import rootdir from "../common/rootdir.mjs";
 import { createLogger, logFromApp } from "../common/logger.mjs";
+import { promisify } from "util";
+import { userFolderPath } from "../common/settings.mjs";
+import { copyDir, ensureDir } from "../common/file.mjs";
 
 const { dispatch, actions } = store;
 const logFromJoystickServer = createLogger("Joystick Server", null);
@@ -72,8 +75,7 @@ export function restartServer(context) {
   const lastRestart = store.state.lastRestartAfterCrash;
   if (!isIntentionalRestart && currentTime - lastRestart <= 3000) {
     logFromApp(
-      `Server died twice in ${
-        currentTime - lastRestart
+      `Server died twice in ${currentTime - lastRestart
       }ms. Preventing auto restart. Waiting a minute before trying again.`
     );
 
@@ -109,3 +111,202 @@ store.subscribe(() => {
     restartServer({ userAction: false });
   }
 });
+
+/**
+ * Queries the systemd user service status for the Autojoy backend.
+ * @returns {Promise<{supported: boolean, installed: boolean, active: boolean, details: { platform: NodeJS.Platform, output?: string }}>} Promise resolving service status.
+ */
+export function getSystemServiceStatus() {
+  return new Promise((resolve) => {
+    const details = { platform: process.platform };
+    if (process.platform !== "linux") {
+      resolve({ supported: false, installed: false, active: false, details });
+      return;
+    }
+
+    const serviceName = "autojoy-backend.service";
+
+    execFile(
+      "systemctl",
+      ["--user", "status", serviceName],
+      { encoding: "utf8" },
+      (err, stdout, stderr) => {
+        const output = (stdout || "") + (stderr || "");
+        details.output = output;
+
+        // If systemctl returned non-zero, service may be missing or inactive.
+        const installed = /Loaded:\s+loaded/gi.test(output);
+        const active = /Active:\s+active \(running\)/gi.test(output);
+
+        resolve({ supported: true, installed, active, details });
+      }
+    );
+  });
+}
+
+/**
+ * Installs the Autojoy systemd user service.
+ * Copies backend/common runtime sources into the user config directory
+ * ("~/.config/com.jhonnymichel/autojoy/src") and runs the installer script.
+ * Falls back to executing via shell if the `.run` file lacks execute permission.
+ * Only supported on Linux.
+ * @returns {Promise<{ok: boolean, message: string}>} Result object with success flag and message.
+ */
+export async function installSystemService() {
+  if (process.platform !== "linux") {
+    return { ok: false, message: "Service install is supported on Linux only." };
+  }
+  const execFileAsync = promisify(execFile);
+  try {
+    // Copy backend runtime sources to user config folder so the service can run them.
+    const targetSrc = path.resolve(userFolderPath, "src");
+    const srcBackend = path.resolve(rootdir, "src/autojoy-backend");
+    const srcCommon = path.resolve(rootdir, "src/common");
+
+    await ensureDir(targetSrc);
+    await copyDir(srcBackend, path.resolve(targetSrc, "autojoy-backend"));
+    await copyDir(srcCommon, path.resolve(targetSrc, "common"));
+
+    const installer = path.resolve(rootdir, "scripts/autojoy-service-install.run");
+    let stdout;
+    try {
+      // Try running directly (requires executable bit)
+      ({ stdout } = await execFileAsync(installer, { cwd: rootdir }));
+    } catch (e) {
+      // Fallback: execute via shell to avoid EACCES on non-executable files
+      const shell = process.env.SHELL || "/usr/bin/bash";
+      ({ stdout } = await execFileAsync(shell, [installer], { cwd: rootdir }));
+    }
+    dispatch(actions.serverStarted());
+    return { ok: true, message: stdout?.toString() || "Service installed" };
+  } catch (error) {
+    const message = error?.stderr?.toString?.() || error?.message || "Failed to install service";
+    return { ok: false, message };
+  }
+}
+
+/**
+ * Uninstalls the Autojoy systemd user service.
+ * Spawns the uninstall script and programmatically responds via stdin whether
+ * Node/NVM should be removed.
+ * Only supported on Linux.
+ * @param {boolean} [removeNode=false] Whether to remove Node/NVM during uninstall.
+ * @returns {Promise<{ok: boolean, message: string}>} Result object with success flag and message.
+ */
+export async function uninstallSystemService(removeNode = false) {
+  if (process.platform !== "linux") {
+    return { ok: false, message: "Service uninstall is supported on Linux only." };
+  }
+  return new Promise((resolve) => {
+    const scriptPath = path.resolve(rootdir, "scripts/autojoy-service-uninstall.sh");
+    const child = spawn(scriptPath, { cwd: rootdir, stdio: ["pipe", "pipe", "pipe"] });
+
+    // Pipe decision programmatically: 'y' to remove Node/NVM, otherwise 'n'
+    const response = removeNode === true ? "y\n" : "n\n";
+    try {
+      child.stdin.write(response);
+      child.stdin.end();
+    } catch (e) {
+      console.error("Failed to write to uninstall script stdin:", e.message);
+    }
+
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (d) => { stdout += d.toString(); });
+    child.stderr.on("data", (d) => { stderr += d.toString(); });
+    child.on("error", (error) => {
+      resolve({ ok: false, message: error.message });
+    });
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolve({ ok: true, message: stdout || "Service uninstalled" });
+      } else {
+        resolve({ ok: false, message: stderr || `Uninstall exited with code ${code}` });
+      }
+    });
+  });
+}
+
+/**
+ * Starts the Autojoy systemd user service.
+ * @returns {Promise<{ok: boolean, message: string}>}
+ */
+export function startSystemService() {
+  return new Promise((resolve) => {
+    if (process.platform !== "linux") {
+      resolve({ ok: false, message: "Service start supported on Linux only." });
+      return;
+    }
+
+    const serviceName = "autojoy-backend.service";
+    execFile(
+      "systemctl",
+      ["--user", "start", serviceName],
+      { encoding: "utf8" },
+      (err, stdout, stderr) => {
+        if (err) {
+          const msg = stderr?.toString?.() || err.message || "Failed to start service";
+          resolve({ ok: false, message: msg });
+          return;
+        }
+        resolve({ ok: true, message: stdout?.toString?.() || "Service started" });
+      }
+    );
+  });
+}
+
+/**
+ * Stops the Autojoy systemd user service.
+ * @returns {Promise<{ok: boolean, message: string}>}
+ */
+export function stopSystemService() {
+  return new Promise((resolve) => {
+    if (process.platform !== "linux") {
+      resolve({ ok: false, message: "Service stop supported on Linux only." });
+      return;
+    }
+
+    const serviceName = "autojoy-backend.service";
+    execFile(
+      "systemctl",
+      ["--user", "stop", serviceName],
+      { encoding: "utf8" },
+      (err, stdout, stderr) => {
+        if (err) {
+          const msg = stderr?.toString?.() || err.message || "Failed to stop service";
+          resolve({ ok: false, message: msg });
+          return;
+        }
+        resolve({ ok: true, message: stdout?.toString?.() || "Service stopped" });
+      }
+    );
+  });
+}
+
+/**
+ * Restarts the Autojoy systemd user service.
+ * @returns {Promise<{ok: boolean, message: string}>}
+ */
+export function restartSystemService() {
+  return new Promise((resolve) => {
+    if (process.platform !== "linux") {
+      resolve({ ok: false, message: "Service restart supported on Linux only." });
+      return;
+    }
+
+    const serviceName = "autojoy-backend.service";
+    execFile(
+      "systemctl",
+      ["--user", "restart", serviceName],
+      { encoding: "utf8" },
+      (err, stdout, stderr) => {
+        if (err) {
+          const msg = stderr?.toString?.() || err.message || "Failed to restart service";
+          resolve({ ok: false, message: msg });
+          return;
+        }
+        resolve({ ok: true, message: stdout?.toString?.() || "Service restarted" });
+      }
+    );
+  });
+}

@@ -5,7 +5,7 @@ set -euo pipefail
 # This script stops and removes the autojoy backend service.
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-UNINSTALL_SH="$SCRIPT_DIR/autojoy-daemon-uninstall.sh"
+UNINSTALL_SH="$SCRIPT_DIR/autojoy-service-uninstall.sh"
 
 if [[ ! -x "$UNINSTALL_SH" ]]; then
   chmod +x "$UNINSTALL_SH"

@@ -20,4 +20,7 @@ contextBridge.exposeInMainWorld("electron", {
   uninstallAutojoyService: async (removeNode = false) => {
     return ipcRenderer.invoke("uninstallAutojoyService", { removeNode }); // Calls the main process
   },
+  getSystemServiceStatus: async () => {
+    return ipcRenderer.invoke("getSystemServiceStatus"); // Calls the main process
+  },
 });
