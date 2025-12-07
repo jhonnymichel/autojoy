@@ -6,7 +6,7 @@
   "entry": "src/main/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron src/main/index.js",
+    "start": "AUTOJOY_DEV=1 electron src/main/index.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "install": "node-gyp rebuild",

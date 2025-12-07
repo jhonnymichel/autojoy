@@ -125,22 +125,49 @@ export function getSystemServiceStatus() {
     }
 
     const serviceName = "autojoy-backend.service";
+    const isDev = Boolean(process.env.AUTOJOY_DEV);
 
-    execFile(
-      "systemctl",
-      ["--user", "status", serviceName],
-      { encoding: "utf8" },
-      (err, stdout, stderr) => {
-        const output = (stdout || "") + (stderr || "");
-        details.output = output;
+    const proceedStatus = () => {
+      execFile(
+        "systemctl",
+        ["--user", "status", serviceName],
+        { encoding: "utf8" },
+        (err, stdout, stderr) => {
+          const output = (stdout || "") + (stderr || "");
+          details.output = output;
 
-        // If systemctl returned non-zero, service may be missing or inactive.
-        const installed = /Loaded:\s+loaded/gi.test(output);
-        const active = /Active:\s+active \(running\)/gi.test(output);
+          const installed = /Loaded:\s+loaded/gi.test(output);
+          const active = /Active:\s+active \(running\)/gi.test(output);
 
-        resolve({ supported: true, installed, active, details });
-      }
-    );
+          resolve({ supported: true, installed, active, details });
+        }
+      );
+    };
+
+    if (isDev) {
+      // In dev mode: stop and disable service, and remove unit file before checking status
+      execFile(
+        "systemctl",
+        ["--user", "stop", serviceName],
+        { encoding: "utf8" },
+        () => {
+          execFile(
+            "systemctl",
+            ["--user", "disable", serviceName],
+            { encoding: "utf8" },
+            () => {
+              // Attempt to remove unit file; ignore errors
+              const unitPath = `${process.env.HOME}/.config/systemd/user/${serviceName}`;
+              execFile("rm", ["-f", unitPath], { encoding: "utf8" }, () => {
+                proceedStatus();
+              });
+            }
+          );
+        }
+      );
+      return;
+    }
+    proceedStatus();
   });
 }
 

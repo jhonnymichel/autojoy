@@ -2,10 +2,10 @@
 set -euo pipefail
 
 SERVICE_NAME="autojoy-backend.service"
-UNIT_SRC_DIR="$(dirname "$0")/../assets/systemd"
-UNIT_SRC_PATH="$UNIT_SRC_DIR/$SERVICE_NAME"
 UNIT_DEST_DIR="$HOME/.config/systemd/user"
 UNIT_DEST_PATH="$UNIT_DEST_DIR/$SERVICE_NAME"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Ensure Node.js available; if missing, install via NVM
 ensure_node() {
@@ -36,7 +36,34 @@ ensure_node() {
 ensure_node
 
 mkdir -p "$UNIT_DEST_DIR"
-cp "$UNIT_SRC_PATH" "$UNIT_DEST_PATH"
+
+# Determine exec path based on dev vs packaged
+DEV_EXEC_PATH="$REPO_ROOT/dev-app-data/src/autojoy-backend/index.mjs"
+PKG_EXEC_PATH="$HOME/.config/com.jhonnymichel/autojoy/src/autojoy-backend/index.mjs"
+if [[ -n "${AUTOJOY_DEV:-}" ]] && [[ -f "$DEV_EXEC_PATH" ]]; then
+	EXEC_PATH="$DEV_EXEC_PATH"
+elif [[ -f "$DEV_EXEC_PATH" ]]; then
+	EXEC_PATH="$DEV_EXEC_PATH"
+else
+	EXEC_PATH="$PKG_EXEC_PATH"
+fi
+
+# Create unit file dynamically with correct ExecStart
+cat > "$UNIT_DEST_PATH" <<EOF
+[Unit]
+Description=Autojoy Backend Daemon
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=$HOME/.config/com.jhonnymichel/autojoy/env.conf
+ExecStart=/usr/bin/env node "$EXEC_PATH" --daemon
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=default.target
+EOF
 
 systemctl --user daemon-reload
 systemctl --user enable "$SERVICE_NAME"

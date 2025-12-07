@@ -12,6 +12,7 @@ let __packagedDirname = rootdir;
 // Resolving user folder. in development mode, it'll be placed in the local copy of the repository (user and config-templates folders).
 let settingsFolder = path.join(rootdir, "dev-app-data");
 // if we're in production, we set user folder to be outside of the app directory, in the root of the install first.
+
 if (settingsFolder.includes(".asar")) {
   settingsFolder = path.resolve(settingsFolder, "..");
 
