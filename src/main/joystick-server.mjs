@@ -11,6 +11,7 @@ const { dispatch, actions } = store;
 const logFromJoystickServer = createLogger("Joystick Server", null);
 
 let appProcess;
+let devServiceCleanupDone = false;
 
 export function startServer() {
   // Spawn the child process
@@ -144,7 +145,7 @@ export function getSystemServiceStatus() {
       );
     };
 
-    if (isDev) {
+    if (isDev && !devServiceCleanupDone) {
       // In dev mode: stop and disable service, and remove unit file before checking status
       execFile(
         "systemctl",
@@ -159,6 +160,7 @@ export function getSystemServiceStatus() {
               // Attempt to remove unit file; ignore errors
               const unitPath = `${process.env.HOME}/.config/systemd/user/${serviceName}`;
               execFile("rm", ["-f", unitPath], { encoding: "utf8" }, () => {
+                devServiceCleanupDone = true;
                 proceedStatus();
               });
             }
@@ -198,11 +200,11 @@ export async function installSystemService() {
     let stdout;
     try {
       // Try running directly (requires executable bit)
-      ({ stdout } = await execFileAsync(installer, { cwd: rootdir }));
+      ({ stdout } = await execFileAsync(installer, { cwd: rootdir, env: { ...process.env } }));
     } catch (e) {
       // Fallback: execute via shell to avoid EACCES on non-executable files
       const shell = process.env.SHELL || "/usr/bin/bash";
-      ({ stdout } = await execFileAsync(shell, [installer], { cwd: rootdir }));
+      ({ stdout } = await execFileAsync(shell, [installer], { cwd: rootdir, env: { ...process.env } }));
     }
     dispatch(actions.serverStarted());
     return { ok: true, message: stdout?.toString() || "Service installed" };

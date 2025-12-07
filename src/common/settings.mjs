@@ -6,7 +6,6 @@ import {
   resolvePathFromUserFolder,
   savers,
 } from "./file.mjs";
-import migrations from "../migrations.mjs";
 
 export const userFolderPath = resolvePathFromUserFolder(".");
 
@@ -126,19 +125,24 @@ function migrateUserSettings() {
     saver: savers.ini,
   });
 
-  const migrationsRan = loaders.json("user/migrations.json");
-  migrations.forEach((migration) => {
-    if (!migrationsRan[migration.name]) {
-      try {
-        migration.execute();
-        logFromApp(`Migration "${migration.name}" applied!`);
-        migrationsRan[migration.name] = new Date().toLocaleDateString();
-      } catch (e) {
-        logFromApp(`Migration "${migration.name}" failed: `, e.message);
+  try {
+    const migrations = require("../migrations.mjs").default;
+    const migrationsRan = loaders.json("user/migrations.json");
+    migrations.forEach((migration) => {
+      if (!migrationsRan[migration.name]) {
+        try {
+          migration.execute();
+          logFromApp(`Migration "${migration.name}" applied!`);
+          migrationsRan[migration.name] = new Date().toLocaleDateString();
+        } catch (e) {
+          logFromApp(`Migration "${migration.name}" failed: `, e.message);
+        }
       }
-    }
-  });
-  savers.json(migrationsRan, "user/migrations.json");
+    });
+    savers.json(migrationsRan, "user/migrations.json");
+  } catch (e) {
+    console.log("No migrations to run.");
+  }
 }
 
 export function validateSettings(log = (...msg) => console.log(...msg)) {
