@@ -43,6 +43,8 @@
     "electron": "^29.1.1",
     "electron-builder": "^24.13.3",
     "eslint": "^9.20.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.6.2",
     "globals": "^15.15.0",
     "node-gyp": "^11.1.0"
   }
