@@ -41,6 +41,7 @@
     "node-addon-api": "^8.3.0",
     "node-gyp": "^11.1.0",
     "vue": "^3.5.25",
+    "vue-router": "^4.6.3",
     "xinput-ffi": "^4.0.0",
     "yaml": "^2.4.0"
   },

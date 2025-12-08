@@ -1,89 +1,77 @@
 <template>
-  <div class="layout page">
-    <menu
-      type="menubar"
-      class="menubar"
-    >
-      <ul>
-        <li><a href="paths.html">Paths</a></li>
-        <li><a href="service.html">Service</a></li>
-      </ul>
-    </menu>
-
-    <div
-      class="app"
-      :class="{ active: ready }"
-    >
-      <div v-if="!serviceStatus.installed">
-        <div class="header">
-          <h2>Install AutoJoy Backend Service</h2>
-          <p>
-            We need to install the autojoy backend service to watch for when controllers are connected and
-            disconnected, and update settings based on them.
-          </p>
-          <p
-            v-if="serviceStatus.result"
-            class="message"
-          >
-            Something wen't wrong. Please try again
-          </p>
-        </div>
-        <div class="buttons-container">
-          <button
-            class="action-button"
-            :class="{ loading: pending }"
-            :disabled="pending"
-            type="button"
-            @click="installService"
-          >
-            Install Service
-          </button>
-        </div>
+  <div
+    class="app"
+    :class="{ active: ready }"
+  >
+    <div v-if="!serviceStatus.installed">
+      <div class="header">
+        <h2>Install AutoJoy Backend Service</h2>
+        <p>
+          We need to install the autojoy backend service to watch for when controllers are connected and
+          disconnected, and update settings based on them.
+        </p>
+        <p
+          v-if="serviceStatus.result"
+          class="message"
+        >
+          Something wen't wrong. Please try again
+        </p>
       </div>
+      <div class="buttons-container">
+        <button
+          class="action-button"
+          :class="{ loading: pending }" 
+          :disabled="pending"
+          type="button"
+          @click="installService"
+        >
+          Install Service
+        </button>
+      </div>
+    </div>
 
-      <div v-else>
-        <div class="header">
-          <h2>AutoJoy Backend Service</h2>
-          <p>Here you can check the service status and uninstall it.</p>
-          <p class="message">
-            <span
-              aria-hidden="true"
-              class="status-indicator"
-              :class="{ active: serviceStatus.active }"
-            />
-            {{ serviceStatus.active ? 'Service is running' : 'Service is stopped' }}
-          </p>
-        </div>
-        <div class="buttons-container">
-          <button
-            class="action-button"
-            :disabled="pending"
-            :class="{ loading: pending, secondary: serviceStatus.active }"
-            type="button"
-            @click="restartService"
-          >
-            {{ serviceStatus.active ? 'Restart' : 'Start' }} Service
-          </button>
-          <button
-            v-if="serviceStatus.active"
-            class="action-button secondary"
-            :disabled="pending"
-            :class="{ loading: pending }"
-            type="button"
-            @click="stopService"
-          >
-            Stop Service
-          </button>
-          <button
-            class="action-button red"
-            :class="{ loading: pending }"
-            :disabled="pending"
-            type="button"
-            @click="uninstallService"
-          >
-            Uninstall Service
-          </button>
-        </div>
+    <div v-else>
+      <div class="header">
+        <h2>AutoJoy Backend Service</h2>
+        <p>Here you can check the service status and uninstall it.</p>
+        <p class="message">
+          <span
+            aria-hidden="true"
+            class="status-indicator"
+            :class="{ active: serviceStatus.active }"
+          />
+          {{ serviceStatus.active ? 'Service is running' : 'Service is stopped' }}
+        </p>
+      </div>
+      <div class="buttons-container">
+        <button
+          class="action-button"
+          :disabled="pending"
+          :class="{ loading: pending, secondary: serviceStatus.active }"
+          type="button"
+          @click="restartService"
+        >
+          {{ serviceStatus.active ? 'Restart' : 'Start' }} Service
+        </button>
+        <button
+          v-if="serviceStatus.active"
+          class="action-button secondary"
+          :disabled="pending"
+          :class="{ loading: pending }"
+          type="button"
+          @click="stopService"
+        >
+          Stop Service
+        </button>
+        <button
+          class="action-button red"
+          :class="{ loading: pending }"
+          :disabled="pending"
+          type="button"
+          @click="uninstallService"
+        >
+          Uninstall Service
+        </button>
       </div>
     </div>
   </div>
@@ -143,23 +131,6 @@ async function stopService() {
 </script>
 
 <style>
-.page {
-  background: #ddd;
-  color: #444;
-}
-
-* {
-  font-family: sans-serif;
-}
-
-.app {
-  visibility: hidden;
-}
-
-.app.active {
-  visibility: visible;
-}
-
 .header {
   padding: 10px;
   padding-bottom: 10px;
@@ -206,11 +177,11 @@ async function stopService() {
   font-weight: 600;
   border: none;
   text-transform: uppercase;
+  transition: filter 150ms;
 }
 
 .action-button:hover {
-  outline-width: 4px;
-  outline-color: #888;
+  filter: brightness(0.95);
 }
 
 .action-button.secondary {
@@ -264,37 +235,5 @@ async function stopService() {
   gap: 10px;
   justify-content: center;
   display: flex;
-}
-
-.menubar {
-  margin: 0px;
-  padding: 10px 20px;
-  border-right: 1px solid #444;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.menubar ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  text-align: right;
-  gap: 10px;
-}
-
-.menubar a {
-  text-decoration: none;
-  color: #444;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.layout {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
 }
 </style>

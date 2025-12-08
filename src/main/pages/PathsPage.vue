@@ -1,73 +1,60 @@
 <template>
-  <div class="layout page">
-    <menu
-      type="menubar"
-      class="menubar"
-    >
-      <ul>
-        <li><a href="paths.html">Paths</a></li>
-        <li><a href="service.html">Service</a></li>
-      </ul>
-    </menu>
-    <div class="content">
-      <div class="header">
-        <h2>Set Your Paths</h2>
-        <p>
-          Provide the path to each software you want AutoJoy to integrate with.
-        </p>
-        <p>
-          For software you don't have or don't want to integrate with, leave it
-          blank.
-        </p>
-        <p>Click <b>Clear</b> to stop integrating with specific software.</p>
-        <p class="message" />
-      </div>
-
-      <form
-        class="form"
-        :class="{ active: ready }"
-        @submit.prevent="saveConfig"
-      >
-        <template
-          v-for="field in fields"
-          :key="field.key"
-        >
-          <div class="field">
-            <div class="label-wrapper">
-              <label>{{ field.label }}</label>
-              <span>
-                <button
-                  type="button"
-                  class="tooltip"
-                  @click="showTooltip(field.key)"
-                >?</button>
-              </span>
-            </div>
-            <div class="field-input">
-              <span class="path-display">{{ paths[field.key] || 'Not set' }}</span>
-              <div class="buttons">
-                <button
-                  type="button"
-                  @click="selectFolder(field.key)"
-                >
-                  Browse
-                </button>
-                <button
-                  type="button"
-                  @click="clearField(field.key)"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-          </div>
-        </template>
-        <button type="submit">
-          Save
-        </button>
-      </form>
-    </div>
+  <div class="header">
+    <h2>Set Your Paths</h2>
+    <p>
+      Provide the path to each software you want AutoJoy to integrate with.
+    </p>
+    <p>
+      For software you don't have or don't want to integrate with, leave it
+      blank.
+    </p>
+    <p>Click <b>Clear</b> to stop integrating with specific software.</p>
+    <p class="message" />
   </div>
+
+  <form
+    class="form"
+    :class="{ active: ready }"
+    @submit.prevent="saveConfig"
+  >
+    <template
+      v-for="field in fields"
+      :key="field.key"
+    >
+      <div class="field">
+        <div class="label-wrapper">
+          <label>{{ field.label }}</label>
+          <span>
+            <button
+              type="button"
+              class="tooltip"
+              @click="showTooltip(field.key)"
+            >?</button>
+          </span>
+        </div>
+        <div class="field-input">
+          <span class="path-display">{{ paths[field.key] || 'Not set' }}</span>
+          <div class="buttons">
+            <button
+              type="button"
+              @click="selectFolder(field.key)"
+            >
+              Browse
+            </button>
+            <button
+              type="button"
+              @click="clearField(field.key)"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+    </template>
+    <button type="submit">
+      Save
+    </button>
+  </form>
 </template>
 
 <script setup>
@@ -134,15 +121,6 @@ function saveConfig() {
 </script>
 
 <style>
-.page {
-  background: #ddd;
-  color: #444;
-}
-
-* {
-  font-family: sans-serif;
-}
-
 .form {
   visibility: hidden;
 }
@@ -224,42 +202,5 @@ function saveConfig() {
 
 button[type='submit'] {
   margin-top: 10px;
-}
-
-.content {
-  flex: 1;
-  padding: 10px;
-}
-
-.menubar {
-  margin: 0px;
-  padding: 10px 20px;
-  border-right: 1px solid #444;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.menubar ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  text-align: right;
-  gap: 10px;
-}
-
-.menubar a {
-  text-decoration: none;
-  color: #444;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.layout {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
 }
 </style>
