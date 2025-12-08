@@ -67,7 +67,8 @@
         <p class="message">{{ serviceStatus }}</p>
       </div>
       <div class="center-container">
-        <button class="big-action-button" @click="installService()" type="button">Install Service</button>
+        <button class="big-action-button" :disabled="pending" @click="installService()" type="button">Install
+          Service</button>
       </div>
     </div>
     <div v-if="serviceStatus.installed">
@@ -79,7 +80,8 @@
         <p class="message">{{ serviceStatus }}</p>
       </div>
       <div class="center-container">
-        <button class="big-action-button" type="button">Uninstall Service</button>
+        <button class="big-action-button" @click="uninstallService()" :disabled="pending" type="button">Uninstall
+          Service</button>
       </div>
     </div>
   </div>
@@ -87,6 +89,7 @@
   <script src="./petite-vue.iife.js"></script>
   <script>
     window.PetiteVue.createApp({
+      pending: false,
       ready: false,
       serviceStatus: { installed: false, active: false, supported: false, details: {} },
       async mounted() {
@@ -94,12 +97,16 @@
         this.ready = true;
       },
       async installService() {
+        this.pending = true;
         const result = await window.electron.installAutojoyService();
         this.serviceStatus = { ...(await window.electron.getSystemServiceStatus()), result };
+        this.pending = false;
       },
       async uninstallService() {
+        this.pending = true;
         await window.electron.uninstallAutojoyService();
         this.serviceStatus = await window.electron.getSystemServiceStatus();
+        this.pending = false;
       }
     }).mount()
 

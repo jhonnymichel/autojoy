@@ -14,7 +14,7 @@ app.on("ready", async () => {
     openPathsPage();
   }
 
-  logFromApp("App started, activating server");
+  logFromApp("App started");
   const serviceStatus = await getSystemServiceStatus()
   if (serviceStatus.supported) {
     if (!serviceStatus.installed) {
@@ -22,12 +22,11 @@ app.on("ready", async () => {
       openServicePage()
     }
   } else {
+    logFromApp("Activating server");
     startServer();
   }
 
   startTray();
-
-
 });
 
 app.on("window-all-closed", (event) => {

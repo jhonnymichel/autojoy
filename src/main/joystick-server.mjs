@@ -1,4 +1,4 @@
-import { fork, execFile, spawn } from "child_process";
+import { fork, execFile, exec } from "child_process";
 import store from "./store.mjs";
 import path from "path";
 import rootdir from "../common/rootdir.mjs";
@@ -118,7 +118,7 @@ store.subscribe(() => {
  * @returns {Promise<{supported: boolean, installed: boolean, active: boolean, details: { platform: NodeJS.Platform, output?: string }}>} Promise resolving service status.
  */
 export function getSystemServiceStatus() {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     const details = { platform: process.platform };
     if (process.platform !== "linux") {
       resolve({ supported: false, installed: false, active: false, details });
@@ -126,7 +126,18 @@ export function getSystemServiceStatus() {
     }
 
     const serviceName = "autojoy-backend.service";
-    const isDev = Boolean(process.env.AUTOJOY_DEV);
+    let isDev = false;
+
+    if (!devServiceCleanupDone) {
+      try {
+        const processCheck = await promisify(exec)(`cat ${`${process.env.HOME}/.config/systemd/user/${serviceName}`} | grep dev-app-data`);
+        if (processCheck.stdout && processCheck.stdout.length) {
+          isDev = true;
+        }
+      } catch (e) {
+        console.log("Error checking service unit file:", e.message);
+      }
+    }
 
     const proceedStatus = () => {
       execFile(
@@ -206,6 +217,7 @@ export async function installSystemService() {
       const shell = process.env.SHELL || "/usr/bin/bash";
       ({ stdout } = await execFileAsync(shell, [installer], { cwd: rootdir, env: { ...process.env } }));
     }
+    logFromApp("Service created and activated");
     dispatch(actions.serverStarted());
     return { ok: true, message: stdout?.toString() || "Service installed" };
   } catch (error) {
@@ -227,32 +239,28 @@ export async function uninstallSystemService(removeNode = false) {
     return { ok: false, message: "Service uninstall is supported on Linux only." };
   }
   return new Promise((resolve) => {
-    const scriptPath = path.resolve(rootdir, "scripts/autojoy-service-uninstall.sh");
-    const child = spawn(scriptPath, { cwd: rootdir, stdio: ["pipe", "pipe", "pipe"] });
+    const serviceName = "autojoy-backend.service";
 
-    // Pipe decision programmatically: 'y' to remove Node/NVM, otherwise 'n'
-    const response = removeNode === true ? "y\n" : "n\n";
-    try {
-      child.stdin.write(response);
-      child.stdin.end();
-    } catch (e) {
-      console.error("Failed to write to uninstall script stdin:", e.message);
-    }
 
-    let stdout = "";
-    let stderr = "";
-    child.stdout.on("data", (d) => { stdout += d.toString(); });
-    child.stderr.on("data", (d) => { stderr += d.toString(); });
-    child.on("error", (error) => {
-      resolve({ ok: false, message: error.message });
-    });
-    child.on("close", (code) => {
-      if (code === 0) {
-        resolve({ ok: true, message: stdout || "Service uninstalled" });
-      } else {
-        resolve({ ok: false, message: stderr || `Uninstall exited with code ${code}` });
+    execFile(
+      "systemctl",
+      ["--user", "stop", serviceName],
+      { encoding: "utf8" },
+      () => {
+        execFile(
+          "systemctl",
+          ["--user", "disable", serviceName],
+          { encoding: "utf8" },
+          () => {
+            // Attempt to remove unit file; ignore errors
+            const unitPath = `${process.env.HOME}/.config/systemd/user/${serviceName}`;
+            execFile("rm", ["-f", unitPath], { encoding: "utf8" }, () => {
+              resolve()
+            });
+          }
+        );
       }
-    });
+    );
   });
 }
 
