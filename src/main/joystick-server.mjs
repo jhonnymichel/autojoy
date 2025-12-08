@@ -6,6 +6,7 @@ import { createLogger, logFromApp } from "../common/logger.mjs";
 import { promisify } from "util";
 import { userFolderPath } from "../common/settings.mjs";
 import { copyDir, ensureDir } from "../common/file.mjs";
+import { app } from "electron";
 
 const { dispatch, actions } = store;
 const logFromJoystickServer = createLogger("Joystick Server", null);
@@ -209,13 +210,15 @@ export async function installSystemService() {
 
     const installer = path.resolve(rootdir, "scripts/autojoy-service-install.run");
     let stdout;
+    const AUTOJOY_DEV = app.isPackaged ? "0" : "1";
+
     try {
       // Try running directly (requires executable bit)
-      ({ stdout } = await execFileAsync(installer, { cwd: rootdir, env: { ...process.env } }));
+      ({ stdout } = await execFileAsync(installer, { cwd: rootdir, env: { ...process.env, AUTOJOY_DEV } }));
     } catch (e) {
       // Fallback: execute via shell to avoid EACCES on non-executable files
       const shell = process.env.SHELL || "/usr/bin/bash";
-      ({ stdout } = await execFileAsync(shell, [installer], { cwd: rootdir, env: { ...process.env } }));
+      ({ stdout } = await execFileAsync(shell, [installer], { cwd: rootdir, env: { ...process.env, AUTOJOY_DEV } }));
     }
     logFromApp("Service created and activated");
     dispatch(actions.serverStarted());

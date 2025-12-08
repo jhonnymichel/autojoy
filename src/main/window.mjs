@@ -8,7 +8,7 @@ import { getSystemServiceStatus, installSystemService, restartSystemService, sto
 const { dispatch, actions } = store;
 let aboutWindow = null;
 
-const isDev = !!process.env.AUTOJOY_DEV;
+const isDev = !app.isPackaged;
 const DEV_URL = 'http://localhost:5173/index.html';
 const pagesDist = path.resolve(rootdir, 'src/main/pages/dist');
 
