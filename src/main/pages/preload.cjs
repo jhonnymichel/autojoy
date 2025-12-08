@@ -23,4 +23,13 @@ contextBridge.exposeInMainWorld("electron", {
   getSystemServiceStatus: async () => {
     return ipcRenderer.invoke("getSystemServiceStatus"); // Calls the main process
   },
+  stopAutojoyService: async () => {
+    return ipcRenderer.invoke("stopAutojoyService"); // Calls the main process
+  },
+  startAutojoyService: async () => {
+    return ipcRenderer.invoke("startAutojoyService"); // Calls the main process
+  },
+  restartAutojoyService: async () => {
+    return ipcRenderer.invoke("restartAutojoyService"); // Calls the main process
+  },
 });

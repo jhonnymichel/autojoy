@@ -3,7 +3,7 @@ import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import store from "./store.mjs";
 import rootdir from "../common/rootdir.mjs";
 import { user } from "../common/settings.mjs";
-import { getSystemServiceStatus, installSystemService, uninstallSystemService } from "./joystick-server.mjs";
+import { getSystemServiceStatus, installSystemService, restartSystemService, stopSystemService, uninstallSystemService } from "./joystick-server.mjs";
 
 const { dispatch, actions } = store;
 let aboutWindow = null;
@@ -58,10 +58,18 @@ ipcMain.handle("installAutojoyService", async () => {
   return installSystemService()
 });
 
+ipcMain.handle("restartAutojoyService", async () => {
+  return restartSystemService()
+});
+
+ipcMain.handle("stopAutojoyService", async () => {
+  return stopSystemService()
+});
 
 ipcMain.handle("uninstallAutojoyService", (event, { removeNode } = { removeNode: false }) => {
   return uninstallSystemService(removeNode)
 });
+
 
 ipcMain.handle("getSystemServiceStatus", () => {
   return getSystemServiceStatus();

@@ -7,9 +7,12 @@
   <title>App Configuration</title>
 </head>
 <style>
-  body {
+  body,
+  html {
     background: #ddd;
     color: #444;
+    padding: 0px;
+    margin: 0px !important;
   }
 
   * {
@@ -34,6 +37,7 @@
     font-size: 40px;
     font-weight: 600;
     color: #555;
+    margin-top: 0px;
     text-transform: uppercase;
   }
 
@@ -53,35 +57,167 @@
   .tooltip:hover {
     background: rgb(255, 255, 255);
   }
+
+  .buttons-container {
+    padding: 10px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .action-button {
+    border-radius: 2px;
+    padding: 10px;
+    background: #04cc90;
+    color: white;
+    font-weight: 600;
+    border: none;
+    text-transform: uppercase;
+  }
+
+  .action-button:hover {
+    outline-width: 4px;
+    outline-color: #888;
+  }
+
+  .action-button.secondary {
+    padding: 10px;
+    background: #ffffff;
+    color: #222;
+    font-weight: 600;
+    border: none;
+    text-transform: uppercase;
+  }
+
+  .action-button.red {
+    background: #cc0404;
+    margin-left: auto;
+  }
+
+  .action-button.loading:disabled {
+    background: #888;
+    cursor: progress;
+  }
+
+  .status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+    background: red;
+    animation: pulse 4000ms infinite alternate;
+  }
+
+  @keyframes pulse {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0.5;
+    }
+  }
+
+  .status-indicator.active {
+    background: green;
+    animation: pulse 2000ms infinite alternate;
+
+  }
+
+  .message {
+    font-weight: 600;
+    font-size: 24px;
+    padding: 10px;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    display: flex;
+  }
+
+  .menubar {
+    margin: 0px;
+    padding: 10px 20px;
+    border-right: 1px solid #444;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .menubar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    gap: 10px;
+  }
+
+  .menubar a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .layout {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+  }
 </style>
 
 <body>
-  <div v-scope @vue:mounted="mounted" class="app" :class="{ active: ready }">
-    <div v-if="!serviceStatus.installed">
-      <div class="header">
-        <h2>Install AutoJoy Backend Service</h2>
-        <p>
-          We need to install the autojoy backend service to watch for when controllers are connected and
-          disconnected, and update settings based on them. </p>
-        </p>
-        <p class="message">{{ serviceStatus }}</p>
+  <div class="layout">
+    <menu type="menubar" class="menubar">
+      <ul>
+        <li><a href="paths.html">Paths</a></li>
+        <li><a href="service.html">Service</a></li>
+      </ul>
+    </menu>
+    <div v-scope @vue:mounted="mounted" class="app" :class="{ active: ready }">
+      <div v-if="!serviceStatus.installed">
+        <div class="header">
+          <h2>Install AutoJoy Backend Service</h2>
+          <p>
+            We need to install the autojoy backend service to watch for when controllers are connected and
+            disconnected, and update settings based on them. </p>
+          </p>
+          <p class="message" v-if="serviceStatus.result">Something wen't wrong. Please try again</p>
+        </div>
+        <div class="buttons-container">
+          <button class="action-button" :class="{ loading: pending }" :disabled="pending" @click="installService()"
+            type="button">Install
+            Service
+          </button>
+        </div>
       </div>
-      <div class="center-container">
-        <button class="big-action-button" :disabled="pending" @click="installService()" type="button">Install
-          Service</button>
-      </div>
-    </div>
-    <div v-if="serviceStatus.installed">
-      <div class="header">
-        <h2>Install AutoJoy Backend Service</h2>
-        <p>
-          Here you can check the service status and uninstall it. </p>
-        </p>
-        <p class="message">{{ serviceStatus }}</p>
-      </div>
-      <div class="center-container">
-        <button class="big-action-button" @click="uninstallService()" :disabled="pending" type="button">Uninstall
-          Service</button>
+      <div v-if="serviceStatus.installed">
+        <div class="header">
+          <h2>AutoJoy Backend Service</h2>
+          <p>
+            Here you can check the service status and uninstall it. </p>
+          </p>
+          <p class="message">
+            <span aria-hidden="true" class="status-indicator" :class="{active: serviceStatus.active}"></span>{{
+            serviceStatus.active ? "Service is running" : "Service is stopped" }}
+          </p>
+        </div>
+        <div class="buttons-container">
+          <button class="action-button" :disabled="pending"
+            :class="{ loading: pending, secondary: serviceStatus.active }" @click="restartService()" type="button">
+            {{ serviceStatus.active ? 'Restart' : 'Start' }} Service
+          </button>
+          <button v-if="serviceStatus.active" class="action-button secondary" :disabled="pending"
+            :class="{ loading: pending }" @click="stopService()" type="button">
+            Stop Service
+          </button>
+          <button class="action-button red" :class="{ loading: pending }" @click="uninstallService()"
+            :disabled="pending" type="button">Uninstall
+            Service
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -91,7 +227,7 @@
     window.PetiteVue.createApp({
       pending: false,
       ready: false,
-      serviceStatus: { installed: false, active: false, supported: false, details: {} },
+      serviceStatus: { installed: false, active: false, supported: false, details: null },
       async mounted() {
         this.serviceStatus = await window.electron.getSystemServiceStatus();
         this.ready = true;
@@ -99,15 +235,31 @@
       async installService() {
         this.pending = true;
         const result = await window.electron.installAutojoyService();
+        await new Promise((r) => setTimeout(r, 1000));
         this.serviceStatus = { ...(await window.electron.getSystemServiceStatus()), result };
         this.pending = false;
       },
       async uninstallService() {
+        if (!window.confirm("Are you sure you want to uninstall the AutoJoy service?")) {
+          return;
+        }
         this.pending = true;
         await window.electron.uninstallAutojoyService();
         this.serviceStatus = await window.electron.getSystemServiceStatus();
         this.pending = false;
-      }
+      },
+      async restartService() {
+        this.pending = true;
+        const result = await window.electron.restartAutojoyService();
+        this.serviceStatus = { ...(await window.electron.getSystemServiceStatus()), result };
+        this.pending = false;
+      },
+      async stopService() {
+        this.pending = true;
+        const result = await window.electron.stopAutojoyService();
+        this.serviceStatus = { ...(await window.electron.getSystemServiceStatus()), result };
+        this.pending = false;
+      },
     }).mount()
 
   </script>
