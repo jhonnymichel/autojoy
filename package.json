@@ -6,14 +6,16 @@
   "entry": "src/main/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "AUTOJOY_DEV=1 electron src/main/index.js",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder",
+    "electron:start": "electron src/main/index.js",
+    "start": "run-p pages:dev electron:start",
+    "electron:pack": "electron-builder --dir",
+    "electron:dist": "electron-builder",
+    "pack": "run-s pages:build electron:pack",
+    "dist": "run-s pages:build electron:dist",
     "install": "node-gyp rebuild",
     "pages:dev": "vite",
     "pages:build": "vite build",
-    "pages:preview": "vite preview",
-    "postinstall": "cp node_modules/petite-vue/dist/petite-vue.iife.js src/main/pages/petite-vue.iife.js"
+    "pages:preview": "vite preview"
   },
   "build": {
     "appId": "com.jhonnymichel.autojoy",
@@ -52,6 +54,7 @@
     "eslint-plugin-vue": "^10.6.2",
     "globals": "^15.15.0",
     "node-gyp": "^11.1.0",
+    "npm-run-all": "^4.1.5",
     "vite": "^7.2.7"
   }
 }
