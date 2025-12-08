@@ -8,6 +8,18 @@ import { getSystemServiceStatus, installSystemService, restartSystemService, sto
 const { dispatch, actions } = store;
 let aboutWindow = null;
 
+const isDev = !!process.env.AUTOJOY_DEV;
+const DEV_URL = 'http://localhost:5173/index.html';
+const pagesDist = path.resolve(rootdir, 'src/main/pages/dist');
+
+function loadPage(window, page) {
+  if (isDev) {
+    window.loadURL(`${DEV_URL}#${page}`);
+  } else {
+    window.loadFile(path.join(pagesDist, 'index.html'), { hash: page });
+  }
+}
+
 export function createAboutWindow() {
   if (!aboutWindow) {
     aboutWindow = new BrowserWindow({
@@ -102,14 +114,14 @@ function createMainWindow() {
 export function openPathsPage() {
   createMainWindow()
 
-  mainWindow.loadFile(path.resolve(rootdir, "src/main/pages/paths.html"));
+  loadPage(mainWindow, 'paths');
   mainWindow.show();
 }
 
 export function openServicePage() {
   createMainWindow()
 
-  mainWindow.loadFile(path.resolve(rootdir, "src/main/pages/service.html"));
+  loadPage(mainWindow, 'service');
   mainWindow.show();
 }
 

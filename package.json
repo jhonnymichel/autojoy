@@ -10,6 +10,9 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "install": "node-gyp rebuild",
+    "pages:dev": "vite",
+    "pages:build": "vite build",
+    "pages:preview": "vite preview",
     "postinstall": "cp node_modules/petite-vue/dist/petite-vue.iife.js src/main/pages/petite-vue.iife.js"
   },
   "build": {
@@ -34,18 +37,21 @@
     "fast-xml-parser": "^4.5.1",
     "ini": "^5.0.0",
     "node-addon-api": "^8.3.0",
-    "petite-vue": "^0.4.1",
+    "node-gyp": "^11.1.0",
+    "vue": "^3.5.25",
     "xinput-ffi": "^4.0.0",
     "yaml": "^2.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
+    "@vitejs/plugin-vue": "^6.0.2",
     "electron": "^29.1.1",
     "electron-builder": "^24.13.3",
     "eslint": "^9.20.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^10.6.2",
     "globals": "^15.15.0",
-    "node-gyp": "^11.1.0"
+    "node-gyp": "^11.1.0",
+    "vite": "^7.2.7"
   }
 }
