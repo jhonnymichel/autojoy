@@ -21,7 +21,7 @@ fi
 
 # Environment file location depends on mode
 if [[ "$DEV_MODE" -eq 1 ]]; then
-  ENV_DIR="$REPO_ROOT/dev-app-data"
+	ENV_DIR="$REPO_ROOT/dev-app-data"
 else
   ENV_DIR="$HOME/.config/com.jhonnymichel/autojoy"
 fi
@@ -79,8 +79,14 @@ $( [[ "$DEV_MODE" -eq 1 ]] && echo "WorkingDirectory=$REPO_ROOT" )
 WantedBy=default.target
 EOF
 
-systemctl --user daemon-reload
-systemctl --user enable "$SERVICE_NAME"
-systemctl --user start "$SERVICE_NAME"
+systemctl --user daemon-reload --no-pager
+# small delay to avoid race where systemd user manager hasn't reloaded yet
+sleep 0.2
+
+# clear any previous failed state
+systemctl --user reset-failed "$SERVICE_NAME" --no-pager || true
+
+# enable and start in one shot
+systemctl --user enable --now "$SERVICE_NAME" --no-pager
 
 echo "Installed and started $SERVICE_NAME (user service)."

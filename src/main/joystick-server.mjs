@@ -155,6 +155,14 @@ export function getSystemServiceStatus() {
           const installed = /Loaded:\s+loaded/gi.test(output);
           const active = /Active:\s+active \(running\)/gi.test(output);
 
+          if (!installed) {
+            dispatch(actions.serverNotInstalled());
+          }
+
+          if (installed && active) {
+            dispatch(actions.serverStarted());
+          }
+
           resolve({ supported: true, installed, active, details });
         },
       );
@@ -216,25 +224,19 @@ export async function installSystemService() {
 
     const installer = path.resolve(
       rootdir,
-      "scripts/autojoy-service-install.run",
+      "scripts/autojoy-service-install.sh",
     );
-    let stdout;
+    let stdout, stderr;
     const AUTOJOY_DEV = app.isPackaged ? "0" : "1";
 
-    try {
-      // Try running directly (requires executable bit)
-      ({ stdout } = await execFileAsync(installer, {
-        cwd: rootdir,
-        env: { ...process.env, AUTOJOY_DEV },
-      }));
-    } catch (e) {
-      // Fallback: execute via shell to avoid EACCES on non-executable files
-      const shell = process.env.SHELL || "/usr/bin/bash";
-      ({ stdout } = await execFileAsync(shell, [installer], {
-        cwd: rootdir,
-        env: { ...process.env, AUTOJOY_DEV },
-      }));
-    }
+    const shell = process.env.SHELL || "/usr/bin/bash";
+    ({ stdout, stderr } = await execFileAsync(shell, [installer], {
+      cwd: rootdir,
+      env: { ...process.env, AUTOJOY_DEV },
+    }));
+    logFromApp("install stdout:", stdout?.toString());
+    logFromApp("install stderr:", stderr?.toString());
+
     logFromApp("Service created and activated");
     dispatch(actions.serverStarted());
     return { ok: true, message: stdout?.toString() || "Service installed" };
@@ -278,6 +280,7 @@ export async function uninstallSystemService(removeNode = false) {
             // Attempt to remove unit file; ignore errors
             const unitPath = `${process.env.HOME}/.config/systemd/user/${serviceName}`;
             execFile("rm", ["-f", unitPath], { encoding: "utf8" }, () => {
+              dispatch(actions.serverNotInstalled());
               resolve();
             });
           },
@@ -298,6 +301,8 @@ export function startSystemService() {
       return;
     }
 
+    dispatch(actions.restartingServer());
+
     const serviceName = "autojoy-backend.service";
     execFile(
       "systemctl",
@@ -307,9 +312,11 @@ export function startSystemService() {
         if (err) {
           const msg =
             stderr?.toString?.() || err.message || "Failed to start service";
+          dispatch(actions.serverStopped());
           resolve({ ok: false, message: msg });
           return;
         }
+        dispatch(actions.serverStarted());
         resolve({
           ok: true,
           message: stdout?.toString?.() || "Service started",
@@ -342,6 +349,7 @@ export function stopSystemService() {
           resolve({ ok: false, message: msg });
           return;
         }
+        dispatch(actions.serverStopped());
         resolve({
           ok: true,
           message: stdout?.toString?.() || "Service stopped",
@@ -365,6 +373,8 @@ export function restartSystemService() {
       return;
     }
 
+    dispatch(actions.restartingServer());
+
     const serviceName = "autojoy-backend.service";
     execFile(
       "systemctl",
@@ -374,9 +384,11 @@ export function restartSystemService() {
         if (err) {
           const msg =
             stderr?.toString?.() || err.message || "Failed to restart service";
+          dispatch(actions.serverStopped());
           resolve({ ok: false, message: msg });
           return;
         }
+        dispatch(actions.serverStarted());
         resolve({
           ok: true,
           message: stdout?.toString?.() || "Service restarted",

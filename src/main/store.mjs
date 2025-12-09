@@ -66,6 +66,11 @@ const store = {
         serverStatus: "stopped-manually",
       };
     },
+    serverNotInstalled() {
+      return {
+        serverStatus: "pending-install",
+      };
+    },
     toggleOpenAtLogin(openAtLogin = false) {
       updateSystemSettings({
         openAtLogin,

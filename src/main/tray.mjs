@@ -35,7 +35,7 @@ export function startTray() {
   const setTrayMenu = () => {
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: `Autojoy controller service is ${store.state.serverStatus}`,
+        label: `Autojoy controller service is ${store.state.serverStatus.replace("-", " ")}`,
         type: "normal",
         enabled: false,
       },

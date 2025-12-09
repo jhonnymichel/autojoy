@@ -9,7 +9,7 @@
           on them.
         </p>
         <p v-if="serviceStatus.result" class="message">
-          Something wen't wrong. Please try again
+          Service is not installed.
         </p>
       </div>
       <div class="buttons-container">
