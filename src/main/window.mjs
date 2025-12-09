@@ -3,20 +3,26 @@ import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import store from "./store.mjs";
 import rootdir from "../common/rootdir.mjs";
 import { user } from "../common/settings.mjs";
-import { getSystemServiceStatus, installSystemService, restartSystemService, stopSystemService, uninstallSystemService } from "./joystick-server.mjs";
+import {
+  getSystemServiceStatus,
+  installSystemService,
+  restartSystemService,
+  stopSystemService,
+  uninstallSystemService,
+} from "./joystick-server.mjs";
 
 const { dispatch, actions } = store;
 let aboutWindow = null;
 
 const isDev = !app.isPackaged;
-const DEV_URL = 'http://localhost:5173/index.html';
-const pagesDist = path.resolve(rootdir, 'src/main/pages/dist');
+const DEV_URL = "http://localhost:5173/index.html";
+const pagesDist = path.resolve(rootdir, "src/main/pages/dist");
 
 function loadPage(window, page = "") {
   if (isDev) {
     window.loadURL(`${DEV_URL}#${page}`);
   } else {
-    window.loadFile(path.join(pagesDist, 'index.html'), { hash: page });
+    window.loadFile(path.join(pagesDist, "index.html"), { hash: page });
   }
 }
 
@@ -67,20 +73,23 @@ ipcMain.handle("openFolderDialog", async () => {
 });
 
 ipcMain.handle("installAutojoyService", async () => {
-  return installSystemService()
+  return installSystemService();
 });
 
 ipcMain.handle("restartAutojoyService", async () => {
-  return restartSystemService()
+  return restartSystemService();
 });
 
 ipcMain.handle("stopAutojoyService", async () => {
-  return stopSystemService()
+  return stopSystemService();
 });
 
-ipcMain.handle("uninstallAutojoyService", (event, { removeNode } = { removeNode: false }) => {
-  return uninstallSystemService(removeNode)
-});
+ipcMain.handle(
+  "uninstallAutojoyService",
+  (event, { removeNode } = { removeNode: false }) => {
+    return uninstallSystemService(removeNode);
+  },
+);
 
 ipcMain.handle("getSystemServiceStatus", () => {
   return getSystemServiceStatus();
@@ -115,21 +124,28 @@ function createMainWindow() {
 }
 
 export function openPathsPage() {
-  createMainWindow()
+  createMainWindow();
 
-  loadPage(mainWindow, 'paths');
+  loadPage(mainWindow, "paths");
   mainWindow.show();
 }
 
 export function openServicePage() {
-  createMainWindow()
+  createMainWindow();
 
-  loadPage(mainWindow, 'service');
+  loadPage(mainWindow, "service");
+  mainWindow.show();
+}
+
+export function openSetupPage() {
+  createMainWindow();
+
+  loadPage(mainWindow, "start-setup");
   mainWindow.show();
 }
 
 export function openDashboardPage() {
-  createMainWindow()
+  createMainWindow();
 
   loadPage(mainWindow);
   mainWindow.show();

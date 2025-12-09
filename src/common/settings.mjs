@@ -1,5 +1,5 @@
 import { logFromApp } from "./logger.mjs";
-import path from "path"
+import path from "path";
 import {
   loaders,
   resolvePathFromPackagedRoot,
@@ -9,8 +9,10 @@ import {
 
 export const userFolderPath = resolvePathFromUserFolder(".");
 
-const packagedRootConfigTemplatesPath =
-  path.join("config-templates", process.platform === "win32" ? "win32" : "linux");
+const packagedRootConfigTemplatesPath = path.join(
+  "config-templates",
+  process.platform === "win32" ? "win32" : "linux",
+);
 
 // must validate and migrate paths before allowing user object to be used.
 migrateUserSettings();
@@ -33,7 +35,7 @@ export const user = {
 function amendNewDefaults({ filePath, templatePath, loader, saver }) {
   const userFile = loader(filePath);
   const appBaseFile = loader(
-    resolvePathFromPackagedRoot(templatePath ?? filePath)
+    resolvePathFromPackagedRoot(templatePath ?? filePath),
   );
 
   let itemsToAmend = [];
@@ -47,7 +49,7 @@ function amendNewDefaults({ filePath, templatePath, loader, saver }) {
   if (itemsToAmend.length) {
     logFromApp(
       `Amending new defaults (${itemsToAmend.join(", ")}) for:`,
-      filePath
+      filePath,
     );
     saver(userFile, filePath);
   }
@@ -61,7 +63,7 @@ function migrateUserFile({ filePath, templatePath, loader, saver }) {
     logFromApp("Creating not found user file: ", filePath);
     saver(
       loader(resolvePathFromPackagedRoot(templatePath ?? filePath)),
-      filePath
+      filePath,
     );
   }
 }
@@ -108,13 +110,19 @@ function migrateUserSettings() {
   });
   migrateUserFile({
     filePath: "config-templates/dolphin-wiimote-emulated.ini",
-    templatePath: path.join(packagedRootConfigTemplatesPath, "dolphin-wiimote-emulated.ini"),
+    templatePath: path.join(
+      packagedRootConfigTemplatesPath,
+      "dolphin-wiimote-emulated.ini",
+    ),
     loader: loaders.ini,
     saver: savers.ini,
   });
   migrateUserFile({
     filePath: "config-templates/dolphin-wiimote-real.ini",
-    templatePath: path.join(packagedRootConfigTemplatesPath, "dolphin-wiimote-real.ini"),
+    templatePath: path.join(
+      packagedRootConfigTemplatesPath,
+      "dolphin-wiimote-real.ini",
+    ),
     loader: loaders.ini,
     saver: savers.ini,
   });
@@ -151,7 +159,7 @@ export function validateSettings(log = (...msg) => console.log(...msg)) {
   if (userSettings.unusedMicrophones) {
     if (!Array.isArray(userSettings.unusedMicrophones)) {
       log(
-        `user settings.unusedMicrophones invalid value. Should be an array. found '${typeof userSettings.unusedMicrophones}'. Resetting it.`
+        `user settings.unusedMicrophones invalid value. Should be an array. found '${typeof userSettings.unusedMicrophones}'. Resetting it.`,
       );
 
       user.settings = {
@@ -161,11 +169,11 @@ export function validateSettings(log = (...msg) => console.log(...msg)) {
     } else if (
       userSettings.unusedMicrophones.some(
         (entry) =>
-          !entry.hasOwnProperty("name") || !entry.hasOwnProperty("position")
+          !entry.hasOwnProperty("name") || !entry.hasOwnProperty("position"),
       )
     ) {
       log(
-        "Invalid user settings.unusedMicrophones entries found. Resetting it."
+        "Invalid user settings.unusedMicrophones entries found. Resetting it.",
       );
 
       user.settings = {
@@ -177,7 +185,7 @@ export function validateSettings(log = (...msg) => console.log(...msg)) {
     if (userSettings.hasOwnProperty("manageMicrophones")) {
       if (typeof userSettings.manageMicrophones !== "boolean") {
         log(
-          `user settings.manageMicrophones invalid value. Should true of false. found '${userSettings.manageMicrophones}'. Resetting it.`
+          `user settings.manageMicrophones invalid value. Should true of false. found '${userSettings.manageMicrophones}'. Resetting it.`,
         );
         user.settings = {
           ...user.settings,

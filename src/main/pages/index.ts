@@ -1,9 +1,11 @@
 import { createApp } from "vue";
+import { createRouter, createWebHashHistory } from "vue-router";
 import App from "./App.vue";
 import IndexPage from "./IndexPage.vue";
 import PathsPage from "./PathsPage.vue";
 import ServicePage from "./ServicePage.vue";
-import { createRouter, createWebHashHistory } from "vue-router";
+import EndSetupPage from "./setup/EndSetupPage.vue";
+import StartSetupPage from "./setup/StartSetupPage.vue";
 
 declare global {
   interface Window {
@@ -18,6 +20,8 @@ async function start() {
   const routes = [
     { path: "/", component: IndexPage },
     { path: "/paths", component: PathsPage },
+    { path: "/start-setup", component: StartSetupPage },
+    { path: "/finish-setup", component: EndSetupPage },
     ...(platform === "linux"
       ? [{ path: "/service", component: ServicePage }]
       : []),

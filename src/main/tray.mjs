@@ -5,9 +5,10 @@ import {
   createAboutWindow,
   openDashboardPage,
   openPathsPage,
+  openSetupPage,
 } from "./window.mjs";
 import rootdir from "../common/rootdir.mjs";
-import { userFolderPath } from "../common/settings.mjs";
+import { user, userFolderPath } from "../common/settings.mjs";
 import { isMicrophoneInUse } from "../common/device-filters.mjs";
 
 const { actions, dispatch } = store;
@@ -18,9 +19,15 @@ export function startTray() {
   );
   const tray = new Tray(icon);
 
-  tray.on("click", () => {
-    openDashboardPage();
-  });
+  const openApp = () => {
+    if (user.settings.setupComplete) {
+      openDashboardPage();
+    } else {
+      openSetupPage();
+    }
+  };
+
+  tray.on("click", openApp);
 
   tray.setTitle("Autojoy");
   tray.setToolTip("Autojoy");
@@ -34,11 +41,9 @@ export function startTray() {
       },
       { type: "separator" },
       {
-        label: `Config paths`,
+        label: `Open Dashboard`,
         type: "normal",
-        click: () => {
-          openPathsPage();
-        },
+        click: openApp,
       },
       { type: "separator" },
       {

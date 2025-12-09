@@ -1,6 +1,5 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
-
 contextBridge.exposeInMainWorld("electron", {
   getAppVersion: () => {
     return ipcRenderer.invoke("getAppVersion");
@@ -12,27 +11,27 @@ contextBridge.exposeInMainWorld("electron", {
     return ipcRenderer.invoke("setPaths", paths);
   },
   selectFolder: async () => {
-    return ipcRenderer.invoke("openFolderDialog"); 
+    return ipcRenderer.invoke("openFolderDialog");
   },
   installAutojoyService: async () => {
-    return ipcRenderer.invoke("installAutojoyService"); 
+    return ipcRenderer.invoke("installAutojoyService");
   },
   uninstallAutojoyService: async (removeNode = false) => {
-    return ipcRenderer.invoke("uninstallAutojoyService", { removeNode }); 
+    return ipcRenderer.invoke("uninstallAutojoyService", { removeNode });
   },
   getSystemServiceStatus: async () => {
-    return ipcRenderer.invoke("getSystemServiceStatus"); 
+    return ipcRenderer.invoke("getSystemServiceStatus");
   },
   stopAutojoyService: async () => {
-    return ipcRenderer.invoke("stopAutojoyService"); 
+    return ipcRenderer.invoke("stopAutojoyService");
   },
   startAutojoyService: async () => {
-    return ipcRenderer.invoke("startAutojoyService"); 
+    return ipcRenderer.invoke("startAutojoyService");
   },
   restartAutojoyService: async () => {
-    return ipcRenderer.invoke("restartAutojoyService"); 
+    return ipcRenderer.invoke("restartAutojoyService");
   },
   getPlatform: async () => {
-    return ipcRenderer.invoke("getPlatform"); 
+    return ipcRenderer.invoke("getPlatform");
   },
 });
