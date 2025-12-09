@@ -21,7 +21,7 @@ export function startServer() {
     [],
     {
       stdio: ["pipe", "pipe", "pipe", "ipc"], // Ensure stdout is piped
-    }
+    },
   );
 
   // Forward messages from child process to main process
@@ -77,8 +77,9 @@ export function restartServer(context) {
   const lastRestart = store.state.lastRestartAfterCrash;
   if (!isIntentionalRestart && currentTime - lastRestart <= 3000) {
     logFromApp(
-      `Server died twice in ${currentTime - lastRestart
-      }ms. Preventing auto restart. Waiting a minute before trying again.`
+      `Server died twice in ${
+        currentTime - lastRestart
+      }ms. Preventing auto restart. Waiting a minute before trying again.`,
     );
 
     restartAgainTimeoutId = setTimeout(() => {
@@ -95,7 +96,7 @@ export function restartServer(context) {
     actions.restartingServer({
       isUserIssuedRestart: isIntentionalRestart,
       serverRestartPadding,
-    })
+    }),
   );
   serverRestartPaddingTimeoutId = setTimeout(() => {
     startServer();
@@ -131,7 +132,9 @@ export function getSystemServiceStatus() {
 
     if (!devServiceCleanupDone) {
       try {
-        const processCheck = await promisify(exec)(`cat ${`${process.env.HOME}/.config/systemd/user/${serviceName}`} | grep dev-app-data`);
+        const processCheck = await promisify(exec)(
+          `cat ${`${process.env.HOME}/.config/systemd/user/${serviceName}`} | grep dev-app-data`,
+        );
         if (processCheck.stdout && processCheck.stdout.length) {
           isDev = true;
         }
@@ -153,7 +156,7 @@ export function getSystemServiceStatus() {
           const active = /Active:\s+active \(running\)/gi.test(output);
 
           resolve({ supported: true, installed, active, details });
-        }
+        },
       );
     };
 
@@ -175,9 +178,9 @@ export function getSystemServiceStatus() {
                 devServiceCleanupDone = true;
                 proceedStatus();
               });
-            }
+            },
           );
-        }
+        },
       );
       return;
     }
@@ -195,7 +198,10 @@ export function getSystemServiceStatus() {
  */
 export async function installSystemService() {
   if (process.platform !== "linux") {
-    return { ok: false, message: "Service install is supported on Linux only." };
+    return {
+      ok: false,
+      message: "Service install is supported on Linux only.",
+    };
   }
   const execFileAsync = promisify(execFile);
   try {
@@ -208,23 +214,35 @@ export async function installSystemService() {
     await copyDir(srcBackend, path.resolve(targetSrc, "autojoy-backend"));
     await copyDir(srcCommon, path.resolve(targetSrc, "common"));
 
-    const installer = path.resolve(rootdir, "scripts/autojoy-service-install.run");
+    const installer = path.resolve(
+      rootdir,
+      "scripts/autojoy-service-install.run",
+    );
     let stdout;
     const AUTOJOY_DEV = app.isPackaged ? "0" : "1";
 
     try {
       // Try running directly (requires executable bit)
-      ({ stdout } = await execFileAsync(installer, { cwd: rootdir, env: { ...process.env, AUTOJOY_DEV } }));
+      ({ stdout } = await execFileAsync(installer, {
+        cwd: rootdir,
+        env: { ...process.env, AUTOJOY_DEV },
+      }));
     } catch (e) {
       // Fallback: execute via shell to avoid EACCES on non-executable files
       const shell = process.env.SHELL || "/usr/bin/bash";
-      ({ stdout } = await execFileAsync(shell, [installer], { cwd: rootdir, env: { ...process.env, AUTOJOY_DEV } }));
+      ({ stdout } = await execFileAsync(shell, [installer], {
+        cwd: rootdir,
+        env: { ...process.env, AUTOJOY_DEV },
+      }));
     }
     logFromApp("Service created and activated");
     dispatch(actions.serverStarted());
     return { ok: true, message: stdout?.toString() || "Service installed" };
   } catch (error) {
-    const message = error?.stderr?.toString?.() || error?.message || "Failed to install service";
+    const message =
+      error?.stderr?.toString?.() ||
+      error?.message ||
+      "Failed to install service";
     return { ok: false, message };
   }
 }
@@ -239,11 +257,13 @@ export async function installSystemService() {
  */
 export async function uninstallSystemService(removeNode = false) {
   if (process.platform !== "linux") {
-    return { ok: false, message: "Service uninstall is supported on Linux only." };
+    return {
+      ok: false,
+      message: "Service uninstall is supported on Linux only.",
+    };
   }
   return new Promise((resolve) => {
     const serviceName = "autojoy-backend.service";
-
 
     execFile(
       "systemctl",
@@ -258,11 +278,11 @@ export async function uninstallSystemService(removeNode = false) {
             // Attempt to remove unit file; ignore errors
             const unitPath = `${process.env.HOME}/.config/systemd/user/${serviceName}`;
             execFile("rm", ["-f", unitPath], { encoding: "utf8" }, () => {
-              resolve()
+              resolve();
             });
-          }
+          },
         );
-      }
+      },
     );
   });
 }
@@ -285,12 +305,16 @@ export function startSystemService() {
       { encoding: "utf8" },
       (err, stdout, stderr) => {
         if (err) {
-          const msg = stderr?.toString?.() || err.message || "Failed to start service";
+          const msg =
+            stderr?.toString?.() || err.message || "Failed to start service";
           resolve({ ok: false, message: msg });
           return;
         }
-        resolve({ ok: true, message: stdout?.toString?.() || "Service started" });
-      }
+        resolve({
+          ok: true,
+          message: stdout?.toString?.() || "Service started",
+        });
+      },
     );
   });
 }
@@ -313,12 +337,16 @@ export function stopSystemService() {
       { encoding: "utf8" },
       (err, stdout, stderr) => {
         if (err) {
-          const msg = stderr?.toString?.() || err.message || "Failed to stop service";
+          const msg =
+            stderr?.toString?.() || err.message || "Failed to stop service";
           resolve({ ok: false, message: msg });
           return;
         }
-        resolve({ ok: true, message: stdout?.toString?.() || "Service stopped" });
-      }
+        resolve({
+          ok: true,
+          message: stdout?.toString?.() || "Service stopped",
+        });
+      },
     );
   });
 }
@@ -330,7 +358,10 @@ export function stopSystemService() {
 export function restartSystemService() {
   return new Promise((resolve) => {
     if (process.platform !== "linux") {
-      resolve({ ok: false, message: "Service restart supported on Linux only." });
+      resolve({
+        ok: false,
+        message: "Service restart supported on Linux only.",
+      });
       return;
     }
 
@@ -341,12 +372,16 @@ export function restartSystemService() {
       { encoding: "utf8" },
       (err, stdout, stderr) => {
         if (err) {
-          const msg = stderr?.toString?.() || err.message || "Failed to restart service";
+          const msg =
+            stderr?.toString?.() || err.message || "Failed to restart service";
           resolve({ ok: false, message: msg });
           return;
         }
-        resolve({ ok: true, message: stdout?.toString?.() || "Service restarted" });
-      }
+        resolve({
+          ok: true,
+          message: stdout?.toString?.() || "Service restarted",
+        });
+      },
     );
   });
 }

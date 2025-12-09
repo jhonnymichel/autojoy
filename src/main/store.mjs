@@ -10,7 +10,7 @@ const store = {
     if (changes) {
       Object.defineProperties(
         store.__state,
-        Object.getOwnPropertyDescriptors(changes)
+        Object.getOwnPropertyDescriptors(changes),
       );
     }
 
@@ -87,7 +87,7 @@ const store = {
 
       const microphoneList = store.state.microphoneList;
       const connectedMicsWithCurrentDeviceName = microphoneList.filter(
-        (d) => d.name === device.name
+        (d) => d.name === device.name,
       );
       const positionOfCurrentDevice =
         connectedMicsWithCurrentDeviceName.indexOf(device);
@@ -100,12 +100,12 @@ const store = {
       const newUnusedList = unusedList.find(
         (entry) =>
           entry.name === unusedListEntry.name &&
-          entry.position === unusedListEntry.position
+          entry.position === unusedListEntry.position,
       )
         ? unusedList.filter(
             (entry) =>
               entry.name !== unusedListEntry.name ||
-              entry.position !== unusedListEntry.position
+              entry.position !== unusedListEntry.position,
           )
         : [...unusedList, unusedListEntry];
 
@@ -121,7 +121,7 @@ const store = {
     },
     setPaths(paths) {
       const validPaths = Object.values(paths).every(
-        (value) => typeof value === "string"
+        (value) => typeof value === "string",
       );
       if (validPaths) {
         user.paths = paths;
@@ -134,9 +134,29 @@ const store = {
           : store.state.serverStatus,
       };
     },
+    completeSetup() {
+      user.settings = {
+        ...user.settings,
+        setupComplete: true,
+      };
+
+      return {
+        setupComlete: true,
+      };
+    },
+    resetSetup() {
+      user.settings = {
+        ...user.settings,
+        setupComplete: false,
+      };
+
+      return {
+        setupComlete: false,
+      };
+    },
   },
   __state: {
-    serverStatus: "starting", // starting, restarting, running, stopped-manually, crashed, pending-user-issued-restart, pending-issued-restart
+    serverStatus: "starting", // pending-install, starting, restarting, running, stopped-manually, crashed, pending-user-issued-restart, pending-issued-restart
     get openAtLogin() {
       const settings = getSystemSettings();
 
@@ -148,6 +168,7 @@ const store = {
     microphoneList: [],
     unusedMicrophones: user.settings.unusedMicrophones ?? [],
     paths: user.paths,
+    setupComplete: user.settings.setupComplete ?? false,
   },
   get state() {
     return store.__state;

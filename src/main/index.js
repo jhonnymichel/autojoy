@@ -1,5 +1,5 @@
 import { app } from "electron";
-import { user, validateSettings } from "../common/settings.mjs";
+import { validateSettings } from "../common/settings.mjs";
 import store from "./store.mjs";
 import { openSetupPage } from "./window.mjs";
 import { getSystemServiceStatus, startServer } from "./joystick-server.mjs";
@@ -13,12 +13,9 @@ app.on("ready", async () => {
   logFromApp("App started");
   const serviceStatus = await getSystemServiceStatus();
   const noPaths = Object.values(store.state.paths).every((path) => !path);
-  const setupComplete = user.settings.setupComplete;
+  const setupComplete = store.state.setupComplete;
   if (!setupComplete || noPaths || !serviceStatus.installed) {
-    user.settings = {
-      ...user.settings,
-      setupComplete: false,
-    };
+    store.dispatch(store.actions.resetSetup());
 
     logFromApp(
       "Setup pending:",

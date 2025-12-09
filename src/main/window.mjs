@@ -2,7 +2,6 @@ import path from "path";
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import store from "./store.mjs";
 import rootdir from "../common/rootdir.mjs";
-import { user } from "../common/settings.mjs";
 import {
   getSystemServiceStatus,
   installSystemService,
@@ -56,12 +55,12 @@ ipcMain.handle("getAppVersion", () => {
   return app.getVersion();
 });
 
-ipcMain.handle("getUser", () => {
-  return structuredClone(user);
+ipcMain.handle("getStoreState", () => {
+  return structuredClone(store.state);
 });
 
-ipcMain.handle("setPaths", (event, paths) => {
-  dispatch(actions.setPaths(paths));
+ipcMain.handle("dispatchAction", (event, { action, payload }) => {
+  dispatch(actions[action](payload));
 });
 
 ipcMain.handle("openFolderDialog", async () => {

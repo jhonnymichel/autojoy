@@ -19,9 +19,9 @@ const isSetup = ref(false);
 const ready = ref(false);
 
 const toggleTutorial = async () => {
-  const user = await window.electron.getUser();
+  const state = await window.electron.getStoreState();
 
-  if (!user?.settings?.setupComplete) {
+  if (!state.setupComplete) {
     isSetup.value = true;
   }
 

@@ -4,11 +4,11 @@ contextBridge.exposeInMainWorld("electron", {
   getAppVersion: () => {
     return ipcRenderer.invoke("getAppVersion");
   },
-  getUser: () => {
-    return ipcRenderer.invoke("getUser");
+  getStoreState: () => {
+    return ipcRenderer.invoke("getStoreState");
   },
-  setPaths: (paths) => {
-    return ipcRenderer.invoke("setPaths", paths);
+  dispatchAction: (action, payload) => {
+    return ipcRenderer.invoke("dispatchAction", { action, payload });
   },
   selectFolder: async () => {
     return ipcRenderer.invoke("openFolderDialog");

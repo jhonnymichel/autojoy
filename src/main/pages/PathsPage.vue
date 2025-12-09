@@ -65,8 +65,8 @@ const tooltips = {
 
 onMounted(async () => {
   try {
-    const user = await window.electron.getUser();
-    Object.assign(paths, { ...(user?.paths ?? {}) });
+    const state = await window.electron.getStoreState();
+    Object.assign(paths, { ...(state?.paths ?? {}) });
   } catch (_) {
     // noop
   } finally {
@@ -90,7 +90,7 @@ function showTooltip(key) {
 function saveConfig() {
   try {
     const plain = toRaw(paths);
-    window.electron.setPaths({ ...plain });
+    window.electron.dispatchAction("setPaths", { ...plain });
     alert(
       "Settings updated! You can close this configuration window and enjoy!\nThe app is running in the tray.",
     );
