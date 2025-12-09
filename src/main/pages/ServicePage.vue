@@ -2,14 +2,24 @@
   <div class="app" :class="{ active: ready }">
     <div v-if="!serviceStatus.installed">
       <div class="header">
-        <h2>Install AutoJoy Backend Service</h2>
+        <h2>AutoJoy Backend Service</h2>
         <p>
           We need to install the autojoy backend service to watch for when
           controllers are connected and disconnected, and update settings based
           on them.
         </p>
-        <p v-if="serviceStatus.result" class="message">
-          Service is not installed.
+        <p class="message">
+          <span
+            class="status-indicator-container"
+            :class="{ loading: pending }"
+          >
+            <span
+              aria-hidden="true"
+              class="status-indicator"
+              :class="{ active: serviceStatus.active }"
+            />
+          </span>
+          {{ pending ? "Service is installing" : "Service is not installed" }}
         </p>
       </div>
       <div class="buttons-container">
@@ -31,10 +41,15 @@
         <p>Here you can check the service status and uninstall it.</p>
         <p class="message">
           <span
-            aria-hidden="true"
-            class="status-indicator"
-            :class="{ active: serviceStatus.active }"
-          />
+            class="status-indicator-container"
+            :class="{ loading: pending }"
+          >
+            <span
+              aria-hidden="true"
+              class="status-indicator"
+              :class="{ active: serviceStatus.active }"
+            />
+          </span>
           {{
             serviceStatus.active ? "Service is running" : "Service is stopped"
           }}
@@ -98,7 +113,6 @@ onMounted(async () => {
 async function installService() {
   pending.value = true;
   const result = await window.electron.installAutojoyService();
-  await new Promise((r) => setTimeout(r, 1000));
   const status = await window.electron.getSystemServiceStatus();
   Object.assign(serviceStatus, { ...status, result });
   pending.value = false;
@@ -215,6 +229,34 @@ async function stopService() {
   margin-right: 5px;
   background: red;
   animation: pulse 4000ms infinite alternate;
+}
+
+.status-indicator-container {
+  display: inline-flex;
+  align-items: center;
+}
+
+.status-indicator-container.loading {
+  width: 40px;
+}
+
+.status-indicator-container.loading .status-indicator {
+  animation:
+    loading 500ms steps(2) infinite alternate,
+    pulse 200ms infinite alternate;
+  background-color: #222;
+}
+
+@keyframes loading {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(20px);
+  }
+  100% {
+    transform: translateX(40px);
+  }
 }
 
 @keyframes pulse {
