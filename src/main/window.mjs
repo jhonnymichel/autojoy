@@ -12,7 +12,7 @@ const isDev = !app.isPackaged;
 const DEV_URL = 'http://localhost:5173/index.html';
 const pagesDist = path.resolve(rootdir, 'src/main/pages/dist');
 
-function loadPage(window, page) {
+function loadPage(window, page = "") {
   if (isDev) {
     window.loadURL(`${DEV_URL}#${page}`);
   } else {
@@ -122,6 +122,13 @@ export function openServicePage() {
   createMainWindow()
 
   loadPage(mainWindow, 'service');
+  mainWindow.show();
+}
+
+export function openDashboardPage() {
+  createMainWindow()
+
+  loadPage(mainWindow);
   mainWindow.show();
 }
 

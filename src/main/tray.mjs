@@ -1,7 +1,7 @@
 import { app, Menu, nativeImage, shell, Tray } from "electron";
 import path from "path";
 import store from "./store.mjs";
-import { createAboutWindow, openPathsPage, } from "./window.mjs";
+import { createAboutWindow, openDashboardPage, openPathsPage, } from "./window.mjs";
 import rootdir from "../common/rootdir.mjs";
 import { userFolderPath } from "../common/settings.mjs";
 import { isMicrophoneInUse } from "../common/device-filters.mjs";
@@ -13,6 +13,10 @@ export function startTray() {
     path.resolve(rootdir, "assets/tray.png")
   );
   const tray = new Tray(icon);
+
+  tray.on("click", () => {
+    openDashboardPage();
+  });
 
   tray.setTitle("Autojoy");
   tray.setToolTip("Autojoy");
