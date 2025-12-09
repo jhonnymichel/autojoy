@@ -82,9 +82,12 @@ ipcMain.handle("uninstallAutojoyService", (event, { removeNode } = { removeNode:
   return uninstallSystemService(removeNode)
 });
 
-
 ipcMain.handle("getSystemServiceStatus", () => {
   return getSystemServiceStatus();
+});
+
+ipcMain.handle("getPlatform", () => {
+  return process.platform;
 });
 
 let mainWindow;

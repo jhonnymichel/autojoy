@@ -1,7 +1,11 @@
 import { app, Menu, nativeImage, shell, Tray } from "electron";
 import path from "path";
 import store from "./store.mjs";
-import { createAboutWindow, openDashboardPage, openPathsPage, } from "./window.mjs";
+import {
+  createAboutWindow,
+  openDashboardPage,
+  openPathsPage,
+} from "./window.mjs";
 import rootdir from "../common/rootdir.mjs";
 import { userFolderPath } from "../common/settings.mjs";
 import { isMicrophoneInUse } from "../common/device-filters.mjs";
@@ -10,7 +14,7 @@ const { actions, dispatch } = store;
 
 export function startTray() {
   const icon = nativeImage.createFromPath(
-    path.resolve(rootdir, "assets/tray.png")
+    path.resolve(rootdir, "assets/tray.png"),
   );
   const tray = new Tray(icon);
 
@@ -47,13 +51,13 @@ export function startTray() {
       { type: "separator" },
       ...(store.state.joystickList.length
         ? store.state.joystickList.map((d) => ({
-          type: "normal",
-          enabled: false,
-          label: `${d.name} (${d.type})`,
-        }))
+            type: "normal",
+            enabled: false,
+            label: `${d.name} (${d.type})`,
+          }))
         : [
-          { type: "normal", enabled: false, label: "No joysticks detected." },
-        ]),
+            { type: "normal", enabled: false, label: "No joysticks detected." },
+          ]),
       {
         type: "separator",
       },
@@ -64,30 +68,30 @@ export function startTray() {
         checked: store.state.manageMicrophones === true,
         click: () => {
           dispatch(
-            actions.toggleMicrophoneManagement(!store.state.manageMicrophones)
+            actions.toggleMicrophoneManagement(!store.state.manageMicrophones),
           );
         },
       },
       ...(store.state.microphoneList.length
         ? store.state.microphoneList.map((d, index) => ({
-          type: "checkbox",
-          checked: isMicrophoneInUse(
-            d,
-            store.state.microphoneList,
-            store.state.unusedMicrophones
-          ),
-          click: () => {
-            dispatch(actions.toggleMicrophoneUse(d));
-          },
-          label: `${d.name}`,
-        }))
+            type: "checkbox",
+            checked: isMicrophoneInUse(
+              d,
+              store.state.microphoneList,
+              store.state.unusedMicrophones,
+            ),
+            click: () => {
+              dispatch(actions.toggleMicrophoneUse(d));
+            },
+            label: `${d.name}`,
+          }))
         : [
-          {
-            type: "normal",
-            enabled: false,
-            label: "No Microphones detected.",
-          },
-        ]),
+            {
+              type: "normal",
+              enabled: false,
+              label: "No Microphones detected.",
+            },
+          ]),
       {
         type: "separator",
       },
@@ -121,7 +125,7 @@ export function startTray() {
       // idiotic hack to update Open at startup value before opening tray.
       e.preventDefault();
       contextMenu.items.find(
-        (item) => item.label === "Open at startup"
+        (item) => item.label === "Open at startup",
       ).checked = store.state.openAtLogin;
       contextMenu.removeAllListeners("menu-will-show");
       setTimeout(() => {

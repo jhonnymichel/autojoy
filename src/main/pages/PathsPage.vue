@@ -1,9 +1,7 @@
 <template>
   <div class="header">
     <h2>Set Your Paths</h2>
-    <p>
-      Provide the path to each software you want AutoJoy to integrate with.
-    </p>
+    <p>Provide the path to each software you want AutoJoy to integrate with.</p>
     <p>
       For software you don't have or don't want to integrate with, leave it
       blank.
@@ -12,15 +10,8 @@
     <p class="message" />
   </div>
 
-  <form
-    class="form"
-    :class="{ active: ready }"
-    @submit.prevent="saveConfig"
-  >
-    <template
-      v-for="field in fields"
-      :key="field.key"
-    >
+  <form class="form" :class="{ active: ready }" @submit.prevent="saveConfig">
+    <template v-for="field in fields" :key="field.key">
       <div class="field">
         <div class="label-wrapper">
           <label>{{ field.label }}</label>
@@ -29,93 +20,83 @@
               type="button"
               class="tooltip"
               @click="showTooltip(field.key)"
-            >?</button>
+            >
+              ?
+            </button>
           </span>
         </div>
         <div class="field-input">
-          <span class="path-display">{{ paths[field.key] || 'Not set' }}</span>
+          <span class="path-display">{{ paths[field.key] || "Not set" }}</span>
           <div class="buttons">
-            <button
-              type="button"
-              @click="selectFolder(field.key)"
-            >
+            <button type="button" @click="selectFolder(field.key)">
               Browse
             </button>
-            <button
-              type="button"
-              @click="clearField(field.key)"
-            >
-              Clear
-            </button>
+            <button type="button" @click="clearField(field.key)">Clear</button>
           </div>
         </div>
       </div>
     </template>
-    <button type="submit">
-      Save
-    </button>
+    <button type="submit">Save</button>
   </form>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, toRaw } from 'vue'
+import { ref, reactive, onMounted, toRaw } from "vue";
 
-const ready = ref(false)
+const ready = ref(false);
 
 const fields = [
-  { key: 'rpcs3', label: 'RPCS3' },
-  { key: 'dolphin', label: 'Dolphin' },
-  { key: 'cemu', label: 'Cemu' },
-  { key: 'ghwtde', label: 'Guitar Hero World Tour: Definitive Edition' },
-]
+  { key: "rpcs3", label: "RPCS3" },
+  { key: "dolphin", label: "Dolphin" },
+  { key: "cemu", label: "Cemu" },
+  { key: "ghwtde", label: "Guitar Hero World Tour: Definitive Edition" },
+];
 
-const paths = reactive({ rpcs3: '', dolphin: '', cemu: '', ghwtde: '' })
-
+const paths = reactive({ rpcs3: "", dolphin: "", cemu: "", ghwtde: "" });
 const tooltips = {
   rpcs3:
     "The RPCS3 installation folder. If using EmuDeck, it's by default inside %AppData%/emudeck/Emulators ",
-  cemu:
-    "The Cemu installation folder. If using EmuDeck, it's by default inside %AppData%/emudeck/Emulators ",
+  cemu: "The Cemu installation folder. If using EmuDeck, it's by default inside %AppData%/emudeck/Emulators ",
   dolphin:
     "If using EmuDeck, it's the installation folder by default inside %AppData%/emudeck/Emulators.\nIf using standalone Dolphin, it's the Dolphin Emulator folder inside your Documents.",
   ghwtde:
     "It's the game settings folder by default inside your Documents/My Games folder.",
-}
+};
 
 onMounted(async () => {
   try {
-    const user = await window.electron.getUser()
-    Object.assign(paths, { ...(user?.paths ?? {}) })
+    const user = await window.electron.getUser();
+    Object.assign(paths, { ...(user?.paths ?? {}) });
   } catch (_) {
     // noop
   } finally {
-    ready.value = true
+    ready.value = true;
   }
-})
+});
 
 async function selectFolder(key) {
-  const folderPath = await window.electron.selectFolder()
-  if (folderPath) paths[key] = folderPath
+  const folderPath = await window.electron.selectFolder();
+  if (folderPath) paths[key] = folderPath;
 }
 
 function clearField(key) {
-  paths[key] = ''
+  paths[key] = "";
 }
 
 function showTooltip(key) {
-  alert(tooltips[key])
+  alert(tooltips[key]);
 }
 
 function saveConfig() {
   try {
-    const plain = toRaw(paths)
-    window.electron.setPaths({ ...plain })
+    const plain = toRaw(paths);
+    window.electron.setPaths({ ...plain });
     alert(
-      'Settings updated! You can close this configuration window and enjoy!\nThe app is running in the tray.'
-    )
+      "Settings updated! You can close this configuration window and enjoy!\nThe app is running in the tray.",
+    );
   } catch (e) {
-    console.error(e)
-    alert('Failed to save settings')
+    console.error(e);
+    alert("Failed to save settings");
   }
 }
 </script>
@@ -200,7 +181,7 @@ function saveConfig() {
   align-items: center;
 }
 
-button[type='submit'] {
+button[type="submit"] {
   margin-top: 10px;
 }
 </style>

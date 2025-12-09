@@ -1,26 +1,21 @@
 <template>
-  <div
-    class="app"
-    :class="{ active: ready }"
-  >
+  <div class="app" :class="{ active: ready }">
     <div v-if="!serviceStatus.installed">
       <div class="header">
         <h2>Install AutoJoy Backend Service</h2>
         <p>
-          We need to install the autojoy backend service to watch for when controllers are connected and
-          disconnected, and update settings based on them.
+          We need to install the autojoy backend service to watch for when
+          controllers are connected and disconnected, and update settings based
+          on them.
         </p>
-        <p
-          v-if="serviceStatus.result"
-          class="message"
-        >
+        <p v-if="serviceStatus.result" class="message">
           Something wen't wrong. Please try again
         </p>
       </div>
       <div class="buttons-container">
         <button
           class="action-button"
-          :class="{ loading: pending }" 
+          :class="{ loading: pending }"
           :disabled="pending"
           type="button"
           @click="installService"
@@ -40,7 +35,9 @@
             class="status-indicator"
             :class="{ active: serviceStatus.active }"
           />
-          {{ serviceStatus.active ? 'Service is running' : 'Service is stopped' }}
+          {{
+            serviceStatus.active ? "Service is running" : "Service is stopped"
+          }}
         </p>
       </div>
       <div class="buttons-container">
@@ -51,7 +48,7 @@
           type="button"
           @click="restartService"
         >
-          {{ serviceStatus.active ? 'Restart' : 'Start' }} Service
+          {{ serviceStatus.active ? "Restart" : "Start" }} Service
         </button>
         <button
           v-if="serviceStatus.active"
@@ -78,55 +75,62 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted } from "vue";
 
-const pending = ref(false)
-const ready = ref(false)
-const serviceStatus = reactive({ installed: false, active: false, supported: false, details: null })
+const pending = ref(false);
+const ready = ref(false);
+const serviceStatus = reactive({
+  installed: false,
+  active: false,
+  supported: false,
+  details: null,
+});
 
 onMounted(async () => {
   try {
-    const status = await window.electron.getSystemServiceStatus()
-    Object.assign(serviceStatus, status)
+    const status = await window.electron.getSystemServiceStatus();
+    Object.assign(serviceStatus, status);
   } finally {
-    ready.value = true
+    ready.value = true;
   }
-})
+});
 
 async function installService() {
-  pending.value = true
-  const result = await window.electron.installAutojoyService()
-  await new Promise((r) => setTimeout(r, 1000))
-  const status = await window.electron.getSystemServiceStatus()
-  Object.assign(serviceStatus, { ...status, result })
-  pending.value = false
+  pending.value = true;
+  const result = await window.electron.installAutojoyService();
+  await new Promise((r) => setTimeout(r, 1000));
+  const status = await window.electron.getSystemServiceStatus();
+  Object.assign(serviceStatus, { ...status, result });
+  pending.value = false;
 }
 
 async function uninstallService() {
-  if (!window.confirm('Are you sure you want to uninstall the AutoJoy service?')) {
-    return
+  if (
+    !window.confirm("Are you sure you want to uninstall the AutoJoy service?")
+  ) {
+    return;
   }
-  pending.value = true
-  await window.electron.uninstallAutojoyService()
-  const status = await window.electron.getSystemServiceStatus()
-  Object.assign(serviceStatus, status)
-  pending.value = false
+  pending.value = true;
+  await window.electron.uninstallAutojoyService();
+  const status = await window.electron.getSystemServiceStatus();
+  Object.assign(serviceStatus, status);
+  pending.value = false;
 }
 
 async function restartService() {
-  pending.value = true
-  const result = await window.electron.restartAutojoyService()
-  const status = await window.electron.getSystemServiceStatus()
-  Object.assign(serviceStatus, { ...status, result })
-  pending.value = false
+  pending.value = true;
+  const result = await window.electron.restartAutojoyService();
+  const status = await window.electron.getSystemServiceStatus();
+  Object.assign(serviceStatus, { ...status, result });
+  pending.value = false;
 }
 
 async function stopService() {
-  pending.value = true
-  const result = await window.electron.stopAutojoyService()
-  const status = await window.electron.getSystemServiceStatus()
-  Object.assign(serviceStatus, { ...status, result })
-  pending.value = false
+  pending.value = true;
+  const result = await window.electron.stopAutojoyService();
+  const status = await window.electron.getSystemServiceStatus();
+  Object.assign(serviceStatus, { ...status, result });
+  pending.value = false;
 }
 </script>
 

@@ -35,6 +35,7 @@
   "license": "MIT",
   "dependencies": {
     "@kmamal/sdl": "^0.11.2",
+    "@vue/eslint-config-prettier": "^10.2.0",
     "bindings": "^1.5.0",
     "fast-xml-parser": "^4.5.1",
     "ini": "^5.0.0",
@@ -46,16 +47,18 @@
     "yaml": "^2.4.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.20.0",
+    "@eslint/js": "^9.39.1",
     "@vitejs/plugin-vue": "^6.0.2",
     "electron": "^29.1.1",
     "electron-builder": "^24.13.3",
-    "eslint": "^9.20.1",
+    "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^10.6.2",
     "globals": "^15.15.0",
     "node-gyp": "^11.1.0",
     "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.49.0",
     "vite": "^7.2.7"
   }
 }

@@ -12,24 +12,27 @@ contextBridge.exposeInMainWorld("electron", {
     return ipcRenderer.invoke("setPaths", paths);
   },
   selectFolder: async () => {
-    return ipcRenderer.invoke("openFolderDialog"); // Calls the main process
+    return ipcRenderer.invoke("openFolderDialog"); 
   },
   installAutojoyService: async () => {
-    return ipcRenderer.invoke("installAutojoyService"); // Calls the main process
+    return ipcRenderer.invoke("installAutojoyService"); 
   },
   uninstallAutojoyService: async (removeNode = false) => {
-    return ipcRenderer.invoke("uninstallAutojoyService", { removeNode }); // Calls the main process
+    return ipcRenderer.invoke("uninstallAutojoyService", { removeNode }); 
   },
   getSystemServiceStatus: async () => {
-    return ipcRenderer.invoke("getSystemServiceStatus"); // Calls the main process
+    return ipcRenderer.invoke("getSystemServiceStatus"); 
   },
   stopAutojoyService: async () => {
-    return ipcRenderer.invoke("stopAutojoyService"); // Calls the main process
+    return ipcRenderer.invoke("stopAutojoyService"); 
   },
   startAutojoyService: async () => {
-    return ipcRenderer.invoke("startAutojoyService"); // Calls the main process
+    return ipcRenderer.invoke("startAutojoyService"); 
   },
   restartAutojoyService: async () => {
-    return ipcRenderer.invoke("restartAutojoyService"); // Calls the main process
+    return ipcRenderer.invoke("restartAutojoyService"); 
+  },
+  getPlatform: async () => {
+    return ipcRenderer.invoke("getPlatform"); 
   },
 });
