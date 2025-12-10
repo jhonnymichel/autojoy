@@ -75,8 +75,8 @@
       term.scrollTop = term.scrollHeight;
     }
 
-    if (window.electron && window.electron.onServiceLog) {
-      window.electron.onServiceLog((line) => append(line));
+    if (window.autojoy) {
+      window.autojoy("onServiceLog", (line) => append(line));
     } else {
       append('Renderer not wired to service logs.');
     }

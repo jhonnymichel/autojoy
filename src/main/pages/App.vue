@@ -20,7 +20,7 @@ const isSetup = ref(false);
 const ready = ref(false);
 
 const toggleTutorial = async () => {
-  const state = await window.electron.getStoreState();
+  const state = await window.autojoy("getStoreState");
 
   isSetup.value = !state.setupComplete;
 

@@ -8,17 +8,10 @@ import EndSetupPage from "./setup/EndSetupPage.vue";
 import StartSetupPage from "./setup/StartSetupPage.vue";
 import AboutPage from "./AboutPage.vue";
 import HelpPage from "./HelpPage.vue";
-
-declare global {
-  interface Window {
-    electron: {
-      getPlatform: () => Promise<string>;
-    };
-  }
-}
+import type {} from "./types/global.d.ts";
 
 async function start() {
-  const platform = await window.electron.getPlatform();
+  const platform = await window.autojoy("getPlatform");
   const routes = [
     { path: "/", component: IndexPage },
     { path: "/paths", component: PathsPage },

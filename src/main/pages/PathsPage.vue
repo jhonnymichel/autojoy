@@ -68,17 +68,17 @@ const tooltips = {
 
 onMounted(async () => {
   try {
-    const state = await window.electron.getStoreState();
+    const state = await window.autojoy("getStoreState");
     Object.assign(paths, { ...(state?.paths ?? {}) });
-  } catch (_) {
-    // noop
+  } catch (e) {
+    console.error(e);
   } finally {
     ready.value = true;
   }
 });
 
 async function selectFolder(key) {
-  const folderPath = await window.electron.selectFolder();
+  const folderPath = await window.autojoy("openFolderDialog");
   if (folderPath) paths[key] = folderPath;
 }
 
@@ -93,8 +93,11 @@ function showTooltip(key) {
 async function saveConfig() {
   try {
     const plain = toRaw(paths);
-    const state = await window.electron.getStoreState();
-    window.electron.dispatchAction("setPaths", { ...plain });
+    const state = await window.autojoy("getStoreState");
+    await window.autojoy("dispatchAction", {
+      action: "setPaths",
+      payload: { ...plain },
+    });
     alert(
       `Settings saved! ${
         state.setupComplete ? "" : "You can proceed to the next step."

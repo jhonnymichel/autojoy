@@ -74,23 +74,25 @@ import GithubButton from "./lib/GithubButton.vue";
 const platform = ref("");
 
 onMounted(async () => {
-  platform.value = await window.electron.getPlatform();
+  platform.value = await window.autojoy("getPlatform");
 });
 
 const router = useRouter();
 
 function openUserFolder() {
-  window.electron.openUserFolder();
+  window.autojoy("openUserFolder");
 }
 
 function openFeatureRequestPage() {
-  window.electron.openExternalLink(
+  window.autojoy(
+    "openExternalLink",
     "https://github.com/jhonnymichel/autojoy/issues/new#feature-request",
   );
 }
 
 function openBugReportPage() {
-  window.electron.openExternalLink(
+  window.autojoy(
+    "openExternalLink",
     "https://github.com/jhonnymichel/autojoy/issues/new#bug-report",
   );
 }

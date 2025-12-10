@@ -105,6 +105,23 @@ export function openDashboardPage() {
   mainWindow.show();
 }
 
+// Export list of IPC command names for typed autocomplete in renderer.
+export const ipcCommands = [
+  "getAppVersion",
+  "getStoreState",
+  "dispatchAction",
+  "openFolderDialog",
+  "installAutojoyService",
+  "restartAutojoyService",
+  "stopAutojoyService",
+  "openServiceLogs",
+  "uninstallAutojoyService",
+  "getSystemServiceStatus",
+  "getPlatform",
+  "openUserFolder",
+  "openExternalLink",
+];
+
 ipcMain.handle("getAppVersion", () => {
   return app.getVersion();
 });

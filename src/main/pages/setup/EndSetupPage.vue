@@ -43,11 +43,11 @@ const allDone = computed(
 const platform = ref("");
 
 onMounted(async () => {
-  platform.value = await window.electron.getPlatform();
+  platform.value = await window.autojoy("getPlatform");
 });
 
 onMounted(async () => {
-  const storeState = await window.electron.getStoreState();
+  const storeState = await window.autojoy("getStoreState");
 
   pathsComplete.value =
     storeState.paths &&
@@ -60,8 +60,11 @@ onMounted(async () => {
 
 async function finishSetup() {
   if (window.confirm("Are you sure you want to finish the setup?")) {
-    window.electron.dispatchAction("completeSetup");
-    const state = await window.electron.getStoreState();
+    await window.autojoy("dispatchAction", {
+      action: "completeSetup",
+      payload: undefined,
+    });
+    const state = await window.autojoy("getStoreState");
     if (state.setupComplete) {
       router.push("/");
     }

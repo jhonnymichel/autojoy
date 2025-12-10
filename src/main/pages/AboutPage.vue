@@ -39,6 +39,6 @@
 import { ref, onMounted } from "vue";
 const appVersion = ref("");
 onMounted(async () => {
-  appVersion.value = await window.electron.getAppVersion();
+  appVersion.value = await window.autojoy("getAppVersion");
 });
 </script>

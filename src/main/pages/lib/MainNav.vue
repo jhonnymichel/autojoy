@@ -36,7 +36,7 @@ import { onMounted, ref } from "vue";
 const platform = ref("");
 
 onMounted(async () => {
-  platform.value = await window.electron.getPlatform();
+  platform.value = await window.autojoy("getPlatform");
 });
 </script>
 

@@ -131,7 +131,7 @@ const serviceStatus = reactive({
 
 onMounted(async () => {
   try {
-    const status = await window.electron.getSystemServiceStatus();
+    const status = await window.autojoy("getSystemServiceStatus");
     Object.assign(serviceStatus, status);
   } finally {
     ready.value = true;
@@ -140,8 +140,8 @@ onMounted(async () => {
 
 async function installService() {
   pending.value = true;
-  const result = await window.electron.installAutojoyService();
-  const status = await window.electron.getSystemServiceStatus();
+  const result = await window.autojoy("installAutojoyService");
+  const status = await window.autojoy("getSystemServiceStatus");
   if (status.installed) {
     alert("Service installed successfully! You can proceed to the next step.");
   } else {
@@ -162,30 +162,30 @@ async function uninstallService() {
     return;
   }
   pending.value = true;
-  await window.electron.uninstallAutojoyService();
-  const status = await window.electron.getSystemServiceStatus();
+  await window.autojoy("uninstallAutojoyService", { removeNode: false });
+  const status = await window.autojoy("getSystemServiceStatus");
   Object.assign(serviceStatus, status);
   pending.value = false;
 }
 
 async function restartService() {
   pending.value = true;
-  const result = await window.electron.restartAutojoyService();
-  const status = await window.electron.getSystemServiceStatus();
+  const result = await window.autojoy("restartAutojoyService");
+  const status = await window.autojoy("getSystemServiceStatus");
   Object.assign(serviceStatus, { ...status, result });
   pending.value = false;
 }
 
 async function stopService() {
   pending.value = true;
-  const result = await window.electron.stopAutojoyService();
-  const status = await window.electron.getSystemServiceStatus();
+  const result = await window.autojoy("stopAutojoyService");
+  const status = await window.autojoy("getSystemServiceStatus");
   Object.assign(serviceStatus, { ...status, result });
   pending.value = false;
 }
 
 function openLogs() {
-  window.electron.openServiceLogs();
+  window.autojoy("openServiceLogs");
 }
 </script>
 

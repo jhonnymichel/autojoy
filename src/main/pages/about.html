@@ -20,7 +20,7 @@
     <script>
       (async () => {
         document.getElementById("app-version").innerText =
-          await window.electron.getAppVersion();
+          await window.autojoy("getAppVersion");
       })();
     </script>
   </body>
