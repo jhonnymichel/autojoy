@@ -98,7 +98,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
-import ActionButton from "./app/ActionButton.vue";
+import ActionButton from "./lib/ActionButton.vue";
 
 const pending = ref(false);
 const ready = ref(false);

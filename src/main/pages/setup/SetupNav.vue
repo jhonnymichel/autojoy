@@ -26,7 +26,7 @@
   </nav>
 </template>
 
-<style>
+<style scoped>
 .menubar {
   margin: 0px;
   padding: 10px 20px;

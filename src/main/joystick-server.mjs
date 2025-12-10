@@ -12,7 +12,7 @@ const { dispatch, actions } = store;
 const logFromJoystickServer = createLogger("Joystick Server", null);
 
 let appProcess;
-let devServiceCleanupDone = false;
+let devServiceCleanupDone = true;
 
 export function startServer() {
   // Spawn the child process

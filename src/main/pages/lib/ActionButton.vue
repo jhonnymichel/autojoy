@@ -53,8 +53,13 @@ defineEmits(["click"]);
   background: #cc0404;
   margin-left: auto;
 }
-.action-button.loading:disabled {
+
+.action-button:disabled {
   background: #888;
+  cursor: not-allowed;
+}
+
+.action-button.loading {
   cursor: progress;
 }
 </style>

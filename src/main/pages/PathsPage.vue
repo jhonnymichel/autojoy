@@ -43,8 +43,8 @@
 
 <script setup>
 import { ref, reactive, onMounted, toRaw } from "vue";
-import ActionButton from "./app/ActionButton.vue";
-import InlineButton from "./app/InlineButton.vue";
+import ActionButton from "./lib/ActionButton.vue";
+import InlineButton from "./lib/InlineButton.vue";
 
 const ready = ref(false);
 

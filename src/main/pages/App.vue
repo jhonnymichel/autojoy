@@ -11,9 +11,10 @@
 </template>
 
 <script setup>
-import MainNav from "./app/MainNav.vue";
+import MainNav from "./lib/MainNav.vue";
 import { ref, onMounted } from "vue";
 import SetupNav from "./setup/SetupNav.vue";
+import { useRouter } from "vue-router";
 
 const isSetup = ref(false);
 const ready = ref(false);
@@ -21,14 +22,14 @@ const ready = ref(false);
 const toggleTutorial = async () => {
   const state = await window.electron.getStoreState();
 
-  if (!state.setupComplete) {
-    isSetup.value = true;
-  }
+  isSetup.value = !state.setupComplete;
 
   ready.value = true;
 };
 
 onMounted(toggleTutorial);
+const router = useRouter();
+router.afterEach(toggleTutorial);
 </script>
 
 <style>
