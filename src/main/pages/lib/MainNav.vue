@@ -11,7 +11,7 @@
           <span>Paths</span>
         </RouterLink>
       </li>
-      <li>
+      <li v-if="platform === 'linux'">
         <RouterLink to="/service" active-class="active">
           <span>Service</span>
         </RouterLink>
@@ -29,6 +29,16 @@
     </ul>
   </nav>
 </template>
+
+<script setup>
+import { onMounted, ref } from "vue";
+
+const platform = ref("");
+
+onMounted(async () => {
+  platform.value = await window.electron.getPlatform();
+});
+</script>
 
 <style scoped>
 .menubar {

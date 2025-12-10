@@ -11,4 +11,9 @@ export default [
   ...tseslint.configs.recommended,
   ...pluginVue.configs["flat/recommended"],
   prettierConfig,
+  {
+    rules: {
+      "prettier/prettier": ["warn", { endOfLine: "auto" }],
+    },
+  },
 ];

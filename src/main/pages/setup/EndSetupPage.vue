@@ -8,7 +8,7 @@
         pathsComplete ? "configured!" : "not configured."
       }}</b>
     </li>
-    <li>
+    <li v-if="platform === 'linux'">
       Backend service is
       <b :class="{ pending: !serviceComplete }">{{
         serviceComplete ? "configured!" : "not configured."
@@ -34,8 +34,17 @@ const pathsComplete = ref(false);
 const serviceComplete = ref(false);
 const ready = ref(false);
 const allDone = computed(
-  () => ready.value && pathsComplete.value && serviceComplete.value,
+  () =>
+    ready.value &&
+    pathsComplete.value &&
+    (serviceComplete.value || platform.value !== "linux"),
 );
+
+const platform = ref("");
+
+onMounted(async () => {
+  platform.value = await window.electron.getPlatform();
+});
 
 onMounted(async () => {
   const storeState = await window.electron.getStoreState();

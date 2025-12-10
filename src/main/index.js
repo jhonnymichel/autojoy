@@ -14,7 +14,11 @@ app.on("ready", async () => {
   const serviceStatus = await getSystemServiceStatus();
   const noPaths = Object.values(store.state.paths).every((path) => !path);
   const setupComplete = store.state.setupComplete;
-  if (!setupComplete || noPaths || !serviceStatus.installed) {
+  if (
+    !setupComplete ||
+    noPaths ||
+    (!serviceStatus.installed && serviceStatus.supported)
+  ) {
     store.dispatch(store.actions.resetSetup());
 
     logFromApp(
