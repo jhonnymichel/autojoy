@@ -397,3 +397,37 @@ export function restartSystemService() {
     );
   });
 }
+
+export function openServiceLogs(callback) {
+  if (process.platform !== "linux") {
+    return;
+  }
+
+  const serviceName = "autojoy-backend.service";
+  // Spawn journalctl -f and stream logs into the app logger
+  const child = execFile(
+    "journalctl",
+    ["--user", "-u", serviceName, "-f", "-n", "100", "--no-pager"],
+    { encoding: "utf8" },
+    () => {},
+  );
+  child.stdout?.on("data", (chunk) => {
+    const line = chunk.toString();
+    logFromApp(line);
+    try {
+      callback?.(line);
+    } catch (e) {
+      logFromApp("Error in service log callback", e.message);
+    }
+  });
+  child.stderr?.on("data", (chunk) => {
+    const line = chunk.toString();
+    logFromApp(line);
+    try {
+      callback?.(line);
+    } catch (e) {
+      logFromApp("Error in service log callback", e.message);
+    }
+  });
+  return child;
+}

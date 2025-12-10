@@ -22,16 +22,23 @@
           {{ pending ? "Service is installing" : "Service is not installed" }}
         </p>
       </div>
+
       <div class="buttons-container">
-        <button
-          class="action-button"
-          :class="{ loading: pending }"
+        <ActionButton
+          v-if="serviceStatus.result"
+          :loading="pending"
           :disabled="pending"
-          type="button"
+          @click="openLogs"
+        >
+          Check Logs
+        </ActionButton>
+        <ActionButton
+          :loading="pending"
+          :disabled="pending"
           @click="installService"
         >
           Install Service
-        </button>
+        </ActionButton>
       </div>
     </div>
 
@@ -56,34 +63,34 @@
         </p>
       </div>
       <div class="buttons-container">
-        <button
-          class="action-button"
+        <ActionButton :loading="pending" :disabled="pending" @click="openLogs">
+          Check Logs
+        </ActionButton>
+        <ActionButton
           :disabled="pending"
-          :class="{ loading: pending, secondary: serviceStatus.active }"
-          type="button"
+          :loading="pending"
+          :secondary="serviceStatus.active"
           @click="restartService"
         >
           {{ serviceStatus.active ? "Restart" : "Start" }} Service
-        </button>
-        <button
+        </ActionButton>
+        <ActionButton
           v-if="serviceStatus.active"
-          class="action-button secondary"
           :disabled="pending"
-          :class="{ loading: pending }"
-          type="button"
+          :loading="pending"
+          :secondary="true"
           @click="stopService"
         >
           Stop Service
-        </button>
-        <button
-          class="action-button red"
-          :class="{ loading: pending }"
+        </ActionButton>
+        <ActionButton
+          :loading="pending"
           :disabled="pending"
-          type="button"
+          :error="true"
           @click="uninstallService"
         >
           Uninstall Service
-        </button>
+        </ActionButton>
       </div>
     </div>
   </div>
@@ -91,6 +98,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
+import ActionButton from "./app/ActionButton.vue";
 
 const pending = ref(false);
 const ready = ref(false);
@@ -114,6 +122,13 @@ async function installService() {
   pending.value = true;
   const result = await window.electron.installAutojoyService();
   const status = await window.electron.getSystemServiceStatus();
+  if (status.installed) {
+    alert("Service installed successfully! You can proceed to the next step.");
+  } else {
+    alert(
+      "Failed to install the AutoJoy service. We recommend trying again.\nPlease check the logs for more details.",
+    );
+  }
   Object.assign(serviceStatus, { ...status, result });
   pending.value = false;
 }
@@ -146,23 +161,13 @@ async function stopService() {
   Object.assign(serviceStatus, { ...status, result });
   pending.value = false;
 }
+
+function openLogs() {
+  window.electron.openServiceLogs();
+}
 </script>
 
 <style>
-.header {
-  padding: 10px;
-  padding-bottom: 10px;
-}
-
-.header h2 {
-  margin-bottom: 0px;
-  font-size: 40px;
-  font-weight: 600;
-  color: #555;
-  margin-top: 0px;
-  text-transform: uppercase;
-}
-
 .tooltip {
   font-size: 12px;
   line-height: 0;
@@ -185,40 +190,6 @@ async function stopService() {
   display: flex;
   justify-content: flex-start;
   gap: 10px;
-}
-
-.action-button {
-  border-radius: 2px;
-  padding: 10px;
-  background: #04cc90;
-  color: white;
-  font-weight: 600;
-  border: none;
-  text-transform: uppercase;
-  transition: filter 150ms;
-}
-
-.action-button:hover {
-  filter: brightness(0.95);
-}
-
-.action-button.secondary {
-  padding: 10px;
-  background: #ffffff;
-  color: #222;
-  font-weight: 600;
-  border: none;
-  text-transform: uppercase;
-}
-
-.action-button.red {
-  background: #cc0404;
-  margin-left: auto;
-}
-
-.action-button.loading:disabled {
-  background: #888;
-  cursor: progress;
 }
 
 .status-indicator {

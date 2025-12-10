@@ -7,7 +7,6 @@
       blank.
     </p>
     <p>Click <b>Clear</b> to stop integrating with specific software.</p>
-    <p class="message" />
   </div>
 
   <form class="form" :class="{ active: ready }" @submit.prevent="saveConfig">
@@ -28,20 +27,24 @@
         <div class="field-input">
           <span class="path-display">{{ paths[field.key] || "Not set" }}</span>
           <div class="buttons">
-            <button type="button" @click="selectFolder(field.key)">
+            <InlineButton type="button" @click="selectFolder(field.key)">
               Browse
-            </button>
-            <button type="button" @click="clearField(field.key)">Clear</button>
+            </InlineButton>
+            <InlineButton type="button" @click="clearField(field.key)">
+              Clear
+            </InlineButton>
           </div>
         </div>
       </div>
     </template>
-    <button type="submit">Save</button>
+    <ActionButton type="submit">Save</ActionButton>
   </form>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, toRaw } from "vue";
+import ActionButton from "./app/ActionButton.vue";
+import InlineButton from "./app/InlineButton.vue";
 
 const ready = ref(false);
 
@@ -87,16 +90,21 @@ function showTooltip(key) {
   alert(tooltips[key]);
 }
 
-function saveConfig() {
+async function saveConfig() {
   try {
     const plain = toRaw(paths);
+    const state = await window.electron.getStoreState();
     window.electron.dispatchAction("setPaths", { ...plain });
     alert(
-      "Settings updated! You can close this configuration window and enjoy!\nThe app is running in the tray.",
+      `Settings saved! ${
+        state.setupComplete ? "" : "You can proceed to the next step."
+      }`,
     );
   } catch (e) {
     console.error(e);
-    alert("Failed to save settings");
+    alert(
+      "Failed to save settings, please try again and report a bug if issue continues",
+    );
   }
 }
 </script>
@@ -131,6 +139,8 @@ function saveConfig() {
 
 .buttons {
   flex-shrink: 0;
+  display: flex;
+  gap: 5px;
 }
 
 .field .path-display {
@@ -138,19 +148,6 @@ function saveConfig() {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-}
-
-.header {
-  padding-bottom: 10px;
-}
-
-.header h2 {
-  margin-bottom: 0px;
-  font-size: 40px;
-  font-weight: 600;
-  margin-top: 0px;
-  color: #555;
-  text-transform: uppercase;
 }
 
 .tooltip {

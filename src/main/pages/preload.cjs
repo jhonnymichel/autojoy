@@ -34,4 +34,14 @@ contextBridge.exposeInMainWorld("electron", {
   getPlatform: async () => {
     return ipcRenderer.invoke("getPlatform");
   },
+  openServiceLogs: async () => {
+    return ipcRenderer.invoke("openServiceLogs");
+  },
+  onServiceLog: (handler) => {
+    ipcRenderer.on("serviceLog", (_event, line) => {
+      try {
+        handler(line);
+      } catch {}
+    });
+  },
 });

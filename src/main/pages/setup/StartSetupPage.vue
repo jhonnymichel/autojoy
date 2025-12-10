@@ -1,9 +1,12 @@
 <template>
-  <h2>Setting Up Autojoy</h2>
+  <h2>Welcome</h2>
   <p>
-    Welcome. Configure your settings using the menu above. Check the Finish step
-    when you're done.
+    Configure your settings using the menu above. Check the Finish step when
+    you're done.
   </p>
+  <ActionButton @click="$router.push('/paths')">Get Started</ActionButton>
 </template>
 
-<script setup></script>
+<script setup>
+import ActionButton from "../app/ActionButton.vue";
+</script>

@@ -146,7 +146,7 @@ const store = {
       };
 
       return {
-        setupComlete: true,
+        setupComplete: true,
       };
     },
     resetSetup() {
@@ -156,7 +156,7 @@ const store = {
       };
 
       return {
-        setupComlete: false,
+        setupComplete: false,
       };
     },
   },
