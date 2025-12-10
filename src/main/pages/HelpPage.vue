@@ -25,7 +25,7 @@
     <p>
       Open a bug report on Github including steps to reproduce the issue and
       logs from the app
-      {{ platform === "linux" ? "and the backend service" : "" }}. (see below)
+      {{ platform === "linux" ? "and the backend service" : "" }} (see below).
     </p>
     <div>
       <GithubButton @click="openBugReportPage()">Report a Bug</GithubButton>
