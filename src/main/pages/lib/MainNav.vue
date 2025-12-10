@@ -16,6 +16,11 @@
           <span>Service</span>
         </RouterLink>
       </li>
+      <li>
+        <RouterLink to="/about" active-class="active">
+          <span>About</span>
+        </RouterLink>
+      </li>
     </ul>
   </nav>
 </template>

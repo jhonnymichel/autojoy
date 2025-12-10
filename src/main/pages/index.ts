@@ -6,6 +6,7 @@ import PathsPage from "./PathsPage.vue";
 import ServicePage from "./ServicePage.vue";
 import EndSetupPage from "./setup/EndSetupPage.vue";
 import StartSetupPage from "./setup/StartSetupPage.vue";
+import AboutPage from "./AboutPage.vue";
 
 declare global {
   interface Window {
@@ -25,6 +26,7 @@ async function start() {
     ...(platform === "linux"
       ? [{ path: "/service", component: ServicePage }]
       : []),
+    { path: "/about", component: AboutPage },
   ];
 
   const router = createRouter({
