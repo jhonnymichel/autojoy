@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoJoy Service Logs</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      color: #0f0;
+      font-family: monospace;
+      height: 100%;
+    }
+
+    .terminal {
+      padding: 10px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .toolbar {
+      background: #222;
+      color: #ccc;
+      padding: 6px 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button {
+      background: #333;
+      color: #ccc;
+      border: 1px solid #444;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #444;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .terminal {
+      flex: 1;
+      overflow: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="toolbar">
+      <button id="clearBtn">Clear</button>
+      <span>Following journalctl for autojoy-backend.service</span>
+    </div>
+    <div id="term" class="terminal"></div>
+  </div>
+  <script>
+    const term = document.getElementById('term');
+    const clearBtn = document.getElementById('clearBtn');
+    clearBtn.addEventListener('click', () => { term.textContent = ''; });
+
+    function append(line) {
+      term.textContent += line.replace(/\u001b\[[0-9;]*m/g, '');
+      term.textContent += '\n';
+      term.scrollTop = term.scrollHeight;
+    }
+
+    if (window.electron && window.electron.onServiceLog) {
+      window.electron.onServiceLog((line) => append(line));
+    } else {
+      append('Renderer not wired to service logs.');
+    }
+  </script>
+</body>
+
+</html>

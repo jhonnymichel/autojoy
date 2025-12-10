@@ -93,7 +93,7 @@ export function createLogsWindow() {
       },
     });
 
-    logsWindow.loadFile(path.resolve(rootdir, "src/main/pages/logs.html"));
+    logsWindow.loadFile(path.resolve(rootdir, "src/main/pages/live-logs.html"));
 
     logsWindow.on("closed", () => {
       logsWindow = null;
