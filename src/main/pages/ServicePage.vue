@@ -4,9 +4,17 @@
       <div class="header">
         <h2>AutoJoy Backend Service</h2>
         <p>
-          We need to install the autojoy backend service to watch for when
-          controllers are connected and disconnected, and update settings based
-          on them.
+          The AutoJoy backend service is responsible for listening to controller
+          connections and applying the appropriate joystick mappings to the
+          emulators and games.
+        </p>
+        <p>
+          In Linux, we install it as a system service, this way the process
+          survives on Gaming Mode (SteamOS, Bazzite).
+        </p>
+        <p>
+          The service runs on user mode (no admin privileges) and must be
+          installed for AutoJoy to work.
         </p>
         <p class="message">
           <span
@@ -45,7 +53,19 @@
     <div v-else>
       <div class="header">
         <h2>AutoJoy Backend Service</h2>
-        <p>Here you can check the service status and uninstall it.</p>
+        <p>
+          The AutoJoy backend service is responsible for listening to controller
+          connections and applying the appropriate joystick mappings to the
+          emulators and games.
+        </p>
+        <p>
+          In Linux, we install it as a system service, this way the process
+          survives on Gaming Mode (SteamOS, Bazzite).
+        </p>
+        <p>
+          Uninstall the service if you want to stop using AutoJoy on your
+          system.
+        </p>
         <p class="message">
           <span
             class="status-indicator-container"
@@ -186,7 +206,6 @@ function openLogs() {
 }
 
 .buttons-container {
-  padding: 10px;
   display: flex;
   justify-content: flex-start;
   gap: 10px;
