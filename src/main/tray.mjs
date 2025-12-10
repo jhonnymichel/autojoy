@@ -1,15 +1,11 @@
 import { app, Menu, nativeImage, shell, Tray } from "electron";
 import path from "path";
 import store from "./store.mjs";
-import {
-  createAboutWindow,
-  openDashboardPage,
-  openPathsPage,
-  openSetupPage,
-} from "./window.mjs";
+import { openDashboardPage, openSetupPage } from "./window.mjs";
 import rootdir from "../common/rootdir.mjs";
 import { user, userFolderPath } from "../common/settings.mjs";
 import { isMicrophoneInUse } from "../common/device-filters.mjs";
+import { platform } from "process";
 
 const { actions, dispatch } = store;
 
@@ -47,7 +43,7 @@ export function startTray() {
       },
       { type: "separator" },
       {
-        label: `Open settings folder`,
+        label: `Open user folder`,
         type: "normal",
         click: () => {
           shell.openPath(userFolderPath);
@@ -100,21 +96,18 @@ export function startTray() {
       {
         type: "separator",
       },
-      {
-        type: "checkbox",
-        label: "Open at startup",
-        checked: store.state.openAtLogin,
-        click: () => {
-          dispatch(actions.toggleOpenAtLogin(!store.state.openAtLogin));
-        },
-      },
-      {
-        type: "normal",
-        label: "About",
-        click: () => {
-          createAboutWindow();
-        },
-      },
+      ...(platform === "win32"
+        ? [
+            {
+              type: "checkbox",
+              label: "Open at startup",
+              checked: store.state.openAtLogin,
+              click: () => {
+                dispatch(actions.toggleOpenAtLogin(!store.state.openAtLogin));
+              },
+            },
+          ]
+        : []),
       {
         type: "normal",
         label: "Exit",

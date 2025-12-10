@@ -13,6 +13,9 @@ contextBridge.exposeInMainWorld("electron", {
   selectFolder: async () => {
     return ipcRenderer.invoke("openFolderDialog");
   },
+  openUserFolder: async () => {
+    return ipcRenderer.invoke("openUserFolder");
+  },
   installAutojoyService: async () => {
     return ipcRenderer.invoke("installAutojoyService");
   },
@@ -36,6 +39,9 @@ contextBridge.exposeInMainWorld("electron", {
   },
   openServiceLogs: async () => {
     return ipcRenderer.invoke("openServiceLogs");
+  },
+  openExternalLink: (url) => {
+    return ipcRenderer.invoke("openExternalLink", url);
   },
   onServiceLog: (handler) => {
     ipcRenderer.on("serviceLog", (_event, line) => {

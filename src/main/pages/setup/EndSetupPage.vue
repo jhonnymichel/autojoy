@@ -9,7 +9,7 @@
       }}</b>
     </li>
     <li>
-      Joystick service is
+      Backend service is
       <b :class="{ pending: !serviceComplete }">{{
         serviceComplete ? "configured!" : "not configured."
       }}</b>

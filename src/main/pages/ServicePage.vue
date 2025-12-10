@@ -146,7 +146,7 @@ async function installService() {
     alert("Service installed successfully! You can proceed to the next step.");
   } else {
     alert(
-      "Failed to install the AutoJoy service. We recommend trying again.\nPlease check the logs for more details.",
+      "Failed to install the AutoJoy backend service. We recommend trying again.\nPlease check the logs for more details.",
     );
   }
   Object.assign(serviceStatus, { ...status, result });
@@ -155,7 +155,9 @@ async function installService() {
 
 async function uninstallService() {
   if (
-    !window.confirm("Are you sure you want to uninstall the AutoJoy service?")
+    !window.confirm(
+      "Are you sure you want to uninstall the AutoJoy backend service?",
+    )
   ) {
     return;
   }

@@ -1,6 +1,6 @@
 <template>
   <button
-    class="action-button"
+    class="github-button"
     :class="{
       secondary,
       red: error,
@@ -10,7 +10,9 @@
     :type="type"
     @click="$emit('click')"
   >
-    <slot />
+    <span
+      ><img src="../assets/github-icon.svg" alt="GitHub" width="24px" /></span
+    ><span><slot /></span>
   </button>
 </template>
 
@@ -28,39 +30,30 @@ defineEmits(["click"]);
 </script>
 
 <style scoped>
-.action-button {
+.github-button {
   border-radius: 2px;
-  padding: 10px;
-  background: #04cc90;
-  color: white;
+  padding: 6px 10px;
+  background: white;
+  color: black;
   font-weight: 600;
   border: none;
   text-transform: uppercase;
   transition: filter 150ms;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
-.action-button:hover {
+.github-button:hover {
   filter: brightness(0.95);
 }
-.action-button.secondary {
-  padding: 10px;
-  background: #ffffff;
-  color: #222;
-  font-weight: 600;
-  border: none;
-  text-transform: uppercase;
-}
-.action-button.red {
-  background: #cc0404;
-  margin-left: auto;
-}
 
-.action-button:disabled {
+.github-button:disabled {
   background: #888;
   cursor: not-allowed;
 }
 
-.action-button.loading {
-  cursor: progress;
+span {
+  display: inline-flex;
 }
 </style>

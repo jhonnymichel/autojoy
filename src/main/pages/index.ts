@@ -7,6 +7,7 @@ import ServicePage from "./ServicePage.vue";
 import EndSetupPage from "./setup/EndSetupPage.vue";
 import StartSetupPage from "./setup/StartSetupPage.vue";
 import AboutPage from "./AboutPage.vue";
+import HelpPage from "./HelpPage.vue";
 
 declare global {
   interface Window {
@@ -26,6 +27,7 @@ async function start() {
     ...(platform === "linux"
       ? [{ path: "/service", component: ServicePage }]
       : []),
+    { path: "/help", component: HelpPage },
     { path: "/about", component: AboutPage },
   ];
 

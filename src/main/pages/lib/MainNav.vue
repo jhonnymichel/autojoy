@@ -17,6 +17,11 @@
         </RouterLink>
       </li>
       <li>
+        <RouterLink to="/help" active-class="active">
+          <span>Help</span>
+        </RouterLink>
+      </li>
+      <li>
         <RouterLink to="/about" active-class="active">
           <span>About</span>
         </RouterLink>

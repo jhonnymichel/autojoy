@@ -1,5 +1,5 @@
 import path from "path";
-import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
 import store from "./store.mjs";
 import rootdir from "../common/rootdir.mjs";
 import {
@@ -11,9 +11,9 @@ import {
   uninstallSystemService,
 } from "./joystick-server.mjs";
 import { logFromApp } from "../common/logger.mjs";
+import { userFolderPath } from "../common/settings.mjs";
 
 const { dispatch, actions } = store;
-let aboutWindow = null;
 let logsWindow = null;
 
 const isDev = !app.isPackaged;
@@ -50,32 +50,6 @@ function createMainWindow() {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
-}
-
-export function createAboutWindow() {
-  if (!aboutWindow) {
-    aboutWindow = new BrowserWindow({
-      autoHideMenuBar: true,
-      resizable: false,
-      icon: path.resolve(rootdir, "assets/tray.png"),
-      show: false, // Don't show the window immediately
-      webPreferences: {
-        preload: path.resolve(rootdir, "src/main/pages/preload.cjs"),
-        contextIsolation: true,
-        nodeIntegrationInWorker: true,
-      },
-    });
-
-    aboutWindow.loadFile(path.resolve(rootdir, "src/main/pages/about.html"));
-
-    // Dereference the window object when it's closed
-    aboutWindow.on("closed", () => {
-      aboutWindow = null;
-    });
-  }
-
-  // Show the window
-  aboutWindow.show();
 }
 
 export function createLogsWindow() {
@@ -188,6 +162,14 @@ ipcMain.handle("getSystemServiceStatus", () => {
 
 ipcMain.handle("getPlatform", () => {
   return process.platform;
+});
+
+ipcMain.handle("openUserFolder", () => {
+  shell.openPath(userFolderPath);
+});
+
+ipcMain.handle("openExternalLink", (event, url) => {
+  shell.openExternal(url);
 });
 
 // <a href="https://www.flaticon.com/free-icons/joystick" title="joystick icons">Joystick icons created by Freepik - Flaticon (https://www.flaticon.com/free-icons/joystick)>
