@@ -36,9 +36,7 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from "vue";
-const appVersion = ref("");
-onMounted(async () => {
-  appVersion.value = await window.autojoy("getAppVersion");
-});
+import { useAppVersion } from "./lib/composables";
+
+const appVersion = useAppVersion();
 </script>

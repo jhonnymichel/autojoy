@@ -20,3 +20,21 @@ export function useStoreState() {
 
   return store;
 }
+
+export function useAppVersion() {
+  const appVersion = ref("");
+  onMounted(async () => {
+    appVersion.value = await window.autojoy("getAppVersion");
+  });
+
+  return appVersion;
+}
+
+export function usePlatform() {
+  const platform = ref("");
+  onMounted(async () => {
+    platform.value = await window.autojoy("getPlatform");
+  });
+
+  return platform;
+}

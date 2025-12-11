@@ -28,8 +28,10 @@
 import { onMounted, ref, computed } from "vue";
 import ActionButton from "../lib/ActionButton.vue";
 import { useRouter } from "vue-router";
+import { usePlatform } from "../lib/composables";
 
 const router = useRouter();
+const platform = usePlatform();
 const pathsComplete = ref(false);
 const serviceComplete = ref(false);
 const ready = ref(false);
@@ -39,12 +41,6 @@ const allDone = computed(
     pathsComplete.value &&
     (serviceComplete.value || platform.value !== "linux"),
 );
-
-const platform = ref("");
-
-onMounted(async () => {
-  platform.value = await window.autojoy("getPlatform");
-});
 
 onMounted(async () => {
   const storeState = await window.autojoy("getStoreState");

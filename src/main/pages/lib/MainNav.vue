@@ -31,13 +31,9 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { usePlatform } from "./composables";
 
-const platform = ref("");
-
-onMounted(async () => {
-  platform.value = await window.autojoy("getPlatform");
-});
+const platform = usePlatform();
 </script>
 
 <style scoped>

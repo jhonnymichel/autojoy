@@ -67,17 +67,13 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from "vue";
 import ActionButton from "./lib/ActionButton.vue";
 import { useRouter } from "vue-router";
 import GithubButton from "./lib/GithubButton.vue";
-const platform = ref("");
-
-onMounted(async () => {
-  platform.value = await window.autojoy("getPlatform");
-});
+import { usePlatform } from "./lib/composables";
 
 const router = useRouter();
+const platform = usePlatform();
 
 function openUserFolder() {
   window.autojoy("openUserFolder");
