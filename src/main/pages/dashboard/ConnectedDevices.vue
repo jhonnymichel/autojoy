@@ -12,12 +12,19 @@
         class="joystick-item"
       >
         <img :src="`../assets/${getIcon(joystick)}`" class="joystick-icon" />
-        <div
-          v-if="getBadge(joystick)"
-          class="joystick-badge"
-          :title="getBadge(joystick).title"
-        >
-          {{ getBadge(joystick).label }}
+        <div class="joystick-badge-container">
+          <div class="joystick-badge" :title="getName(joystick)">
+            {{ getName(joystick) }}
+          </div>
+        </div>
+        <div class="joystick-badge-container badge-top">
+          <div
+            v-if="getBadge(joystick)"
+            class="joystick-badge"
+            :title="getBadge(joystick).title"
+          >
+            {{ getBadge(joystick).label }}
+          </div>
         </div>
       </div>
     </div>
@@ -40,8 +47,12 @@ const icons = {
 };
 
 const badges = {
-  xinput: {
-    label: "XInput",
+  xbox: {
+    label: "Xbox",
+    title: "An xinput device. Made for Xbox and/or PC.",
+  },
+  pc: {
+    label: "PC",
     title: "An xinput device. Made for Xbox and/or PC.",
   },
   ps: {
@@ -55,22 +66,20 @@ const badges = {
 };
 
 function getBadge(joystick) {
+  const name = getName(joystick).toLowerCase();
+  if (name.includes("xbox")) {
+    return badges.xbox;
+  }
+
   if (joystick.type.toLowerCase().includes("xinput")) {
-    return badges.xinput;
+    return badges.pc;
   }
 
-  if (joystick.name.toLowerCase().includes("xbox")) {
-    return badges.xinput;
-  }
-
-  if (joystick.name.toLowerCase().includes("wii")) {
+  if (getName(joystick).toLowerCase().includes("wii")) {
     return badges.wii;
   }
 
-  if (
-    joystick.name.toLowerCase().includes("playstation") ||
-    joystick.name.toLowerCase().includes("ps ")
-  ) {
+  if (name.includes("playstation") || name.includes("sony computer")) {
     return badges.ps;
   }
 
@@ -92,7 +101,6 @@ function getIcon(joystick) {
 }
 
 function getName(joystick) {
-  console.log(joystick);
   const hardwareInfo = getHardwareInfo({
     manufacturerId: joystick.raw.vendor,
     productId: joystick.raw.product,
@@ -123,14 +131,31 @@ img {
   height: auto;
 }
 
-.joystick-badge {
+.joystick-badge-container {
   position: absolute;
+  width: 100%;
   bottom: 8px;
-  left: 8px;
+  left: 0px;
+  display: flex;
+  justify-content: center;
+}
+
+.joystick-badge-container.badge-top {
+  top: 8px;
+  justify-content: flex-start;
+  bottom: initial;
+}
+
+.joystick-badge {
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

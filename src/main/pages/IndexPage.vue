@@ -45,12 +45,7 @@
     </MessageBanner>
   </template>
 
-  <ConnectedDevices
-    :joysticks="[
-      ...(storeState.joystickList ?? []),
-      ...(storeState.joystickList ?? []),
-    ]"
-  />
+  <ConnectedDevices :joysticks="storeState.joystickList ?? []" />
 </template>
 
 <script setup>
