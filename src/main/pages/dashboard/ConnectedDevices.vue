@@ -79,7 +79,12 @@ function getBadge(joystick) {
     return badges.wii;
   }
 
-  if (name.includes("playstation") || name.includes("sony computer")) {
+  if (
+    name.includes("playstation") ||
+    name.includes("sony computer") ||
+    name.includes("dualshock") ||
+    name.includes("dualsense")
+  ) {
     return badges.ps;
   }
 
