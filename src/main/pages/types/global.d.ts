@@ -1,6 +1,15 @@
+type AutojoyCommand = string;
+
+type AutojoyPayload = unknown;
+type AutojoyResult = unknown;
+
 declare global {
   interface Window {
-    autojoy: (command: string, payload?: any) => Promise<any> | boolean;
+    autojoy: (
+      command: AutojoyCommand,
+      payload?: AutojoyPayload,
+    ) => Promise<AutojoyResult> | boolean | AutojoyResult;
   }
 }
+
 export {};

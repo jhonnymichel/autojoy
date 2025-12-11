@@ -105,56 +105,42 @@ export function openDashboardPage() {
   mainWindow.show();
 }
 
-// Export list of IPC command names for typed autocomplete in renderer.
-export const ipcCommands = [
-  "getAppVersion",
-  "getStoreState",
-  "dispatchAction",
-  "openFolderDialog",
-  "installAutojoyService",
-  "restartAutojoyService",
-  "stopAutojoyService",
-  "openServiceLogs",
-  "uninstallAutojoyService",
-  "getSystemServiceStatus",
-  "getPlatform",
-  "openUserFolder",
-  "openExternalLink",
-];
+function exposeCommand(name, handler) {
+  ipcMain.handle(name, handler);
+}
 
-ipcMain.handle("getAppVersion", () => {
+exposeCommand("getAppVersion", () => {
   return app.getVersion();
 });
 
-ipcMain.handle("getStoreState", () => {
+exposeCommand("getStoreState", () => {
   return structuredClone(store.state);
 });
 
-ipcMain.handle("dispatchAction", (event, { action, payload }) => {
+exposeCommand("dispatchAction", (event, { action, payload }) => {
   dispatch(actions[action](payload));
 });
 
-ipcMain.handle("openFolderDialog", async () => {
+exposeCommand("openFolderDialog", async () => {
   const result = await dialog.showOpenDialog({
-    properties: ["openDirectory"], // Allow selecting folders
+    properties: ["openDirectory"],
   });
-
   return result.canceled ? null : result.filePaths[0];
 });
 
-ipcMain.handle("installAutojoyService", async () => {
+exposeCommand("installAutojoyService", async () => {
   return installSystemService();
 });
 
-ipcMain.handle("restartAutojoyService", async () => {
+exposeCommand("restartAutojoyService", async () => {
   return restartSystemService();
 });
 
-ipcMain.handle("stopAutojoyService", async () => {
+exposeCommand("stopAutojoyService", async () => {
   return stopSystemService();
 });
 
-ipcMain.handle("openServiceLogs", async () => {
+exposeCommand("openServiceLogs", async () => {
   createLogsWindow();
   const child = openServiceLogs((line) => {
     try {
@@ -166,27 +152,25 @@ ipcMain.handle("openServiceLogs", async () => {
   return !!child;
 });
 
-ipcMain.handle(
+exposeCommand(
   "uninstallAutojoyService",
   (event, { removeNode } = { removeNode: false }) => {
     return uninstallSystemService(removeNode);
   },
 );
 
-ipcMain.handle("getSystemServiceStatus", () => {
+exposeCommand("getSystemServiceStatus", () => {
   return getSystemServiceStatus();
 });
 
-ipcMain.handle("getPlatform", () => {
+exposeCommand("getPlatform", () => {
   return process.platform;
 });
 
-ipcMain.handle("openUserFolder", () => {
+exposeCommand("openUserFolder", () => {
   shell.openPath(userFolderPath);
 });
 
-ipcMain.handle("openExternalLink", (event, url) => {
+exposeCommand("openExternalLink", (event, url) => {
   shell.openExternal(url);
 });
-
-// <a href="https://www.flaticon.com/free-icons/joystick" title="joystick icons">Joystick icons created by Freepik - Flaticon (https://www.flaticon.com/free-icons/joystick)>
