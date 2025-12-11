@@ -16,7 +16,6 @@
 
 <script setup>
 import { defineProps, defineEmits } from "vue";
-
 defineProps({
   type: { type: String, default: "button" },
   secondary: { type: Boolean, default: false },

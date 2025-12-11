@@ -1,7 +1,7 @@
 import { onMounted, onUnmounted, ref } from "vue";
 
 export function useStoreState() {
-  const store = ref();
+  const store = ref({});
 
   const updateStore = (newState) => {
     store.value = newState;

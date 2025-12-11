@@ -25,7 +25,8 @@
     <p>
       Open a bug report on Github including steps to reproduce the issue and
       logs from the app
-      {{ platform === "linux" ? "and the backend service" : "" }} (see below).
+      {{ platform === "linux" ? "and the joystick backend service" : "" }} (see
+      below).
     </p>
     <div>
       <GithubButton @click="openBugReportPage()">Report a Bug</GithubButton>
@@ -43,8 +44,8 @@
   </div>
   <div v-if="platform === 'linux'" class="actionable-text">
     <p>
-      On Linux, the AutoJoy backend service runs separately from the app. The
-      logs can be found on the Service Menu.
+      On Linux, the joystick backend runs separately from the app, as a system
+      service. The logs can be found on the Service Menu.
     </p>
     <div>
       <ActionButton @click="router.push('/service')"
@@ -58,7 +59,7 @@
       You can find the joystick bindings in the files inside the
       <b>config-templates</b> folder, located inside the user folder. Exit and
       reopen the app
-      <span v-if="platform === 'linux'"> and the autojoy backend service</span>
+      <span v-if="platform === 'linux'"> and the joystick backend service</span>
       after editing the files.
     </p>
     <div>
