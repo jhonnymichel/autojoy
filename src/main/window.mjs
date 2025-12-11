@@ -111,7 +111,7 @@ function exposeCommand(name, handler) {
 
 function subscribeToStore() {
   store.subscribe(() => {
-    mainWindow?.webContents.send("storeUpdate", store.state);
+    mainWindow?.webContents.send("storeUpdate", structuredClone(store.state));
   });
 }
 

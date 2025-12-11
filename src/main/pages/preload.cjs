@@ -3,7 +3,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 const storeSubscribers = [];
 
-ipcRenderer.on("storeUpdate", (state) => {
+ipcRenderer.on("storeUpdate", (_, state) => {
   storeSubscribers.forEach((payload) => {
     try {
       payload(state);
