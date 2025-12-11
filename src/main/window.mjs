@@ -37,9 +37,10 @@ function createMainWindow() {
 
   mainWindow = new BrowserWindow({
     autoHideMenuBar: true,
-    resizable: false,
+    resizable: true,
     icon: path.resolve(rootdir, "assets/tray.png"),
-    show: false, // Don't show the window immediately
+    show: false, // Don't show the window immediately,
+    title: "Autojoy",
     webPreferences: {
       preload: path.resolve(rootdir, "src/main/pages/preload.cjs"),
       contextIsolation: true,

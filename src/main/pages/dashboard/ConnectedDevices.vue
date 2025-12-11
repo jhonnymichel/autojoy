@@ -115,6 +115,7 @@ function getName(joystick) {
 .joystick-item {
   position: relative;
   width: calc(25% - 10px);
+  max-width: 200px;
 }
 
 img {
