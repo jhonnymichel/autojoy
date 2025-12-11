@@ -45,7 +45,6 @@ export const hardwareInfo = {
 
       return joystickTypes.xinputGuitar;
     },
-    name: "Wireless Guitar Hero Guitar (Xbox 360)",
   },
 };
 

@@ -47,9 +47,12 @@
     </MessageBanner>
   </template>
 
-  <h3>Current Store State:</h3>
-
-  {{ JSON.stringify(storeState, null, 2) }}
+  <ConnectedDevices
+    :joysticks="[
+      ...(storeState.joystickList ?? []),
+      ...(storeState.joystickList ?? []),
+    ]"
+  />
 </template>
 
 <script setup>
@@ -57,6 +60,7 @@ import { useRouter } from "vue-router";
 import ActionButton from "./lib/ActionButton.vue";
 import { usePlatform, useStoreState } from "./lib/composables";
 import MessageBanner from "./lib/MessageBanner.vue";
+import ConnectedDevices from "./dashboard/ConnectedDevices.vue";
 
 const storeState = useStoreState();
 const platform = usePlatform();
