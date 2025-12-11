@@ -1,17 +1,17 @@
 # autojoy
 
-Detects connected devices and can automatically update emulators, games and other apps settings based on them.
-When controllers are different from eachother (a guitar and a drum controller, for example) and connection order matters, this becomes useful.
+Detects connected joystick and accessories and can automatically update emulators, games and other apps settings based on them.
+When joysticks are different from eachother (a guitar and a drum joystick, for example) and connection order matters, this becomes useful.
 
 ## Use Case
 
-If you play a game that uses a different type of controller in an emulator (like rock band), you would:
+If you play a game that uses a different type of joystick in an emulator (like rock band), you would:
 
-- have to update the input settings every time you want to play a game that uses a regular controller (unless you want to play Heavy Rain with a guitar)
+- have to update the input settings every time you want to play a game that uses a regular joystick (unless you want to play Heavy Rain with a guitar)
 
-Or when you play the same game with a variable number of players or wants to switch controller types:
+Or when you play the same game with a variable number of players or wants to switch joystick types:
 
-- Player 1 is a Guitar Controller, Player 2 is Drums. Next time you play, you want to play Drums but Player 1 is set as a Guitar. You'd have to reassign controllers in the settings or keep both instruments turned on even when you're playing alone.
+- Player 1 is a Guitar Controller, Player 2 is Drums. Next time you play, you want to play Drums but Player 1 is set as a Guitar. You'd have to reassign joysticks in the settings or keep both instruments turned on even when you're playing alone.
 
 In some emulatoers, when you attach an USB peripheral such as a Microphone, you have to change settings again to pick that device up.
 
@@ -53,8 +53,8 @@ Currently only supports Windows.
 
 ### Guitar Hero World Tour Definitive Edition
 
-- It's recommended to disconnect non-instrument controllers for full band gameplay. Player 1 in this game is always the singer controlled with the computer keyboard when a microphone is setup.
-- Regular Controllers: We skip supporting them since the singer player is controlled by the computer keyboard.
+- It's recommended to disconnect non-instrument joysticks for full band gameplay. Player 1 in this game is always the singer controlled with the computer keyboard when a microphone is setup.
+- Regular joysticks: We skip supporting them since the singer player is controlled by the computer keyboard.
 
 ### Cemu
 
