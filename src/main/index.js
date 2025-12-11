@@ -1,47 +1,15 @@
-import { app } from "electron";
-import { validateSettings } from "../common/settings.mjs";
-import store from "./store.mjs";
-import { openSetupPage } from "./window.mjs";
-import { getSystemServiceStatus, startServer } from "./joystick-server.mjs";
-import { startTray } from "./tray.mjs";
-import { logFromApp, resetLogFile } from "../common/logger.mjs";
+import { app, dialog } from "electron";
 
-resetLogFile();
-validateSettings(logFromApp);
+const gotTheLock = app.requestSingleInstanceLock();
 
-app.on("ready", async () => {
-  logFromApp("App started");
-  const serviceStatus = await getSystemServiceStatus();
-  const noPaths = Object.values(store.state.paths).every((path) => !path);
-  const setupComplete = store.state.setupComplete;
-  if (
-    !setupComplete ||
-    noPaths ||
-    (!serviceStatus.installed && serviceStatus.supported)
-  ) {
-    store.dispatch(store.actions.resetSetup());
-
-    logFromApp(
-      "Setup pending:",
-      JSON.stringify(
-        {
-          noPaths,
-          serviceInstalled: serviceStatus.installed,
-          setupComplete,
-        },
-        null,
-        2,
-      ),
-    );
-    openSetupPage();
-  } else {
-    logFromApp("Activating server");
-    startServer();
-  }
-
-  startTray();
-});
-
-app.on("window-all-closed", (event) => {
-  event.preventDefault();
-});
+if (!gotTheLock) {
+  dialog.showErrorBox(
+    "Autojoy is already running!",
+    "Another instance of Autojoy is already running. Close other instances before opening the app.",
+  );
+  app.quit();
+} else {
+  app.on("ready", async () => {
+    import("./startup.mjs");
+  });
+}
