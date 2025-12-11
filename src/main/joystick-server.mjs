@@ -1,11 +1,17 @@
 import { fork, execFile, exec } from "child_process";
+import fs from "fs";
 import store from "./store.mjs";
 import path from "path";
 import rootdir from "../common/rootdir.mjs";
 import { createLogger, logFromApp } from "../common/logger.mjs";
 import { promisify } from "util";
 import { userFolderPath } from "../common/settings.mjs";
-import { copyDir, ensureDir } from "../common/file.mjs";
+import {
+  copyDir,
+  createDirectory,
+  deleteDirectory,
+  saveFile,
+} from "../common/file.mjs";
 import { app } from "electron";
 
 const { dispatch, actions } = store;
@@ -212,39 +218,73 @@ export async function installSystemService() {
     };
   }
   const execFileAsync = promisify(execFile);
+
   try {
     // Copy backend runtime sources to user config folder so the service can run them.
     const targetSrc = path.resolve(userFolderPath, "src");
     const srcBackend = path.resolve(rootdir, "src/autojoy-backend");
     const srcCommon = path.resolve(rootdir, "src/common");
 
-    await ensureDir(targetSrc);
-    await copyDir(srcBackend, path.resolve(targetSrc, "autojoy-backend"));
-    await copyDir(srcCommon, path.resolve(targetSrc, "common"));
+    createDirectory(targetSrc);
+    copyDir(srcBackend, path.resolve(targetSrc, "autojoy-backend"));
+    copyDir(srcCommon, path.resolve(targetSrc, "common"));
 
-    const installer = path.resolve(
+    const installerBasePath = path.resolve(
       rootdir,
-      "scripts/autojoy-service-install.sh",
+      `scripts/autojoy-service-install${app.isPackaged ? "" : "-dev"}.sh`,
     );
+
+    logFromApp("Installer script:", installerBasePath);
+
+    const installerFileContents = fs.readFileSync(installerBasePath, {
+      encoding: "utf8",
+    });
+
+    logFromApp("Installer script content read.");
+
+    const tmpFolder = path.resolve(userFolderPath, "tmp");
+    createDirectory(tmpFolder);
+
+    const installerExecPath = path.join(
+      tmpFolder,
+      "autojoy-service-install.sh",
+    );
+
+    // copying file to tmp with execute permissions, needed because in prod, sh file can´t run from .asar package.
+    saveFile(installerFileContents, installerExecPath, { mode: 0o755 });
+
+    logFromApp("Installer script saved to", installerExecPath);
+
     let stdout, stderr;
-    const AUTOJOY_DEV = app.isPackaged ? "0" : "1";
 
     const shell = process.env.SHELL || "/usr/bin/bash";
-    ({ stdout, stderr } = await execFileAsync(shell, [installer], {
-      cwd: rootdir,
-      env: { ...process.env, AUTOJOY_DEV },
-    }));
+
+    try {
+      ({ stdout, stderr } = await execFileAsync(shell, [installerExecPath], {
+        cwd: tmpFolder,
+        env: { ...process.env },
+      }));
+    } catch (e) {
+      logFromApp("Installer execution via shell failed", e.message);
+    }
+
     logFromApp("install stdout:", stdout?.toString());
     logFromApp("install stderr:", stderr?.toString());
 
     logFromApp("Service created and activated");
     dispatch(actions.serverStarted());
+
+    try {
+      deleteDirectory(tmpFolder);
+    } catch (e) {
+      logFromApp("Failed to delete tmp folder:", e.message);
+    }
+
     return { ok: true, message: stdout?.toString() || "Service installed" };
-  } catch (error) {
+  } catch (e) {
     const message =
-      error?.stderr?.toString?.() ||
-      error?.message ||
-      "Failed to install service";
+      e?.stderr?.toString?.() || e?.message || "Failed to install service";
+    logFromApp("Failed to install service:", e.message);
     return { ok: false, message };
   }
 }
@@ -413,7 +453,6 @@ export function openServiceLogs(callback) {
   );
   child.stdout?.on("data", (chunk) => {
     const line = chunk.toString();
-    logFromApp(line);
     try {
       callback?.(line);
     } catch (e) {
@@ -422,7 +461,6 @@ export function openServiceLogs(callback) {
   });
   child.stderr?.on("data", (chunk) => {
     const line = chunk.toString();
-    logFromApp(line);
     try {
       callback?.(line);
     } catch (e) {

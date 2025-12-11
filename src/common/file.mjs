@@ -6,7 +6,6 @@ import { XMLBuilder, XMLParser } from "fast-xml-parser";
 import { execSync } from "child_process";
 import rootdir from "./rootdir.mjs";
 
-
 // we keep a reference to the app directory so we can grab templates from here when needed. applies in production where the app dir is packaged.
 let __packagedDirname = rootdir;
 // Resolving user folder. in development mode, it'll be placed in the local copy of the repository (user and config-templates folders).
@@ -43,7 +42,7 @@ if (settingsFolder.includes(".asar")) {
           "powershell -command \"[System.Environment]::GetFolderPath('LocalApplicationData')\"",
           {
             encoding: "utf8",
-          }
+          },
         ).trim();
 
         return localAppDataPath;
@@ -65,7 +64,11 @@ if (settingsFolder.includes(".asar")) {
 
   const platformBaseSettingsFolder = getSettingsBaseFolderByPlatform();
   if (platformBaseSettingsFolder) {
-    settingsFolder = path.resolve(platformBaseSettingsFolder, "com.jhonnymichel", "autojoy");
+    settingsFolder = path.resolve(
+      platformBaseSettingsFolder,
+      "com.jhonnymichel",
+      "autojoy",
+    );
   }
 }
 
@@ -145,33 +148,39 @@ export function deleteFile(filepath) {
   }
 }
 
-function saveFile(content, filepath) {
+export function saveFile(content, filepath, options = {}) {
   const resolvedPath = resolvePathFromUserFolder(filepath);
   const directoryPath = path.dirname(resolvedPath);
   createDirectory(directoryPath);
-  fs.writeFileSync(resolvedPath, content, { flag: "w", encoding: "utf-8" });
+  fs.writeFileSync(resolvedPath, content, {
+    flag: "w",
+    encoding: "utf-8",
+    ...options,
+  });
 }
 
-function createDirectory(directoryPath) {
+export function createDirectory(directoryPath) {
   if (!fs.existsSync(directoryPath)) {
     fs.mkdirSync(directoryPath, { recursive: true });
   }
 }
 
-export async function ensureDir(dirPath) {
-  await fs.promises.mkdir(dirPath, { recursive: true });
-}
-
-export async function copyDir(src, dest) {
-  await ensureDir(dest);
-  const entries = await fs.promises.readdir(src, { withFileTypes: true });
+export function copyDir(src, dest) {
+  createDirectory(dest);
+  const entries = fs.readdirSync(src, { withFileTypes: true });
   for (const entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
     if (entry.isDirectory()) {
-      await copyDir(srcPath, destPath);
+      copyDir(srcPath, destPath);
     } else {
-      await fs.promises.copyFile(srcPath, destPath);
+      fs.copyFileSync(srcPath, destPath);
     }
+  }
+}
+
+export function deleteDirectory(directoryPath) {
+  if (fs.existsSync(directoryPath)) {
+    fs.rmSync(directoryPath, { recursive: true, force: true });
   }
 }
