@@ -109,6 +109,14 @@ function exposeCommand(name, handler) {
   ipcMain.handle(name, handler);
 }
 
+function subscribeToStore() {
+  store.subscribe(() => {
+    mainWindow?.webContents.send("storeUpdate", store.state);
+  });
+}
+
+subscribeToStore();
+
 exposeCommand("getAppVersion", () => {
   return app.getVersion();
 });
