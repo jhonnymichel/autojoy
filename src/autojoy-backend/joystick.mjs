@@ -1,4 +1,4 @@
-import { hardwareInfo, joystickTypes } from "../common/joystick.mjs";
+import { getHardwareInfo, joystickTypes } from "../common/joystick.mjs";
 
 export function createJoystick(raw) {
   return createJoystickFromSDLDevice(
@@ -6,25 +6,7 @@ export function createJoystick(raw) {
     getHardwareInfo({
       manufacturerId: raw.vendor,
       productId: raw.product,
-    })
-  );
-}
-
-export function isHardware(
-  { manufacturerId, productId } = {},
-  hardwareInfoEntry
-) {
-  return (
-    hardwareInfoEntry?.manufacturerId === manufacturerId &&
-    hardwareInfoEntry?.productId === productId
-  );
-}
-
-export function getHardwareInfo(deviceInfo) {
-  return Object.values(hardwareInfo).find(
-    (hw) =>
-      hw.manufacturerId === deviceInfo.manufacturerId &&
-      hw.productId === deviceInfo.productId
+    }),
   );
 }
 

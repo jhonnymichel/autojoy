@@ -39,13 +39,30 @@ export const hardwareInfo = {
     manufacturerId: 4617,
     productId: 10370,
     getType: (device) => {
-
       if (device.name.includes("Drum")) {
         return joystickTypes.xinputRockBandDrumKit;
       }
 
-      return joystickTypes.xinputGuitar
+      return joystickTypes.xinputGuitar;
     },
     name: "Wireless Guitar Hero Guitar (Xbox 360)",
   },
 };
+
+export function isHardware(
+  { manufacturerId, productId } = {},
+  hardwareInfoEntry,
+) {
+  return (
+    hardwareInfoEntry?.manufacturerId === manufacturerId &&
+    hardwareInfoEntry?.productId === productId
+  );
+}
+
+export function getHardwareInfo(deviceInfo) {
+  return Object.values(hardwareInfo).find(
+    (hw) =>
+      hw.manufacturerId === deviceInfo.manufacturerId &&
+      hw.productId === deviceInfo.productId,
+  );
+}

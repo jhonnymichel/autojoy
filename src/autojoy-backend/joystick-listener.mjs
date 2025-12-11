@@ -1,5 +1,5 @@
-import { hardwareInfo } from "../common/joystick.mjs";
-import { createJoystick, isHardware } from "./joystick.mjs";
+import { hardwareInfo, isHardware } from "../common/joystick.mjs";
+import { createJoystick } from "./joystick.mjs";
 import sdl from "@kmamal/sdl";
 
 const subscribers = [];
@@ -30,9 +30,9 @@ async function sdlHandler() {
       sdlDevicesToInclude.some((d) =>
         isHardware(
           { manufacturerId: device.vendor, productId: device.product },
-          d
-        )
-      )
+          d,
+        ),
+      ),
   );
 
   const newDeviceList = gameControllers.map((device) => createJoystick(device));
@@ -42,7 +42,7 @@ async function sdlHandler() {
       (value, position) =>
         value?.type !== deviceList[position]?.type ||
         value?.raw.id !== deviceList[position]?.raw.id ||
-        value?.raw._index !== deviceList[position]?.raw._index
+        value?.raw._index !== deviceList[position]?.raw._index,
     ) ||
     newDeviceList.length !== deviceList.length
   ) {
