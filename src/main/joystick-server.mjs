@@ -21,6 +21,9 @@ let appProcess;
 let devServiceCleanupDone = false;
 
 export function startServer() {
+  if (process.platform === "linux") {
+    return;
+  }
   // Spawn the child process
   appProcess = fork(
     path.resolve(rootdir, "src/autojoy-backend/index.mjs"),
@@ -63,6 +66,10 @@ let restartAgainTimeoutId;
 let serverRestartPaddingTimeoutId;
 
 export function restartServer(context) {
+  if (process.platform === "linux") {
+    restartSystemService();
+    return;
+  }
   clearTimeout(restartAgainTimeoutId);
   clearTimeout(serverRestartPaddingTimeoutId);
 

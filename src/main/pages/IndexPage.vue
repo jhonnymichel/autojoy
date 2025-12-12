@@ -23,7 +23,7 @@
       <template #content>
         <p>
           AutoJoy won't work without the joystick backend service. Go to the
-          Service menu to start the it.
+          Service menu to start it.
         </p>
         <ActionButton @click="router.push('/service')">
           Manage Service
