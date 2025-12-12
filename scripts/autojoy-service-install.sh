@@ -6,7 +6,7 @@ UNIT_DEST_DIR="$HOME/.config/systemd/user"
 UNIT_DEST_PATH="$UNIT_DEST_DIR/$SERVICE_NAME"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-EXEC_PATH="$HOME/.config/com.jhonnymichel/autojoy/src/autojoy-backend/index.mjs"
+EXEC_PATH="$HOME/.config/com.jhonnymichel/autojoy/.src/autojoy-backend.js"
 ENV_DIR="$HOME/.config/com.jhonnymichel/autojoy"
 mkdir -p "$ENV_DIR"
 ENV_FILE="$ENV_DIR/env.conf"

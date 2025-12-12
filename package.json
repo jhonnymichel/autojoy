@@ -2,20 +2,24 @@
   "name": "autojoy",
   "version": "2.0.1",
   "description": "Automatically update emulators and games input settings based on what's connected to your computer!",
-  "main": "src/main/index.js",
-  "entry": "src/main/index.js",
+  "main": "src/dist/main.js",
+  "entry": "src/dist/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "electron:start": "electron src/main/index.js",
-    "start": "run-p pages:dev electron:start",
+    "electron:start": "electron src/dist/main.js",
+    "start": "run-p pages:dev backend:dev main:dev electron:start",
     "electron:pack": "electron-builder --dir",
     "electron:dist": "electron-builder",
-    "pack": "run-s pages:build electron:pack",
-    "dist": "run-s pages:build electron:dist",
+    "pack": "run-s pages:build backend:prod main:prod electron:pack",
+    "dist": "run-s pages:build backend:prod main:prod electron:dist",
     "install": "node-gyp rebuild",
     "pages:dev": "vite",
     "pages:build": "vite build",
-    "pages:preview": "vite preview"
+    "pages:preview": "vite preview",
+    "backend:dev": "esbuild src/autojoy-backend/index.mjs    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:@kmamal/sdl --external:*.node --outfile=src/dist/autojoy-backend.js --watch",
+    "backend:prod": "esbuild src/autojoy-backend/index.mjs    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:@kmamal/sdl --external:*.node --outfile=src/dist/autojoy-backend.js --minify",
+    "main:dev": "esbuild src/main/index.js    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:electron --external:*.node --outfile=src/dist/main.js --watch",
+    "main:prod": "esbuild src/main/index.js   --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"  --bundle --platform=node --format=esm --target=node20 --external:electron --external:*.node --outfile=src/dist/main.js --minify"
   },
   "build": {
     "appId": "com.jhonnymichel.autojoy",
@@ -34,19 +38,18 @@
   "author": "Jhonny Michel <jhonnymichel@outlook.com>",
   "license": "MIT",
   "dependencies": {
-    "@kmamal/sdl": "^0.11.2",
+    "@kmamal/sdl": "^0.11.2"
+  },
+  "devDependencies": {
     "@vue/eslint-config-prettier": "^10.2.0",
     "bindings": "^1.5.0",
     "fast-xml-parser": "^4.5.1",
     "ini": "^5.0.0",
     "node-addon-api": "^8.3.0",
-    "node-gyp": "^11.1.0",
     "vue": "^3.5.25",
     "vue-router": "^4.6.3",
     "xinput-ffi": "^4.0.0",
-    "yaml": "^2.4.0"
-  },
-  "devDependencies": {
+    "yaml": "^2.4.0",
     "@eslint/js": "^9.39.1",
     "@vitejs/plugin-vue": "^6.0.2",
     "electron": "^29.1.1",

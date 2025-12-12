@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # exit tmp and dev-app-data -- this script is meant to run inside there
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-EXEC_PATH="$REPO_ROOT/dev-app-data/src/autojoy-backend/index.mjs"
+EXEC_PATH="$REPO_ROOT/dev-app-data/.src/autojoy-backend.js"
 ENV_DIR="$REPO_ROOT/dev-app-data"
 mkdir -p "$ENV_DIR"
 ENV_FILE="$ENV_DIR/env.conf"

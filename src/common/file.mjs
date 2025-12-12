@@ -10,9 +10,9 @@ import rootdir from "./rootdir.mjs";
 let __packagedDirname = rootdir;
 // Resolving user folder. in development mode, it'll be placed in the local copy of the repository (user and config-templates folders).
 let settingsFolder = path.join(rootdir, "dev-app-data");
-// if we're in production, we set user folder to be outside of the app directory, in the root of the install first.
 
-if (settingsFolder.includes(".asar")) {
+// if we're in production, we set user folder to be outside of the app directory, in the root of the install first.
+if (settingsFolder.includes(".asar") || __packagedDirname.includes(".src")) {
   settingsFolder = path.resolve(settingsFolder, "..");
 
   // function getRealDocumentsPath() {
@@ -177,6 +177,12 @@ export function copyDir(src, dest) {
       fs.copyFileSync(srcPath, destPath);
     }
   }
+}
+
+export function copyFile(src, dest) {
+  const destDir = path.dirname(dest);
+  createDirectory(destDir);
+  fs.copyFileSync(src, dest);
 }
 
 export function deleteDirectory(directoryPath) {

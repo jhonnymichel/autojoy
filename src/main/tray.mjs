@@ -5,7 +5,6 @@ import { openDashboardPage, openSetupPage } from "./window.mjs";
 import rootdir from "../common/rootdir.mjs";
 import { user, userFolderPath } from "../common/settings.mjs";
 import { isMicrophoneInUse } from "../common/device-filters.mjs";
-import { platform } from "process";
 
 const { actions, dispatch } = store;
 
@@ -96,7 +95,7 @@ export function startTray() {
       {
         type: "separator",
       },
-      ...(platform === "win32"
+      ...(process.platform === "win32"
         ? [
             {
               type: "checkbox",

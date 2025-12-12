@@ -1,4 +1,5 @@
 import globals from "globals";
+import { globalIgnores } from "eslint/config";
 import eslintjs from "@eslint/js";
 import tseslint from "typescript-eslint";
 import pluginVue from "eslint-plugin-vue";
@@ -16,4 +17,5 @@ export default [
       "prettier/prettier": ["warn", { endOfLine: "auto" }],
     },
   },
+  globalIgnores(["**/dist/**", "**/node_modules/**"]),
 ];

@@ -7,10 +7,11 @@ import { createLogger, logFromApp } from "../common/logger.mjs";
 import { promisify } from "util";
 import { userFolderPath } from "../common/settings.mjs";
 import {
-  copyDir,
   createDirectory,
   deleteDirectory,
   saveFile,
+  copyFile,
+  copyDir,
 } from "../common/file.mjs";
 import { app } from "electron";
 
@@ -25,13 +26,9 @@ export function startServer() {
     return;
   }
   // Spawn the child process
-  appProcess = fork(
-    path.resolve(rootdir, "src/autojoy-backend/index.mjs"),
-    [],
-    {
-      stdio: ["pipe", "pipe", "pipe", "ipc"], // Ensure stdout is piped
-    },
-  );
+  appProcess = fork(path.resolve(rootdir, "src/dist/autojoy-backend.js"), [], {
+    stdio: ["pipe", "pipe", "pipe", "ipc"], // Ensure stdout is piped
+  });
 
   // Forward messages from child process to main process
   appProcess.on("message", (message) => {
@@ -153,6 +150,7 @@ export function getSystemServiceStatus() {
         }
       } catch (e) {
         console.log("Error checking service unit file:", e.message);
+        isDev = app.isPackaged === false;
       }
     }
 
@@ -228,13 +226,23 @@ export async function installSystemService() {
 
   try {
     // Copy backend runtime sources to user config folder so the service can run them.
-    const targetSrc = path.resolve(userFolderPath, "src");
-    const srcBackend = path.resolve(rootdir, "src/autojoy-backend");
-    const srcCommon = path.resolve(rootdir, "src/common");
+    const targetSrc = path.resolve(userFolderPath, ".src");
+    const backendFilePath = path.resolve(
+      rootdir,
+      "src/dist/autojoy-backend.js",
+    );
 
     createDirectory(targetSrc);
-    copyDir(srcBackend, path.resolve(targetSrc, "autojoy-backend"));
-    copyDir(srcCommon, path.resolve(targetSrc, "common"));
+    copyFile(backendFilePath, path.resolve(targetSrc, "autojoy-backend.js"));
+    copyDir(
+      path.resolve(rootdir, "node_modules/@kmamal/sdl"),
+      path.join(targetSrc, "node_modules/@kmamal/sdl"),
+    );
+    copyDir(
+      path.resolve(rootdir, "config-templates"),
+      path.join(targetSrc, "config-templates"),
+    );
+    copyDir(path.resolve(rootdir, "user"), path.join(targetSrc, "user"));
 
     const installerBasePath = path.resolve(
       rootdir,
