@@ -6,74 +6,57 @@ import { XMLBuilder, XMLParser } from "fast-xml-parser";
 import { execSync } from "child_process";
 import rootdir from "./rootdir.mjs";
 
+const isDev = process.env.AUTOJOY_ENV === "dev";
 // we keep a reference to the app directory so we can grab templates from here when needed. applies in production where the app dir is packaged.
 let __packagedDirname = rootdir;
-// Resolving user folder. in development mode, it'll be placed in the local copy of the repository (user and config-templates folders).
-let settingsFolder = path.join(rootdir, "dev-app-data");
 
-// if we're in production, we set user folder to be outside of the app directory, in the root of the install first.
-if (
-  settingsFolder.includes(".asar") ||
-  (process.env.AUTOJOY_BACKEND_MODE === "service" &&
-    process.env.AUTOJOY_ENV === "prod")
-) {
+// Resolving user folder. we start inside the root.
+let settingsFolder = rootdir;
+
+// if we're in a package, we set user folder to be outside of the app directory, in the root of the install first.
+// if not the case, we create a folder inside the root.
+// if we can't find a better user folder based on platform, we stay with this default.
+if (settingsFolder.includes(".asar")) {
   settingsFolder = path.resolve(settingsFolder, "..");
+} else {
+  settingsFolder = path.resolve(settingsFolder, "user-data");
+}
 
-  // function getRealDocumentsPath() {
-  //   try {
-  //     const docPath = execSync(
-  //       "powershell -command \"[Environment]::GetFolderPath('MyDocuments')\"",
-  //       { encoding: "utf8" }
-  //     ).trim();
-  //     return docPath;
-  //   } catch (error) {
-  //     console.error("Failed to get Documents path:", error);
-  //     return null;
-  //   }
-  // }
+function getSettingsBaseFolderByPlatform() {
+  try {
+    if (process.platform === "win32") {
+      const localAppDataPath = execSync(
+        "powershell -command \"[System.Environment]::GetFolderPath('LocalApplicationData')\"",
+        {
+          encoding: "utf8",
+        },
+      ).trim();
 
-  // const documentsPath = getRealDocumentsPath();
-
-  // // if we have the documents path extracted, we use documents/autojoy as the user folder.
-  // if (documentsPath) {
-  //   userFolder = documentsPath + "/autojoy";
-  // }
-
-  function getSettingsBaseFolderByPlatform() {
-    try {
-      if (process.platform === "win32") {
-        const localAppDataPath = execSync(
-          "powershell -command \"[System.Environment]::GetFolderPath('LocalApplicationData')\"",
-          {
-            encoding: "utf8",
-          },
-        ).trim();
-
-        return localAppDataPath;
-      }
-
-      // linux: use XDG config home or ~/.config
-      const xdg = process.env.XDG_CONFIG_HOME;
-      if (xdg && xdg.length) {
-        return xdg;
-      }
-
-      const home = process.env.HOME || process.env.USERPROFILE;
-      return path.resolve(home, ".config");
-    } catch (error) {
-      console.error("Failed to resolve settings base folder:", error);
-      return null;
+      return localAppDataPath;
     }
-  }
 
-  const platformBaseSettingsFolder = getSettingsBaseFolderByPlatform();
-  if (platformBaseSettingsFolder) {
-    settingsFolder = path.resolve(
-      platformBaseSettingsFolder,
-      "com.jhonnymichel",
-      "autojoy",
-    );
+    // linux: use XDG config home or ~/.config
+    const xdg = process.env.XDG_CONFIG_HOME;
+    if (xdg && xdg.length) {
+      return xdg;
+    }
+
+    const home = process.env.HOME || process.env.USERPROFILE;
+    return path.resolve(home, ".config");
+  } catch (error) {
+    console.error("Failed to resolve settings base folder:", error);
+    return null;
   }
+}
+
+// resolving the proper user folder based on platform, if possible.
+const platformBaseSettingsFolder = getSettingsBaseFolderByPlatform();
+if (platformBaseSettingsFolder) {
+  settingsFolder = path.resolve(
+    platformBaseSettingsFolder,
+    "com.jhonnymichel",
+    isDev ? "autojoy-dev" : "autojoy",
+  );
 }
 
 const xmlParser = new XMLParser();

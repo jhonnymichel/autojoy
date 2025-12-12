@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "electron:start": "electron src/dist/main.js",
-    "start": "run-p pages:dev backend:dev main:dev electron:start",
+    "start": "cross-env AUTOJOY_ENV=dev run-p pages:dev backend:dev main:dev electron:start",
     "electron:pack": "electron-builder --dir",
     "electron:dist": "electron-builder",
     "pack": "run-s pages:build backend:prod main:prod electron:pack",

@@ -5,11 +5,9 @@ SERVICE_NAME="autojoy-backend.service"
 UNIT_DEST_DIR="$HOME/.config/systemd/user"
 UNIT_DEST_PATH="$UNIT_DEST_DIR/$SERVICE_NAME"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-# exit tmp and dev-app-data -- this script is meant to run inside there
-REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-EXEC_PATH="$REPO_ROOT/dev-app-data/.src/autojoy-backend.js"
-ENV_DIR="$REPO_ROOT/dev-app-data"
+EXEC_PATH="$HOME/.config/com.jhonnymichel/autojoy-dev/.src/autojoy-backend.js"
+ENV_DIR="$HOME/.config/com.jhonnymichel/autojoy-dev"
 mkdir -p "$ENV_DIR"
 ENV_FILE="$ENV_DIR/env.conf"
 
@@ -63,7 +61,6 @@ EnvironmentFile=$ENV_FILE
 ExecStart=/usr/bin/env node "$EXEC_PATH" --daemon
 Restart=always
 RestartSec=2
-WorkingDirectory=$REPO_ROOT
 
 [Install]
 WantedBy=default.target
