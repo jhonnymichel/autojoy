@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from "vue";
+import { defineEmits } from "vue";
 defineProps({
   type: { type: String, default: "button" },
   primary: { type: Boolean, default: false },
