@@ -42,6 +42,11 @@ ensure_node() {
 
 ensure_node
 
+{
+	echo "AUTOJOY_BACKEND_MODE=service"
+	echo "AUTOJOY_ENV=prod"
+} >> "$ENV_FILE"
+
 mkdir -p "$UNIT_DEST_DIR"
 
 # Create unit file dynamically with correct ExecStart

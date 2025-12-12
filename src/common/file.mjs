@@ -12,7 +12,11 @@ let __packagedDirname = rootdir;
 let settingsFolder = path.join(rootdir, "dev-app-data");
 
 // if we're in production, we set user folder to be outside of the app directory, in the root of the install first.
-if (settingsFolder.includes(".asar") || __packagedDirname.includes(".src")) {
+if (
+  settingsFolder.includes(".asar") ||
+  (process.env.AUTOJOY_BACKEND_MODE === "service" &&
+    process.env.AUTOJOY_ENV === "prod")
+) {
   settingsFolder = path.resolve(settingsFolder, "..");
 
   // function getRealDocumentsPath() {

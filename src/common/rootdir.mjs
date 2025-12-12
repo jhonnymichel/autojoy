@@ -8,9 +8,9 @@ const __dirname = path.dirname(__filename);
 let rootdir = path.resolve(__dirname, "..", "..");
 
 // when running from system service
-if (__dirname.endsWith(".src")) {
-  if (__dirname.includes("dev-app-data")) {
-    // going to the root of the root of dev-app-data
+if (process.env.AUTOJOY_BACKEND_MODE === "service") {
+  if (process.env.AUTOJOY_ENV === "dev") {
+    // going to the root of dev-app-data
     rootdir = path.resolve(__dirname, "..", "..");
   } else {
     //  stay in the module root if it's inside <user-folder>/.src/

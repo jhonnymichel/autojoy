@@ -28,6 +28,11 @@ export function startServer() {
   // Spawn the child process
   appProcess = fork(path.resolve(rootdir, "src/dist/autojoy-backend.js"), [], {
     stdio: ["pipe", "pipe", "pipe", "ipc"], // Ensure stdout is piped
+    env: {
+      ...process.env,
+      AUTOJOY_BACKEND_MODE: "fork",
+      AUTOJOY_ENV: app.isPackaged ? "prod" : "dev",
+    },
   });
 
   // Forward messages from child process to main process
