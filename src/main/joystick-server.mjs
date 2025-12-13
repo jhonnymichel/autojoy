@@ -14,15 +14,18 @@ import {
   copyDir,
 } from "../common/file.mjs";
 import { app } from "electron";
+import ipc from "node-ipc";
 
 const { dispatch, actions } = store;
 const logFromJoystickServer = createLogger("Joystick Server", null);
 
 let appProcess;
 let devServiceCleanupDone = false;
+let serviceConnectionDone = false;
 
 export function startServer() {
   if (process.platform === "linux") {
+    createSystemServiceConnection();
     return;
   }
   // Spawn the child process
@@ -130,6 +133,34 @@ store.subscribe(() => {
   }
 });
 
+function createSystemServiceConnection() {
+  if (serviceConnectionDone) {
+    return;
+  }
+
+  serviceConnectionDone = true;
+
+  ipc.config.id = "autojoy-app";
+  ipc.config.retry = 1500;
+  ipc.config.silent = true;
+  ipc.connectTo("autojoy-backend", () => {
+    const onSystemServiceDisconnect = () => {
+      logFromApp("Disconnected from backend IPC server");
+      ipc.of["autojoy-backend"].off("disconnect", onSystemServiceDisconnect);
+    };
+
+    ipc.of["autojoy-backend"].on("connect", () => {
+      logFromApp("Connected to backend IPC server");
+      ipc.of["autojoy-backend"].on("disconnect", onSystemServiceDisconnect);
+      ipc.of["autojoy-backend"].emit("request-joystick-list", "autojoy-app");
+    });
+
+    ipc.of["autojoy-backend"].on("event", (message) => {
+      dispatch(actions.message(JSON.parse(message)));
+    });
+  });
+}
+
 /**
  * Queries the systemd user service status for the Autojoy backend.
  * @returns {Promise<{supported: boolean, installed: boolean, active: boolean, details: { platform: NodeJS.Platform, output?: string }}>} Promise resolving service status.
@@ -148,7 +179,7 @@ export function getSystemServiceStatus() {
     if (!devServiceCleanupDone) {
       try {
         const processCheck = await promisify(exec)(
-          `cat ${`${process.env.HOME}/.config/systemd/user/${serviceName}`} | grep dev-app-data`,
+          `cat ${`${process.env.HOME}/.config/systemd/user/${serviceName}`} | grep autojoy-dev`,
         );
         if (processCheck.stdout && processCheck.stdout.length) {
           isDev = true;
@@ -293,6 +324,7 @@ export async function installSystemService() {
 
     logFromApp("Service created and activated");
     dispatch(actions.serverStarted());
+    createSystemServiceConnection();
 
     try {
       deleteDirectory(tmpFolder);

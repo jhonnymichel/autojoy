@@ -1,4 +1,5 @@
 import { hardwareInfo, isHardware } from "../../../common/joystick.mjs";
+import { sendEvent } from "../../event-broadcaster.mjs";
 import mmJoystick from "../../native/mmjoystick-native.cjs";
 const isWindows = process.platform === "win32";
 // Harmonix Wii Drums
@@ -25,7 +26,7 @@ export default {
       console.error(
         "RPCS3 MMJoystick Handler - joystick not found. Restarting server to refresh list",
       );
-      process.send(JSON.stringify({ type: "issueRestart" }));
+      sendEvent(JSON.stringify({ type: "issueRestart" }));
     }
 
     return joystick ? joystick.id + 1 : null;

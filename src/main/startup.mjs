@@ -33,6 +33,7 @@ validateSettings(logFromApp);
         2,
       ),
     );
+
     openSetupPage();
   } else {
     logFromApp("Activating server");

@@ -9,6 +9,9 @@ export const joystickListener = {
   async listen() {
     sdlHandler();
   },
+  getJoystickList() {
+    return structuredClone(deviceList);
+  },
   onListChange(notify) {
     subscribers.push(notify);
   },
