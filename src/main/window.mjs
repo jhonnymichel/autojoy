@@ -15,6 +15,7 @@ import { userFolderPath } from "../common/settings.mjs";
 
 const { dispatch, actions } = store;
 let logsWindow = null;
+let serviceLogsChild = null;
 
 const isDev = !app.isPackaged;
 const DEV_URL = "http://localhost:5173/index.html";
@@ -71,6 +72,11 @@ export function createLogsWindow() {
     logsWindow.loadFile(path.resolve(rootdir, "src/main/pages/live-logs.html"));
 
     logsWindow.on("closed", () => {
+      // Ensure we stop streaming logs when window closes
+      try {
+        serviceLogsChild?.kill?.();
+      } catch {}
+      serviceLogsChild = null;
       logsWindow = null;
     });
   }
@@ -151,14 +157,18 @@ exposeCommand("stopAutojoyService", async () => {
 
 exposeCommand("openServiceLogs", async () => {
   createLogsWindow();
-  const child = openServiceLogs((line) => {
+  // Avoid spawning multiple journalctl processes
+  if (serviceLogsChild) {
+    return true;
+  }
+  serviceLogsChild = openServiceLogs((line) => {
     try {
       logsWindow?.webContents.send("serviceLog", line);
     } catch (e) {
       logFromApp("Error sending web contents to logs window", e.message);
     }
   });
-  return !!child;
+  return !!serviceLogsChild;
 });
 
 exposeCommand(
