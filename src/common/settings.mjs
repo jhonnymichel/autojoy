@@ -156,6 +156,18 @@ function migrateUserSettings() {
 export function validateSettings(log = (...msg) => console.log(...msg)) {
   const userSettings = user.settings;
 
+  if (userSettings.hasOwnProperty("setupComplete")) {
+    if (typeof userSettings.setupComplete !== "boolean") {
+      log(
+        `user settings.setupComplete invalid value. Should be true of false. found '${userSettings.setupComplete}'. Resetting it.`,
+      );
+      user.settings = {
+        ...user.settings,
+        setupComplete: false,
+      };
+    }
+  }
+
   if (userSettings.unusedMicrophones) {
     if (!Array.isArray(userSettings.unusedMicrophones)) {
       log(
