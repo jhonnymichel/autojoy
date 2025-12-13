@@ -94,7 +94,7 @@ function openBugReportPage() {
   );
 }
 </script>
-<style>
+<style scoped>
 .actionable-text {
   display: flex;
   flex-direction: row;

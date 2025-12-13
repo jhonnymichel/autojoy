@@ -1,3 +1,4 @@
+import { logFromApp } from "../common/logger.mjs";
 import { user } from "../common/settings.mjs";
 import { getSystemSettings, updateSystemSettings } from "./system.mjs";
 
@@ -130,6 +131,11 @@ const store = {
       );
       if (validPaths) {
         user.paths = paths;
+      } else {
+        logFromApp(
+          "Invalid paths provided, not saving.",
+          JSON.stringify(paths, null, 2),
+        );
       }
 
       return {

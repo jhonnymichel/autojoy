@@ -7,6 +7,19 @@
       blank.
     </p>
     <p>Click <b>Clear</b> to stop integrating with specific software.</p>
+
+    <ActionableText>
+      <template #text>
+        Autojoy can try to detect the paths for the empty entries.
+        automatically, and you can manually point to the ones it can't
+        find.</template
+      >
+      <template #action>
+        <ActionButton @click="autoDetectPaths()"
+          >Auto Fill Empty Paths</ActionButton
+        ></template
+      >
+    </ActionableText>
   </div>
 
   <form class="form" :class="{ active: ready }" @submit.prevent="saveConfig">
@@ -46,12 +59,14 @@ import { ref, reactive, onMounted, toRaw } from "vue";
 import ActionButton from "./lib/ActionButton.vue";
 import InlineButton from "./lib/InlineButton.vue";
 import { useRouter } from "vue-router";
-import { useSetupProgress } from "./lib/composables";
+import { usePlatform, useSetupProgress } from "./lib/composables";
+import ActionableText from "./lib/ActionableText.vue";
 
 const ready = ref(false);
 
 const router = useRouter();
 const setupProgress = useSetupProgress();
+const platform = usePlatform();
 
 const fields = [
   { key: "rpcs3", label: "RPCS3" },
@@ -62,13 +77,23 @@ const fields = [
 
 const paths = reactive({ rpcs3: "", dolphin: "", cemu: "", ghwtde: "" });
 const tooltips = {
-  rpcs3:
-    "The RPCS3 installation folder. If using EmuDeck, it's by default inside %AppData%/emudeck/Emulators ",
-  cemu: "The Cemu installation folder. If using EmuDeck, it's by default inside %AppData%/emudeck/Emulators ",
-  dolphin:
-    "If using EmuDeck, it's the installation folder by default inside %AppData%/emudeck/Emulators.\nIf using standalone Dolphin, it's the Dolphin Emulator folder inside your Documents.",
-  ghwtde:
-    "It's the game settings folder by default inside your Documents/My Games folder.",
+  win32: {
+    rpcs3:
+      "The RPCS3 installation folder.\nIf using EmuDeck, it's by default inside %AppData%/emudeck/Emulators.",
+    cemu: "The Cemu installation folder.\nIf using EmuDeck, it's by default inside %AppData%/emudeck/Emulators ",
+    dolphin:
+      "If using EmuDeck, it's the installation folder by default inside %AppData%/emudeck/Emulators.\nIf using standalone Dolphin, it's the Dolphin Emulator folder inside your Documents.",
+    ghwtde:
+      "It's the game settings folder by default inside your Documents/My Games folder.",
+  },
+  linux: {
+    rpcs3: "The RPCS3 config folder. Usually ~/.config/rpcs3/",
+    cemu: "The Cemu config folder. Usually ~/.config/cemu/",
+    dolphin:
+      "The Dolphin install folder. When using the flatpack image, it's usually ~/.var/app/org.DolphinEmu.dolphin-emu/",
+    ghwtde:
+      "It's the game settings folder by default inside your Documents/My Games directory.",
+  },
 };
 
 onMounted(async () => {
@@ -92,13 +117,28 @@ function clearField(key) {
 }
 
 function showTooltip(key) {
-  alert(tooltips[key]);
+  alert(tooltips[platform.value][key]);
+}
+
+async function autoDetectPaths() {
+  const autoDetectionResults = await window.autojoy(
+    "autoDetectPaths",
+    toRaw(paths),
+  );
+
+  if (autoDetectionResults.success) {
+    alert("Paths were found! Review them below and click Save when ready.");
+  } else {
+    alert("Auto-detection did not find any paths. Please set them manually.");
+  }
+  Object.assign(paths, autoDetectionResults.paths);
 }
 
 async function saveConfig() {
   try {
     const plain = toRaw(paths);
     const state = await window.autojoy("getStoreState");
+    console.log("Saving paths:", plain);
     await window.autojoy("dispatchAction", {
       action: "setPaths",
       payload: { ...plain },

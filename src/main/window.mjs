@@ -12,6 +12,8 @@ import {
 } from "./joystick-server.mjs";
 import { logFromApp } from "../common/logger.mjs";
 import { userFolderPath } from "../common/settings.mjs";
+import fs from "fs";
+import os from "os";
 
 const { dispatch, actions } = store;
 let logsWindow = null;
@@ -192,4 +194,99 @@ exposeCommand("openUserFolder", () => {
 
 exposeCommand("openExternalLink", (event, url) => {
   shell.openExternal(url);
+});
+
+// Resolve default emulator/config paths per platform, preserving provided values.
+
+exposeCommand("autoDetectPaths", (event, currentPaths) => {
+  const platform = process.platform;
+  const homePath = os.homedir();
+
+  const result = { ...currentPaths };
+
+  console.log("Auto detecting paths. Current paths:", result);
+
+  const candidates = {
+    win32: {
+      rpcs3: [
+        path.join(process.env.APPDATA || "", "emudeck", "Emulators", "rpcs3"),
+        path.join(process.env.LOCALAPPDATA || "", "rpcs3"),
+      ],
+      cemu: [
+        path.join(process.env.APPDATA || "", "emudeck", "Emulators", "cemu"),
+        path.join(process.env.PROGRAMFILES || "C:/Program Files", "Cemu"),
+      ],
+      dolphin: [
+        path.join(process.env.APPDATA || "", "emudeck", "Emulators", "Dolphin"),
+        path.join(
+          process.env.USERPROFILE || "",
+          "Documents",
+          "Dolphin Emulator",
+        ),
+      ],
+      ghwtde: [
+        path.join(
+          process.env.USERPROFILE || "",
+          "Documents",
+          "My Games",
+          "Guitar Hero World Tour Definitive Edition",
+        ),
+      ],
+    },
+    linux: {
+      rpcs3: [path.join(homePath, ".config", "rpcs3")],
+      cemu: [path.join(homePath, ".config", "Cemu")],
+      dolphin: [
+        path.join(homePath, ".var", "app", "org.DolphinEmu.dolphin-emu"),
+      ],
+      ghwtde: [
+        path.join(
+          homePath,
+          "Games",
+          "umu",
+          "umu-default",
+          "drive_c",
+          "users",
+          path.basename(homePath),
+          "My Documents",
+          "My Games",
+          "Guitar Hero World Tour Definitive Edition",
+        ),
+      ],
+    },
+  };
+
+  const setIfEmpty = (key, paths) => {
+    if (result[key]) {
+      return false;
+    }
+    for (const p of paths) {
+      if (!p) continue;
+      try {
+        if (fs.existsSync(p)) {
+          result[key] = p;
+          return true;
+        }
+      } catch {
+        logFromApp("Error checking path existence", p);
+      }
+    }
+    return false;
+  };
+
+  console.log("Auto detecting paths. Current paths:", result);
+
+  const table = candidates[platform] || candidates.linux;
+  let found = false;
+  found = setIfEmpty("rpcs3", table.rpcs3) || found;
+  found = setIfEmpty("cemu", table.cemu) || found;
+  found = setIfEmpty("dolphin", table.dolphin) || found;
+  found = setIfEmpty("ghwtde", table.ghwtde) || found;
+
+  return {
+    success:
+      found ||
+      !!(result.rpcs3 || result.cemu || result.dolphin || result.ghwtde),
+    paths: result,
+  };
 });
