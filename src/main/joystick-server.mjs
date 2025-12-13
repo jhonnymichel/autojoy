@@ -375,6 +375,8 @@ export async function uninstallSystemService(removeNode = false) {
               dispatch(actions.serverNotInstalled());
               resolve();
             });
+
+            deleteDirectory(path.resolve(userFolderPath, ".src"));
           },
         );
       },
