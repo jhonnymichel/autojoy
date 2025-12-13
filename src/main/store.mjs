@@ -146,6 +146,7 @@ const store = {
       };
 
       return {
+        serverStatus: "pending-user-issued-restart",
         setupComplete: true,
       };
     },

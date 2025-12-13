@@ -1,7 +1,7 @@
 import { app } from "electron";
 import { validateSettings } from "../common/settings.mjs";
 import store from "./store.mjs";
-import { openSetupPage } from "./window.mjs";
+import { openDashboardPage, openSetupPage } from "./window.mjs";
 import { getSystemServiceStatus, startServer } from "./joystick-server.mjs";
 import { startTray } from "./tray.mjs";
 import { logFromApp, resetLogFile } from "../common/logger.mjs";
@@ -12,13 +12,10 @@ validateSettings(logFromApp);
 (async () => {
   logFromApp("App started");
   const serviceStatus = await getSystemServiceStatus();
+  const serviceNeeded = !serviceStatus.installed && serviceStatus.supported;
   const noPaths = Object.values(store.state.paths).every((path) => !path);
   const setupComplete = store.state.setupComplete;
-  if (
-    !setupComplete ||
-    noPaths ||
-    (!serviceStatus.installed && serviceStatus.supported)
-  ) {
+  if (!setupComplete) {
     store.dispatch(store.actions.resetSetup());
 
     logFromApp(
@@ -38,6 +35,10 @@ validateSettings(logFromApp);
   } else {
     logFromApp("Activating server");
     startServer();
+
+    if (serviceNeeded || noPaths) {
+      openDashboardPage();
+    }
   }
 
   startTray();

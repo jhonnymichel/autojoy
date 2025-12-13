@@ -44,11 +44,22 @@
       </template>
     </MessageBanner>
   </template>
+  <MessageBanner v-if="allPathsEmpty" level="warning">
+    <template #title>Paths not set</template>
+    <template #content>
+      <p>
+        No path to emulator or game is provided. Go to the paths menu to choose
+        what software you want Autojoy to integrate with.
+      </p>
+      <ActionButton @click="router.push('/paths')"> Set Paths </ActionButton>
+    </template>
+  </MessageBanner>
 
   <ConnectedDevices :joysticks="storeState.joystickList ?? []" />
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useRouter } from "vue-router";
 import ActionButton from "./lib/ActionButton.vue";
 import { usePlatform, useStoreState } from "./lib/composables";
@@ -58,6 +69,15 @@ import ConnectedDevices from "./dashboard/ConnectedDevices.vue";
 const storeState = useStoreState();
 const platform = usePlatform();
 const router = useRouter();
+const allPathsEmpty = computed(() => {
+  if (!storeState.value.paths) {
+    return false;
+  }
+
+  return Object.values(storeState.value.paths).every(
+    (p) => !p || p.length === 0,
+  );
+});
 </script>
 
 <style scoped></style>

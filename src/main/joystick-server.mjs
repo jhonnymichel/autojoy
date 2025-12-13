@@ -481,6 +481,7 @@ export function restartSystemService() {
           return;
         }
         dispatch(actions.serverStarted());
+        createSystemServiceConnection();
         resolve({
           ok: true,
           message: stdout?.toString?.() || "Service restarted",
