@@ -12,6 +12,8 @@ import {
   saveFile,
   copyFile,
   copyDir,
+  savers,
+  loaders,
 } from "../common/file.mjs";
 import { app } from "electron";
 import ipc from "node-ipc";
@@ -20,7 +22,7 @@ const { dispatch, actions } = store;
 const logFromJoystickServer = createLogger("Joystick Server", null);
 
 let appProcess;
-let devServiceCleanupDone = false;
+let outdatedServiceCleanupDone = false;
 let serviceConnectionDone = false;
 
 export function startServer() {
@@ -174,19 +176,30 @@ export function getSystemServiceStatus() {
     }
 
     const serviceName = "autojoy-backend.service";
-    let isDev = false;
+    let isOutdated = false;
 
-    if (!devServiceCleanupDone) {
+    if (!outdatedServiceCleanupDone) {
       try {
         const processCheck = await promisify(exec)(
           `cat ${`${process.env.HOME}/.config/systemd/user/${serviceName}`} | grep autojoy-dev`,
         );
         if (processCheck.stdout && processCheck.stdout.length) {
-          isDev = true;
+          isOutdated = true;
         }
       } catch (e) {
         console.log("Error checking service unit file:", e.message);
-        isDev = app.isPackaged === false;
+        isOutdated = app.isPackaged === false;
+      }
+
+      try {
+        const installMeta = loaders.json(".src/meta.json");
+        if (installMeta.version !== app.getVersion()) {
+          logFromApp("Outdated joystick backend service found. uninstalling");
+          isOutdated = true;
+        }
+      } catch (e) {
+        logFromApp("Error loading install meta:", e.message);
+        isOutdated = true;
       }
     }
 
@@ -215,7 +228,7 @@ export function getSystemServiceStatus() {
       );
     };
 
-    if (isDev && !devServiceCleanupDone) {
+    if (isOutdated && !outdatedServiceCleanupDone) {
       // In dev mode: stop and disable service, and remove unit file before checking status
       execFile(
         "systemctl",
@@ -230,7 +243,7 @@ export function getSystemServiceStatus() {
               // Attempt to remove unit file; ignore errors
               const unitPath = `${process.env.HOME}/.config/systemd/user/${serviceName}`;
               execFile("rm", ["-f", unitPath], { encoding: "utf8" }, () => {
-                devServiceCleanupDone = true;
+                outdatedServiceCleanupDone = true;
                 proceedStatus();
               });
             },
@@ -279,6 +292,11 @@ export async function installSystemService() {
       path.join(targetSrc, "config-templates"),
     );
     copyDir(path.resolve(rootdir, "user"), path.join(targetSrc, "user"));
+
+    savers.json(
+      { version: app.getVersion() },
+      path.join(targetSrc, "meta.json"),
+    );
 
     const installerBasePath = path.resolve(
       rootdir,

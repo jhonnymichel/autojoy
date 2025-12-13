@@ -119,7 +119,9 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import ActionButton from "./lib/ActionButton.vue";
-
+import { useSetupProgress, useStoreState } from "./lib/composables";
+import { useRouter } from "vue-router";
+const router = useRouter();
 const pending = ref(false);
 const ready = ref(false);
 const serviceStatus = reactive({
@@ -128,6 +130,9 @@ const serviceStatus = reactive({
   supported: false,
   details: null,
 });
+
+const storeState = useStoreState();
+const setupProgress = useSetupProgress();
 
 onMounted(async () => {
   try {
@@ -143,7 +148,13 @@ async function installService() {
   const result = await window.autojoy("installAutojoyService");
   const status = await window.autojoy("getSystemServiceStatus");
   if (status.installed) {
-    alert("Service installed successfully! You can proceed to the next step.");
+    alert(
+      `Service installed successfully!${storeState.value.setupComplete ? "" : " You can now proceed to the next step."}`,
+    );
+
+    if (!storeState.value.setupComplete) {
+      router.push(setupProgress.getNextSetupStep());
+    }
   } else {
     alert(
       "Failed to install the AutoJoy backend service. We recommend trying again.\nPlease check the logs for more details.",

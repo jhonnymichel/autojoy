@@ -45,8 +45,13 @@
 import { ref, reactive, onMounted, toRaw } from "vue";
 import ActionButton from "./lib/ActionButton.vue";
 import InlineButton from "./lib/InlineButton.vue";
+import { useRouter } from "vue-router";
+import { useSetupProgress } from "./lib/composables";
 
 const ready = ref(false);
+
+const router = useRouter();
+const setupProgress = useSetupProgress();
 
 const fields = [
   { key: "rpcs3", label: "RPCS3" },
@@ -103,6 +108,10 @@ async function saveConfig() {
         state.setupComplete ? "" : "You can proceed to the next step."
       }`,
     );
+
+    if (!state.setupComplete) {
+      router.push(setupProgress.getNextSetupStep());
+    }
   } catch (e) {
     console.error(e);
     alert(

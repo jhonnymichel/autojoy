@@ -134,9 +134,10 @@ const store = {
 
       return {
         paths: user.paths,
-        serverStatus: validPaths
-          ? "pending-user-issued-restart"
-          : store.state.serverStatus,
+        serverStatus:
+          validPaths && store.state.serverStatus !== "pending-install"
+            ? "pending-user-issued-restart"
+            : store.state.serverStatus,
       };
     },
     completeSetup() {

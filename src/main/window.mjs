@@ -98,10 +98,10 @@ export function openServicePage() {
   mainWindow.show();
 }
 
-export function openSetupPage() {
+export function openSetupPage(hash = "") {
   createMainWindow();
 
-  loadPage(mainWindow, "start-setup");
+  loadPage(mainWindow, `start-setup${hash ? `#${hash}` : ""}`);
   mainWindow.show();
 }
 
