@@ -1,7 +1,7 @@
 <template>
   <div class="banner" :class="level">
     <div class="banner-header">
-      <img :src="`./assets/${level}-icon.png`" width="24" alt="Warning" />
+      <img :src="icons[level]" width="24" :alt="level" />
       <h3><slot name="title"></slot></h3>
     </div>
     <div class="banner-content">
@@ -11,6 +11,11 @@
 </template>
 
 <script setup>
+// import infoIcon from "../assets/info-icon.png";
+import warningIcon from "../assets/warning-icon.png";
+import dangerIcon from "../assets/danger-icon.png";
+// import successIcon from "../assets/success-icon.png";
+
 defineProps({
   level: {
     default: "info",
@@ -19,6 +24,13 @@ defineProps({
       ["info", "warning", "danger", "success"].includes(value),
   },
 });
+
+const icons = {
+  info: null,
+  warning: warningIcon,
+  danger: dangerIcon,
+  success: null,
+};
 </script>
 
 <style scoped>
