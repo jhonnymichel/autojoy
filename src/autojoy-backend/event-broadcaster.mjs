@@ -1,5 +1,6 @@
 import ipc from "node-ipc";
 import { joystickListener } from "./joystick-listener.mjs";
+import { microphoneListener } from "./microphone-listener.mjs";
 
 const backendMode = process.env.AUTOJOY_BACKEND_MODE;
 
@@ -14,13 +15,22 @@ if (backendMode === "service") {
     ipc.server.on("request-joystick-list", (entity, socket) => {
       if (entity === "autojoy-app") {
         sockets.push(socket);
-        console.log("sending joystick list to app");
+        console.log("sending joystick and microphone list to app");
         ipc.server.emit(
           socket,
           "event",
           JSON.stringify({
             type: "joystickList",
             data: joystickListener.getJoystickList(),
+          }),
+        );
+
+        ipc.server.emit(
+          socket,
+          "event",
+          JSON.stringify({
+            type: "microphoneList",
+            data: microphoneListener.getMicrophoneList(),
           }),
         );
       }
