@@ -8,6 +8,33 @@ export const joystickTypes = {
   gamepad: "GAMEPAD",
 };
 
+const xinputSubtypeToGlobalType = {
+  XINPUT_DEVSUBTYPE_GUITAR_BASS: joystickTypes.xinputGuitar,
+  XINPUT_DEVSUBTYPE_GUITAR: joystickTypes.xinputGuitar,
+  XINPUT_DEVSUBTYPE_GUITAR_ALTERNATE: joystickTypes.xinputGuitar,
+  // TODO: support guitar hero drum kit.
+  XINPUT_DEVSUBTYPE_DRUM_KIT: joystickTypes.rockBandDrumKit,
+  XINPUT_DEVSUBTYPE_GAMEPAD: joystickTypes.gamepad,
+};
+
+const xinputVendorNameToVendorId = {
+  "Microsoft Corp.": 1118,
+};
+
+const xinputProductNameToProductId = {
+  "Xbox One Elite Controller": 767,
+};
+
+export function getXinputJoystickType(subtype) {
+  return xinputSubtypeToGlobalType[subtype];
+}
+
+export function getXinputVendorAndProductIds(vendorName, productName) {
+  const vendorId = xinputVendorNameToVendorId[vendorName] ?? vendorName;
+  const productId = xinputProductNameToProductId[productName] ?? productName;
+  return { vendorId, productId };
+}
+
 export const hardwareInfo = {
   harmonixDrumControllerForNintendoWii: {
     manufacturerId: 7085,
@@ -24,12 +51,12 @@ export const hardwareInfo = {
     productId: 256,
     getType: () => joystickTypes.ps3GuitarHeroGuitar,
   },
-  crkdGuitarPCMode: {
-    manufacturerId: 1118,
-    productId: 654,
-    getType: () => joystickTypes.crkdGuitarPCMode,
-    name: "CRKD Guitar (PC Mode)",
-  },
+  // crkdGuitarPCMode: {
+  //   manufacturerId: 1118,
+  //   productId: 654,
+  //   getType: () => joystickTypes.crkdGuitarPCMode,
+  //   name: "CRKD Guitar (PC Mode)",
+  // },
   wirelessGuitarHeroGuitarForXbox360: {
     manufacturerId: 1118,
     productId: 673,

@@ -16,8 +16,8 @@
     "pages:dev": "vite",
     "pages:build": "vite build",
     "pages:preview": "vite preview",
-    "backend:dev": "esbuild src/autojoy-backend/index.mjs    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:@kmamal/sdl --external:*.node --outfile=src/dist/autojoy-backend.js --watch",
-    "backend:prod": "esbuild src/autojoy-backend/index.mjs    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:@kmamal/sdl --external:*.node --outfile=src/dist/autojoy-backend.js --minify",
+    "backend:dev": "esbuild src/autojoy-backend/index.mjs    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:xinput-ffi --external:@kmamal/sdl --external:*.node --outfile=src/dist/autojoy-backend.js --watch",
+    "backend:prod": "esbuild src/autojoy-backend/index.mjs    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:xinput-ffi --external:@kmamal/sdl --external:*.node --outfile=src/dist/autojoy-backend.js --minify",
     "main:dev": "esbuild src/main/index.js    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:electron --external:*.node --outfile=src/dist/main.js --watch",
     "main:prod": "esbuild src/main/index.js   --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"  --bundle --platform=node --format=esm --target=node20 --external:electron --external:*.node --outfile=src/dist/main.js --minify"
   },
@@ -61,10 +61,11 @@
     "vite": "^7.2.7",
     "vue": "^3.5.25",
     "vue-router": "^4.6.3",
-    "xinput-ffi": "^4.0.0",
     "yaml": "^2.4.0"
   },
   "dependencies": {
-    "@kmamal/sdl": "^0.11.13"
+    "@kmamal/sdl": "^0.11.13",
+    "node-hid": "^3.2.0",
+    "xinput-ffi": "^4.0.2"
   }
 }

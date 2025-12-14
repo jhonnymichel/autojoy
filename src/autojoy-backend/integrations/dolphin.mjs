@@ -2,7 +2,12 @@ import path from "path";
 import fs from "fs";
 import { loaders, savers } from "../../common/file.mjs";
 import { user } from "../../common/settings.mjs";
-import { joystickTypes } from "../../common/joystick.mjs";
+import {
+  getXinputJoystickType,
+  getXinputVendorAndProductIds,
+  joystickTypes,
+} from "../../common/joystick.mjs";
+import { createJoystickFromXinputDevice } from "../joystick.mjs";
 
 const configTemplates = {
   gamecube: loaders.ini("config-templates/dolphin-gc.ini"),
@@ -51,27 +56,134 @@ function resolveDolphinPath() {
   return path.resolve(user.paths.dolphin);
 }
 
-function renameSDLControllers(arr) {
-  if (process.platform !== "linux") {
+// SDL3 on windows now uses xinput when possible, and dolphin name resolution is not reliable.
+// some xinput devices will be "SDL/<number>/XInput Controller #1", others will be "SDL/<number>/<original name>".
+// we will have to fallback to using xinput api directly on dolphin.
+async function addXinputNameToDevices(arr) {
+  if (process.platform !== "win32") {
     return arr;
   }
+
+  const xinput = await import("xinput-ffi");
+
+  const xinputDevices = [];
+
+  for (
+    let position = 0;
+    position < xinput.constants.XUSER_MAX_COUNT;
+    position++
+  ) {
+    try {
+      const device = await xinput.getCapabilitiesEx(position);
+      xinputDevices.push(createJoystickFromXinputDevice(device));
+    } catch {
+      // either the device is not connected or the xinput device could not be identified and we report it as not connected
+      xinputDevices.push(null);
+    }
+  }
+
+  const assignedXinputIndexes = [];
+
   return arr.map((item) => {
-    let name = item.name;
+    const deviceType = item.type;
+    const vendorId = item.raw.vendor;
+    const productId = item.raw.product;
+    const equivalentXinputDeviceIndex = xinputDevices.findIndex(
+      (xinputDevice, index) => {
+        if (!xinputDevice) {
+          return false;
+        }
 
-    switch (item.type) {
-      case joystickTypes.crkdGuitarPCMode:
-        name = `Atari Xbox 360 Game Controller`;
-        break;
-      default:
-        break;
+        const xinputDeviceType = getXinputJoystickType(
+          xinputDevice.raw.capabilities.dubType,
+        );
+
+        const { vendorId: xinputVendorId, productId: xinputProductId } =
+          getXinputVendorAndProductIds(
+            xinputDevice.raw.vendorId,
+            xinputDevice.raw.productId,
+          );
+
+        const hasFullMatch =
+          xinputDeviceType === deviceType &&
+          xinputVendorId === vendorId &&
+          xinputProductId === productId;
+
+        const hasVendorAndProduct =
+          xinputVendorId === vendorId && xinputProductId === productId;
+        const hasVendorAndType =
+          xinputDeviceType === deviceType && xinputVendorId === vendorId;
+
+        const hasMatch =
+          (hasFullMatch || hasVendorAndProduct || hasVendorAndType) &&
+          !assignedXinputIndexes.includes(index);
+
+        if (hasMatch) {
+          assignedXinputIndexes.push(index);
+        }
+
+        return hasMatch;
+      },
+    );
+    const isXinput = equivalentXinputDeviceIndex > -1;
+
+    if (isXinput) {
+      return {
+        ...item,
+        name: `XInput/${equivalentXinputDeviceIndex}/${getTypeToXinputIdentifier(deviceType)}`,
+      };
     }
-
-    if (name === "Xbox 360 Wireless Controller") {
-      name = "X360 Wireless Controller";
-    }
-
-    return { ...item, name };
+    return item;
   });
+}
+
+function getTypeToXinputIdentifier(type) {
+  switch (type) {
+    case joystickTypes.crkdGuitarPCMode:
+    case joystickTypes.xinputGuitar:
+      return "Device";
+    case joystickTypes.xinputRockBandDrumKit:
+      return "Drum Kit";
+    default:
+      return "Gamepad";
+  }
+}
+
+function renameSDLControllers(arr) {
+  if (process.platform === "linux") {
+    return arr.map((item) => {
+      let name = item.name;
+
+      switch (item.type) {
+        case joystickTypes.crkdGuitarPCMode:
+          name = `Atari Xbox 360 Game Controller`;
+          break;
+        default:
+          break;
+      }
+
+      if (name === "Xbox 360 Wireless Controller") {
+        name = "X360 Wireless Controller";
+      }
+
+      return { ...item, name };
+    });
+  } else {
+    return arr.map((item) => {
+      let name = item.name;
+
+      switch (name) {
+        case "Harmonix Drum Controller for Nintendo Wii":
+          name =
+            "Licensed by Nintendo of America Harmonix Drum Controller for Nintendo Wii";
+          break;
+        default:
+          break;
+      }
+
+      return { ...item, name };
+    });
+  }
 }
 
 // Dolphin uses the format: SDL/count/deviceName
@@ -89,10 +201,11 @@ function prependNumbersToSDLDeviceNames(arr) {
   });
 }
 
-function handleSDLJoystickListUpdate(joystickList) {
-  const renamedList = prependNumbersToSDLDeviceNames(
-    renameSDLControllers(joystickList),
+async function handleSDLJoystickListUpdate(joystickList) {
+  const renamedList = await addXinputNameToDevices(
+    prependNumbersToSDLDeviceNames(renameSDLControllers(joystickList)),
   );
+
   const newConfig = {};
 
   wiiConstants.playerIdentifiers.forEach((identifier, position) => {

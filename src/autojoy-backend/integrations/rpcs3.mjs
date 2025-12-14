@@ -3,7 +3,13 @@ import fs from "fs";
 import mmjoystick from "./rpcs3/mmjoystick.mjs";
 import { loaders, savers } from "../../common/file.mjs";
 import { user } from "../../common/settings.mjs";
-import { hardwareInfo, isHardware } from "../../common/joystick.mjs";
+import {
+  getXinputJoystickType,
+  getXinputVendorAndProductIds,
+  hardwareInfo,
+  isHardware,
+} from "../../common/joystick.mjs";
+import { createJoystickFromXinputDevice } from "../joystick.mjs";
 
 const configTemplates = loaders.yml("config-templates/rpcs3.yml");
 const rpcs3Path = user.paths.rpcs3;
@@ -96,6 +102,87 @@ function appendNumbersToSDLDeviceNames(arr) {
   });
 }
 
+// SDL3 on windows now uses xinput when possible, changing some device names to the structure:
+// XInput Controller <number>
+// eg.: XInput Controller 1, XInput Controller 2.
+async function addXinputNameToDevices(arr) {
+  if (process.platform !== "win32") {
+    return arr;
+  }
+
+  const xinput = await import("xinput-ffi");
+
+  const xinputDevices = [];
+
+  for (
+    let position = 0;
+    position < xinput.constants.XUSER_MAX_COUNT;
+    position++
+  ) {
+    try {
+      const device = await xinput.getCapabilitiesEx(position);
+      xinputDevices.push(createJoystickFromXinputDevice(device));
+    } catch {
+      // either the device is not connected or the xinput device could not be identified and we report it as not connected
+      // xinputDevices.push(null);
+    }
+  }
+
+  const assignedXinputIndexes = [];
+
+  return arr.map((item) => {
+    const deviceType = item.type;
+    const vendorId = item.raw.vendor;
+    const productId = item.raw.product;
+    const equivalentXinputDeviceIndex = xinputDevices.findIndex(
+      (xinputDevice, index) => {
+        if (!xinputDevice) {
+          return false;
+        }
+
+        const xinputDeviceType = getXinputJoystickType(
+          xinputDevice.raw.capabilities.dubType,
+        );
+
+        const { vendorId: xinputVendorId, productId: xinputProductId } =
+          getXinputVendorAndProductIds(
+            xinputDevice.raw.vendorId,
+            xinputDevice.raw.productId,
+          );
+
+        const hasFullMatch =
+          xinputDeviceType === deviceType &&
+          xinputVendorId === vendorId &&
+          xinputProductId === productId;
+
+        const hasVendorAndProduct =
+          xinputVendorId === vendorId && xinputProductId === productId;
+        const hasVendorAndType =
+          xinputDeviceType === deviceType && xinputVendorId === vendorId;
+
+        const hasMatch =
+          (hasFullMatch || hasVendorAndProduct || hasVendorAndType) &&
+          !assignedXinputIndexes.includes(index);
+
+        if (hasMatch) {
+          assignedXinputIndexes.push(index);
+        }
+
+        return hasMatch;
+      },
+    );
+    const isXinput = equivalentXinputDeviceIndex > -1;
+
+    if (isXinput) {
+      return {
+        ...item,
+        name: `XInput Controller ${equivalentXinputDeviceIndex + 1}`,
+      };
+    }
+    return item;
+  });
+}
+
 /*
 Wii and PS3 peripherals only work via evdev on Linux.
 
@@ -104,7 +191,7 @@ NAME FIXES AND PREFIXES
 - eg.: 2. Xbox Series X Controller, 2. DualSense Wireless Controller
 - the number is relative to how many of the same controller is connected.
 - only 2nd + devices get the prefix.
-- there are also some name fixes needed for certain devices.
+- there are also some name fixes needed for certain devices.  
 */
 
 const evdevDevices = [
@@ -155,10 +242,12 @@ function addEvdevInfo(arr) {
   });
 }
 
-function handleSDLJoystickListUpdate(joystickList) {
+async function handleSDLJoystickListUpdate(joystickList) {
   // updating device names to match what rpcs3 uses
-  const fixedList = appendNumbersToSDLDeviceNames(
-    renameDLSController(addEvdevInfo(joystickList)),
+  const fixedList = await addXinputNameToDevices(
+    appendNumbersToSDLDeviceNames(
+      renameDLSController(addEvdevInfo(joystickList)),
+    ),
   );
 
   const newConfig = {};
