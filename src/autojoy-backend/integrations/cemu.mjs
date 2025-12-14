@@ -60,7 +60,9 @@ function handleXinputJoystickListUpdate(joystickList) {
 
     const device = joystickList[deviceIndex];
 
-    const newConfig = configTemplates[device.type] ?? configTemplates.GAMEPAD;
+    const newConfig = structuredClone(
+      configTemplates[device.type] ?? configTemplates.GAMEPAD,
+    );
 
     newConfig.emulated_controller.controller.api = xinputApiValue;
     newConfig.emulated_controller.controller.uuid = deviceIndex;
@@ -95,14 +97,14 @@ async function handleSDLJoystickListUpdate(joystickList) {
       const device = deviceList[position];
       let newConfig;
       if (position === 0) {
-        newConfig = configTemplates.WII_U_GAMEPAD;
+        newConfig = structuredClone(configTemplates.WII_U_GAMEPAD);
 
         newConfig.emulated_controller.controller[1].api = sdlApiValue;
         newConfig.emulated_controller.controller[1].uuid = device.uuid;
         newConfig.emulated_controller.controller[1].display_name =
           getFixedOldDeviceSDLName(device);
       } else {
-        newConfig = configTemplates.GAMEPAD;
+        newConfig = structuredClone(configTemplates.GAMEPAD);
 
         newConfig.emulated_controller.controller.api = sdlApiValue;
         newConfig.emulated_controller.controller.uuid = device.uuid;
