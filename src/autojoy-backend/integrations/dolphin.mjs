@@ -1,5 +1,5 @@
 import path from "path";
-import fs from "fs"
+import fs from "fs";
 import { loaders, savers } from "../../common/file.mjs";
 import { user } from "../../common/settings.mjs";
 import { joystickTypes } from "../../common/joystick.mjs";
@@ -34,37 +34,45 @@ const wiiConstants = {
 };
 
 function resolveDolphinPath() {
-  const dolphinPortablePath = path.resolve(user.paths.dolphin, "User/Config")
+  const dolphinPortablePath = path.resolve(user.paths.dolphin, "User/Config");
   if (fs.existsSync(dolphinPortablePath)) {
-    return dolphinPortablePath
+    return dolphinPortablePath;
   }
 
-  const dolphinFlatpackPath = path.resolve(user.paths.dolphin, "config/dolphin-emu")
+  const dolphinFlatpackPath = path.resolve(
+    user.paths.dolphin,
+    "config/dolphin-emu",
+  );
   if (fs.existsSync(dolphinFlatpackPath)) {
-    return dolphinFlatpackPath
+    return dolphinFlatpackPath;
   }
 
   // TODO: Dolphin installed via regular installer on Windows, folder is on My Documents. check structure and add case.
-  return path.resolve(user.paths.dolphin)
+  return path.resolve(user.paths.dolphin);
 }
 
 function renameSDLControllers(arr) {
-  if (process.platform !== "linux") { return arr }
+  if (process.platform !== "linux") {
+    return arr;
+  }
   return arr.map((item) => {
     let name = item.name;
 
     switch (item.type) {
       case joystickTypes.crkdGuitarPCMode:
-        name = `Atari Xbox 360 Game Controller`
+        name = `Atari Xbox 360 Game Controller`;
         break;
       default:
         break;
     }
 
+    if (name === "Xbox 360 Wireless Controller") {
+      name = "X360 Wireless Controller";
+    }
+
     return { ...item, name };
   });
 }
-
 
 // Dolphin uses the format: SDL/count/deviceName
 // eg.: SDL/0/Xbox Series X Controller
@@ -82,7 +90,9 @@ function prependNumbersToSDLDeviceNames(arr) {
 }
 
 function handleSDLJoystickListUpdate(joystickList) {
-  const renamedList = prependNumbersToSDLDeviceNames(renameSDLControllers(joystickList));
+  const renamedList = prependNumbersToSDLDeviceNames(
+    renameSDLControllers(joystickList),
+  );
   const newConfig = {};
 
   wiiConstants.playerIdentifiers.forEach((identifier, position) => {
@@ -97,7 +107,7 @@ function handleSDLJoystickListUpdate(joystickList) {
 
     newConfig[identifier] = structuredClone(
       configTemplates.wiimoteEmulated[joystick.type] ??
-      configTemplates.wiimoteEmulated.GAMEPAD
+        configTemplates.wiimoteEmulated.GAMEPAD,
     );
 
     newConfig[identifier].Device = joystick.name;
@@ -106,17 +116,17 @@ function handleSDLJoystickListUpdate(joystickList) {
 
   savers.ini(
     newConfig,
-    path.resolve(dolphinPath, wiiConstants.inputConfigFilePath)
+    path.resolve(dolphinPath, wiiConstants.inputConfigFilePath),
   );
 
   console.log(
     "DOLPHIN - Wii Input settings saved at",
-    path.resolve(dolphinPath, wiiConstants.inputConfigFilePath)
+    path.resolve(dolphinPath, wiiConstants.inputConfigFilePath),
   );
 
   const newGCConfig = {};
   const newMainConfig = loaders.ini(
-    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
+    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath),
   );
 
   gamecubeConstants.playerIdentifiers.forEach((identifier, position) => {
@@ -141,22 +151,22 @@ function handleSDLJoystickListUpdate(joystickList) {
 
   savers.ini(
     newGCConfig,
-    path.resolve(dolphinPath, gamecubeConstants.inputConfigFilePath)
+    path.resolve(dolphinPath, gamecubeConstants.inputConfigFilePath),
   );
 
   console.log(
     "DOLPHIN - GC Input settings saved at",
-    path.resolve(dolphinPath, gamecubeConstants.inputConfigFilePath)
+    path.resolve(dolphinPath, gamecubeConstants.inputConfigFilePath),
   );
 
   savers.ini(
     newMainConfig,
-    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
+    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath),
   );
 
   console.log(
     "DOLPHIN - Main settings saved at",
-    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath)
+    path.resolve(dolphinPath, gamecubeConstants.deviceModeFilePath),
   );
 }
 

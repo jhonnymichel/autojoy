@@ -84,6 +84,92 @@ XINPUT_GUITAR:
     Vendor ID: 4794
     Product ID: 512
   Buddy Device: "Null"
+XINPUT_SANTROLLER_GUITAR:
+  Handler: SDL
+  Device: ""
+  Config:
+    Left Stick Left: ""
+    Left Stick Down: ""
+    Left Stick Right: ""
+    Left Stick Up: ""
+    Right Stick Left: LS X+
+    Right Stick Down: LT
+    Right Stick Right: LS X-
+    Right Stick Up: LT
+    Start: Start
+    Select: Back
+    PS Button: Guide
+    Square: West
+    Cross: South
+    Circle: East
+    Triangle: North
+    Left: Left
+    Down: Down
+    Right: Right
+    Up: Up
+    R1: LS Y+
+    R2: RT
+    R3: RS
+    L1: LB
+    L2: LT
+    L3: LS
+    IR Nose: ""
+    IR Tail: ""
+    IR Left: ""
+    IR Right: ""
+    Tilt Left: ""
+    Tilt Right: ""
+    Motion Sensor X:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Motion Sensor Y:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Motion Sensor Z:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Motion Sensor G:
+      Axis: ""
+      Mirrored: false
+      Shift: 0
+    Pressure Intensity Button: ""
+    Pressure Intensity Percent: 50
+    Pressure Intensity Toggle Mode: false
+    Pressure Intensity Deadzone: 0
+    Left Stick Multiplier: 100
+    Right Stick Multiplier: 100
+    Left Stick Deadzone: 27244
+    Right Stick Deadzone: 7849
+    Left Trigger Threshold: 30
+    Right Trigger Threshold: 30
+    Left Pad Squircling Factor: 8000
+    Right Pad Squircling Factor: 8000
+    Color Value R: 0
+    Color Value G: 0
+    Color Value B: 0
+    Blink LED when battery is below 20%: true
+    Use LED as a battery indicator: false
+    LED battery indicator brightness: 50
+    Player LED enabled: true
+    Enable Large Vibration Motor: true
+    Enable Small Vibration Motor: true
+    Switch Vibration Motors: false
+    Mouse Movement Mode: Relative
+    Mouse Deadzone X Axis: 60
+    Mouse Deadzone Y Axis: 60
+    Mouse Acceleration X Axis: 200
+    Mouse Acceleration Y Axis: 250
+    Left Stick Lerp Factor: 100
+    Right Stick Lerp Factor: 100
+    Analog Button Lerp Factor: 100
+    Trigger Lerp Factor: 100
+    Device Class Type: 1
+    Vendor ID: 4794
+    Product ID: 512
+  Buddy Device: "Null"
 CRKD_GUITAR_PC_MODE:
   Handler: SDL
   Device: Xbox 360 Controller 1

@@ -95,6 +95,7 @@ function getIcon(joystick) {
   switch (joystick.type) {
     case joystickTypes.crkdGuitarPCMode:
     case joystickTypes.ps3GuitarHeroGuitar:
+    case joystickTypes.santrollerGuitar:
     case joystickTypes.xinputGuitar:
       return icons.guitar;
     case joystickTypes.wiiAndPs3RockBandDrumKit:

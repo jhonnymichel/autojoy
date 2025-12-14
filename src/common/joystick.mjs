@@ -1,5 +1,6 @@
 export const joystickTypes = {
   xinputGuitar: "XINPUT_GUITAR",
+  santrollerGuitar: "XINPUT_SANTROLLER_GUITAR",
   ps3GuitarHeroGuitar: "PS3_GUITARHERO_GUITAR",
   crkdGuitarPCMode: "CRKD_GUITAR_PC_MODE",
   xinputRockBandDrumKit: "XINPUT_ROCKBAND_DRUM_KIT",
@@ -43,7 +44,7 @@ export const hardwareInfo = {
         return joystickTypes.xinputRockBandDrumKit;
       }
 
-      return joystickTypes.xinputGuitar;
+      return joystickTypes.santrollerGuitar;
     },
   },
 };
