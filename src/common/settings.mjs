@@ -1,6 +1,8 @@
 import { logFromApp } from "./logger.mjs";
 import path from "path";
 import {
+  copyDir,
+  deleteDirectory,
   loaders,
   resolvePathFromPackagedRoot,
   resolvePathFromUserFolder,
@@ -13,6 +15,12 @@ const packagedRootConfigTemplatesPath = path.join(
   "config-templates",
   process.platform === "win32" ? "win32" : "linux",
 );
+
+const isDev = process.env.AUTOJOY_ENV === "dev";
+if (isDev) {
+  console.log("Resetting bindings because we are in dev mode");
+  resetBindings()
+}
 
 // must validate and migrate paths before allowing user object to be used.
 migrateUserSettings();
@@ -151,6 +159,14 @@ function migrateUserSettings() {
   } catch (e) {
     console.log("No migrations to run.");
   }
+}
+
+export function resetBindings() {
+  deleteDirectory(path.resolve(userFolderPath, "config-templates"));
+  copyDir(
+    resolvePathFromPackagedRoot(packagedRootConfigTemplatesPath),
+    path.resolve(userFolderPath, "config-templates"),
+  );
 }
 
 export function validateSettings(log = (...msg) => console.log(...msg)) {

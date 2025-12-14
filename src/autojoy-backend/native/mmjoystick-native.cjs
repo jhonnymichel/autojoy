@@ -1,11 +1,2 @@
-let mmJoystick;
-try {
-	mmJoystick = require("../../../build/Release/joystick.node");
-} catch (e) {
-	mmJoystick = {
-		getJoysticks() {
-			return [];
-		},
-	};
-}
+const mmJoystick = require("../../build/Release/joystick.node");
 module.exports = mmJoystick;
