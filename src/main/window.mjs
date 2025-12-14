@@ -217,7 +217,13 @@ exposeCommand("autoDetectPaths", (event, currentPaths) => {
         path.join(process.env.PROGRAMFILES || "C:/Program Files", "Cemu"),
       ],
       dolphin: [
-        path.join(process.env.APPDATA || "", "emudeck", "Emulators", "Dolphin"),
+        path.join(
+          process.env.APPDATA || "",
+          "emudeck",
+          "Emulators",
+          "Dolphin-x64",
+        ),
+
         path.join(
           process.env.USERPROFILE || "",
           "Documents",
