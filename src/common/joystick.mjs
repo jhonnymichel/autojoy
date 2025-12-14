@@ -51,16 +51,10 @@ export const hardwareInfo = {
     productId: 256,
     getType: () => joystickTypes.ps3GuitarHeroGuitar,
   },
-  xbox360Controller: {
+  xbox360WirelessAdapter: {
     manufacturerId: 1118,
     productId: 654,
     getType: () => joystickTypes.gamepad,
-  },
-  wirelessGuitarHeroGuitarForXbox360: {
-    manufacturerId: 1118,
-    productId: 673,
-    getType: () => joystickTypes.xinputGuitar,
-    name: "Wireless Guitar Hero Guitar (Xbox 360)",
   },
   santrollerBoard: {
     manufacturerId: 4617,

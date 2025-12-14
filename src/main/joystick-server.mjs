@@ -292,6 +292,10 @@ export async function installSystemService() {
       path.join(targetSrc, "node_modules/node-hid"),
     );
     copyDir(
+      path.resolve(rootdir, "node_modules/pkg-prebuilds"),
+      path.join(targetSrc, "node_modules/pkg-prebuilds"),
+    );
+    copyDir(
       path.resolve(rootdir, "config-templates"),
       path.join(targetSrc, "config-templates"),
     );

@@ -13,3 +13,35 @@ export function findNextConnectedXinputIdentifier(deviceList, position) {
     }
   }
 }
+
+export function getEvdevName(device) {
+  let evdevName = device.name;
+  evdevName = `${device.hidInfo?.manufacturer} ${device.hidInfo?.product}`;
+  if (!evdevName.trim()) {
+    evdevName = device.name;
+  }
+  return evdevName;
+}
+
+export function getFixedOldDeviceSDLName(device) {
+  let name = getFixedX360ControllerName(device);
+
+  if (
+    device.hidInfo?.manufacturer.includes(
+      "Licensed by Sony Computer Entertainment",
+    ) ||
+    device.hidInfo?.manufacturer.includes("Licensed by Nintendo of America")
+  ) {
+    name = `${device.hidInfo.manufacturer.trim()} ${device.hidInfo.product.trim()}`;
+  }
+
+  return name;
+}
+
+function getFixedX360ControllerName(device) {
+  if (process.platform === "linux") {
+    return device.name.replace("Xbox 360", "X360");
+  }
+
+  return device.name;
+}

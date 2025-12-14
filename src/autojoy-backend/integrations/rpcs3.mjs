@@ -10,6 +10,7 @@ import {
   isHardware,
 } from "../../common/joystick.mjs";
 import { createJoystickFromXinputDevice } from "../joystick.mjs";
+import { getEvdevName, getFixedOldDeviceSDLName } from "./shared.mjs";
 
 const configTemplates = loaders.yml("config-templates/rpcs3.yml");
 const rpcs3Path = user.paths.rpcs3;
@@ -60,6 +61,7 @@ function renameDLSController(arr) {
   return arr.map((item) => {
     let name = item.name;
 
+    // specific name fixes for rpcs3 SDL device names, on windows.
     switch (name) {
       case "PS5 Controller":
         name = "DualSense Wireless Controller";
@@ -70,6 +72,8 @@ function renameDLSController(arr) {
       default:
         break;
     }
+
+    name = getFixedOldDeviceSDLName(item);
 
     return { ...item, name };
   });
@@ -225,15 +229,8 @@ function addEvdevInfo(arr) {
       return item;
     }
 
-    let evdevName = item.name;
-    if (
-      evdevName ===
-      "Licensed by Nintendo of America Harmonix Drum Controller for Nintendo Wii"
-    ) {
-      // yes, it's the double space after America.
-      evdevName =
-        "Licensed by Nintendo of America  Harmonix Drum Controller for Nintendo Wii";
-    }
+    let evdevName = getEvdevName(item);
+
     if (counts[item.name] > 1) {
       evdevName = `${counts[item.name]}. ${evdevName}`;
     }

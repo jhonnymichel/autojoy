@@ -5,11 +5,10 @@ import { user } from "../../common/settings.mjs";
 import {
   getXinputJoystickType,
   getXinputVendorAndProductIds,
-  hardwareInfo,
-  isHardware,
   joystickTypes,
 } from "../../common/joystick.mjs";
 import { createJoystickFromXinputDevice } from "../joystick.mjs";
+import { getFixedOldDeviceSDLName } from "./shared.mjs";
 
 const configTemplates = {
   gamecube: loaders.ini("config-templates/dolphin-gc.ini"),
@@ -155,32 +154,7 @@ function renameSDLControllers(arr) {
   return arr.map((item) => {
     let name = item.name;
 
-    if (process.platform === "linux") {
-      if (
-        isHardware(
-          {
-            manufacturerId: item.raw.vendor,
-            productId: item.raw.product,
-          },
-          hardwareInfo.xbox360Controller,
-        )
-      ) {
-        name = "Atari Xbox 360 Game Controller";
-      }
-
-      if (name === "Xbox 360 Wireless Controller") {
-        name = "X360 Wireless Controller";
-      }
-    }
-
-    if (
-      item.hidInfo?.manufacturer.includes(
-        "Licensed by Sony Computer Entertainment",
-      ) ||
-      item.hidInfo?.manufacturer.includes("Licensed by Nintendo of America")
-    ) {
-      name = `${item.hidInfo.manufacturer.trim()} ${item.hidInfo.product.trim()}`;
-    }
+    name = getFixedOldDeviceSDLName(item);
 
     return { ...item, name };
   });
