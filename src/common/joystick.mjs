@@ -51,12 +51,11 @@ export const hardwareInfo = {
     productId: 256,
     getType: () => joystickTypes.ps3GuitarHeroGuitar,
   },
-  // crkdGuitarPCMode: {
-  //   manufacturerId: 1118,
-  //   productId: 654,
-  //   getType: () => joystickTypes.crkdGuitarPCMode,
-  //   name: "CRKD Guitar (PC Mode)",
-  // },
+  xbox360Controller: {
+    manufacturerId: 1118,
+    productId: 654,
+    getType: () => joystickTypes.gamepad,
+  },
   wirelessGuitarHeroGuitarForXbox360: {
     manufacturerId: 1118,
     productId: 673,

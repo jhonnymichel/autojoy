@@ -16,10 +16,10 @@
     "pages:dev": "vite",
     "pages:build": "vite build",
     "pages:preview": "vite preview",
-    "backend:dev": "esbuild src/autojoy-backend/index.mjs    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:xinput-ffi --external:@kmamal/sdl --external:*.node --outfile=src/dist/autojoy-backend.js --watch",
-    "backend:prod": "esbuild src/autojoy-backend/index.mjs    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:xinput-ffi --external:@kmamal/sdl --external:*.node --outfile=src/dist/autojoy-backend.js --minify",
-    "main:dev": "esbuild src/main/index.js    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:electron --external:*.node --outfile=src/dist/main.js --watch",
-    "main:prod": "esbuild src/main/index.js   --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"  --bundle --platform=node --format=esm --target=node20 --external:electron --external:*.node --outfile=src/dist/main.js --minify"
+    "backend:dev": "esbuild src/autojoy-backend/index.mjs    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:xinput-ffi --external:node-hid --external:@kmamal/sdl --external:*.node --outfile=src/dist/autojoy-backend.js --watch",
+    "backend:prod": "esbuild src/autojoy-backend/index.mjs    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:xinput-ffi --external:node-hid --external:@kmamal/sdl --external:*.node --outfile=src/dist/autojoy-backend.js --minify",
+    "main:dev": "esbuild src/main/index.js    --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --bundle --platform=node --format=esm --target=node20 --external:electron --external:*.node --external:node-hid --outfile=src/dist/main.js --watch",
+    "main:prod": "esbuild src/main/index.js   --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"  --bundle --platform=node --format=esm --target=node20 --external:electron --external:*.node --external:node-hid --outfile=src/dist/main.js --minify"
   },
   "build": {
     "appId": "com.jhonnymichel.autojoy",

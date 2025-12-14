@@ -5,6 +5,8 @@ import { user } from "../../common/settings.mjs";
 import {
   getXinputJoystickType,
   getXinputVendorAndProductIds,
+  hardwareInfo,
+  isHardware,
   joystickTypes,
 } from "../../common/joystick.mjs";
 import { createJoystickFromXinputDevice } from "../joystick.mjs";
@@ -150,40 +152,38 @@ function getTypeToXinputIdentifier(type) {
 }
 
 function renameSDLControllers(arr) {
-  if (process.platform === "linux") {
-    return arr.map((item) => {
-      let name = item.name;
+  return arr.map((item) => {
+    let name = item.name;
 
-      switch (item.type) {
-        case joystickTypes.crkdGuitarPCMode:
-          name = `Atari Xbox 360 Game Controller`;
-          break;
-        default:
-          break;
+    if (process.platform === "linux") {
+      if (
+        isHardware(
+          {
+            manufacturerId: item.raw.vendor,
+            productId: item.raw.product,
+          },
+          hardwareInfo.xbox360Controller,
+        )
+      ) {
+        name = "Atari Xbox 360 Game Controller";
       }
 
       if (name === "Xbox 360 Wireless Controller") {
         name = "X360 Wireless Controller";
       }
+    }
 
-      return { ...item, name };
-    });
-  } else {
-    return arr.map((item) => {
-      let name = item.name;
+    if (
+      item.hidInfo?.manufacturer.includes(
+        "Licensed by Sony Computer Entertainment",
+      ) ||
+      item.hidInfo?.manufacturer.includes("Licensed by Nintendo of America")
+    ) {
+      name = `${item.hidInfo.manufacturer.trim()} ${item.hidInfo.product.trim()}`;
+    }
 
-      switch (name) {
-        case "Harmonix Drum Controller for Nintendo Wii":
-          name =
-            "Licensed by Nintendo of America Harmonix Drum Controller for Nintendo Wii";
-          break;
-        default:
-          break;
-      }
-
-      return { ...item, name };
-    });
-  }
+    return { ...item, name };
+  });
 }
 
 // Dolphin uses the format: SDL/count/deviceName

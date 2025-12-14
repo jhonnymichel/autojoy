@@ -288,6 +288,10 @@ export async function installSystemService() {
       path.join(targetSrc, "node_modules/@kmamal/sdl"),
     );
     copyDir(
+      path.resolve(rootdir, "node_modules/node-hid"),
+      path.join(targetSrc, "node_modules/node-hid"),
+    );
+    copyDir(
       path.resolve(rootdir, "config-templates"),
       path.join(targetSrc, "config-templates"),
     );

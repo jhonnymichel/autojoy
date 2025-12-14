@@ -1,6 +1,7 @@
 import { hardwareInfo, isHardware } from "../common/joystick.mjs";
 import { createJoystick } from "./joystick.mjs";
 import sdl from "@kmamal/sdl";
+import hid from "node-hid";
 
 const subscribers = [];
 let deviceList = [];
@@ -25,6 +26,8 @@ const sdlDevicesToInclude = [
 
 async function sdlHandler() {
   const devices = sdl.joystick.devices;
+  const hidDevices = hid.devices();
+
   // TODO: support "Mayflash Wiimote PC Adapter". gotta use "name", not type.
   // TODO: support "Wii Rock Band Drums". gotta use name, not type + MMJoystick in RPCS3.
   const gameControllers = devices.filter(
@@ -38,7 +41,12 @@ async function sdlHandler() {
       ),
   );
 
-  const newDeviceList = gameControllers.map((device) => createJoystick(device));
+  const newDeviceList = gameControllers.map((device) => {
+    const hidInfo = hidDevices.find(
+      (h) => h.vendorId === device.vendor && h.productId === device.product,
+    );
+    return { ...createJoystick(device), hidInfo };
+  });
 
   if (
     newDeviceList.some(
