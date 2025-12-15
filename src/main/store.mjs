@@ -162,6 +162,11 @@ const store = {
         setupComplete: true,
       };
     },
+    manualSync() {
+      return {
+        serverStatus: "pending-user-issued-restart",
+      };
+    },
     resetSetup() {
       user.settings = {
         ...user.settings,

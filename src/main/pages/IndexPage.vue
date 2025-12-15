@@ -61,6 +61,17 @@
     :unused-microphones="storeState.unusedMicrophones ?? []"
     :manage-microphones="storeState.manageMicrophones ?? false"
   />
+  <h3>Sync Input Settings</h3>
+
+  <ActionableText>
+    <template #text
+      >Emulators and games settings are synced automatically. If needed, you can
+      manually sync them here.</template
+    >
+    <template #action>
+      <ActionButton @click="syncSettings()">Sync Manually</ActionButton>
+    </template>
+  </ActionableText>
 </template>
 
 <script setup>
@@ -71,6 +82,7 @@ import { usePlatform, useStoreState } from "./lib/composables";
 import MessageBanner from "./lib/MessageBanner.vue";
 import ConnectedJoysticks from "./dashboard/ConnectedJoysticks.vue";
 import ConnectedMicrophones from "./dashboard/ConnectedMicrophones.vue";
+import ActionableText from "./lib/ActionableText.vue";
 
 const storeState = useStoreState();
 const platform = usePlatform();
@@ -84,6 +96,14 @@ const allPathsEmpty = computed(() => {
     (p) => !p || p.length === 0,
   );
 });
+
+async function syncSettings() {
+  await window.autojoy("dispatchAction", {
+    action: "manualSync",
+  });
+
+  alert("Settings synced successfully.");
+}
 </script>
 
 <style scoped></style>
