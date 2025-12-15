@@ -26,6 +26,7 @@
     "directories": {
       "buildResources": "electron-builder"
     },
+    "npmRebuild": false,
     "linux": {
       "artifactName": "autojoy-v${version}-linux.${ext}",
       "category": "Utility",
