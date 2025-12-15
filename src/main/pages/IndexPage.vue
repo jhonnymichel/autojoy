@@ -55,7 +55,12 @@
     </template>
   </MessageBanner>
 
-  <ConnectedDevices :joysticks="storeState.joystickList ?? []" />
+  <ConnectedJoysticks :joysticks="storeState.joystickList ?? []" />
+  <ConnectedMicrophones
+    :microphones="storeState.microphoneList ?? []"
+    :unused-microphones="storeState.unusedMicrophones ?? []"
+    :manage-microphones="storeState.manageMicrophones ?? false"
+  />
 </template>
 
 <script setup>
@@ -64,7 +69,8 @@ import { useRouter } from "vue-router";
 import ActionButton from "./lib/ActionButton.vue";
 import { usePlatform, useStoreState } from "./lib/composables";
 import MessageBanner from "./lib/MessageBanner.vue";
-import ConnectedDevices from "./dashboard/ConnectedDevices.vue";
+import ConnectedJoysticks from "./dashboard/ConnectedJoysticks.vue";
+import ConnectedMicrophones from "./dashboard/ConnectedMicrophones.vue";
 
 const storeState = useStoreState();
 const platform = usePlatform();

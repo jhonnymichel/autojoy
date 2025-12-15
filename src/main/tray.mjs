@@ -77,11 +77,14 @@ export function startTray() {
             type: "checkbox",
             checked: isMicrophoneInUse(
               d,
+              index,
               store.state.microphoneList,
               store.state.unusedMicrophones,
             ),
             click: () => {
-              dispatch(actions.toggleMicrophoneUse(d));
+              dispatch(
+                actions.toggleMicrophoneUse({ device: d, position: index }),
+              );
             },
             label: `${d.name}`,
           }))

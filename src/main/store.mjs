@@ -88,15 +88,20 @@ const store = {
         serverStatus: "pending-user-issued-restart",
       };
     },
-    toggleMicrophoneUse(device) {
+    toggleMicrophoneUse({ device, position }) {
       const unusedList = store.state.unusedMicrophones;
 
       const microphoneList = store.state.microphoneList;
       const connectedMicsWithCurrentDeviceName = microphoneList.filter(
         (d) => d.name === device.name,
       );
+
+      const deviceInStore = microphoneList.find(
+        (d, p) => d.name === device.name && p === position,
+      );
+
       const positionOfCurrentDevice =
-        connectedMicsWithCurrentDeviceName.indexOf(device);
+        connectedMicsWithCurrentDeviceName.indexOf(deviceInStore);
 
       const unusedListEntry = {
         name: device.name,
