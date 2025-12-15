@@ -1,8 +1,22 @@
 export const joystickTypes = {
+  /* TODO: Diferentiate between RB and GH guitars. 
+     1. On Dolphin, we always emulate GH guitars.
+     2. On RPCS3, we always emulate RB guitars (more consistent whammy and tilt activation).
+     But we are currently losing the distortion picker on RB guitars because of this. 
+  */
   xinputGuitar: "XINPUT_GUITAR",
+  /* Santroller Guitar should be just an xinput guitar, but it has some caveats:
+    1. On windows, the whammy bar on RPCS3 does not use the full RS X axis 
+    because of a driver optimization Santroller tries to do.
+    2. On linux, whammy and tilt are LS axis instead of RS.
+    TODO: Differentiate RB from GH guitar.
+  */
   santrollerGuitar: "XINPUT_SANTROLLER_GUITAR",
+  /* TODO: support PS3 RB and Wii Guitars */
   ps3GuitarHeroGuitar: "PS3_GUITARHERO_GUITAR",
+  /* DEPRECATED: we only support mode 8 on PC mode, which maps to XINPUT_GUITAR. */
   crkdGuitarPCMode: "CRKD_GUITAR_PC_MODE",
+  /* TODO: support xinput GH Drums */
   xinputRockBandDrumKit: "XINPUT_ROCKBAND_DRUM_KIT",
   wiiAndPs3RockBandDrumKit: "WII_PS3_ROCKBAND_DRUM_KIT",
   gamepad: "GAMEPAD",
@@ -12,7 +26,6 @@ const xinputSubtypeToGlobalType = {
   XINPUT_DEVSUBTYPE_GUITAR_BASS: joystickTypes.xinputGuitar,
   XINPUT_DEVSUBTYPE_GUITAR: joystickTypes.xinputGuitar,
   XINPUT_DEVSUBTYPE_GUITAR_ALTERNATE: joystickTypes.xinputGuitar,
-  // TODO: support guitar hero drum kit.
   XINPUT_DEVSUBTYPE_DRUM_KIT: joystickTypes.rockBandDrumKit,
   XINPUT_DEVSUBTYPE_GAMEPAD: joystickTypes.gamepad,
 };

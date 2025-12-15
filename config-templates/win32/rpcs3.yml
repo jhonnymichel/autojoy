@@ -93,21 +93,21 @@ XINPUT_SANTROLLER_GUITAR:
     Left Stick Right: LS X+
     Left Stick Up: LS Y+
     Right Stick Left: RS X-
-    Right Stick Down: LT
+    Right Stick Down: RS Y-
     Right Stick Right: RS X+
-    Right Stick Up: LT
+    Right Stick Up: RS Y+
     Start: Start
-    Select: Back
+    Select: Back,RS Y+
     PS Button: Guide
-    Square: West
+    Square: North
     Cross: South
     Circle: East
-    Triangle: North
+    Triangle: West
     Left: Left
     Down: Down
     Right: Right
     Up: Up
-    R1: RS Y+
+    R1: RB
     R2: RT
     R3: RS
     L1: LB
@@ -135,14 +135,20 @@ XINPUT_SANTROLLER_GUITAR:
       Axis: ""
       Mirrored: false
       Shift: 0
+    Orientation Reset Button: ""
+    Orientation Enabled: false
     Pressure Intensity Button: ""
     Pressure Intensity Percent: 50
     Pressure Intensity Toggle Mode: false
     Pressure Intensity Deadzone: 0
+    Analog Limiter Button: ""
+    Analog Limiter Toggle Mode: false
     Left Stick Multiplier: 100
     Right Stick Multiplier: 100
-    Left Stick Deadzone: 7849
-    Right Stick Deadzone: 27244
+    Left Stick Deadzone: 5743
+    Right Stick Deadzone: 6756
+    Left Stick Anti-Deadzone: 0
+    Right Stick Anti-Deadzone: 0
     Left Trigger Threshold: 30
     Right Trigger Threshold: 30
     Left Pad Squircling Factor: 8000
@@ -154,9 +160,10 @@ XINPUT_SANTROLLER_GUITAR:
     Use LED as a battery indicator: false
     LED battery indicator brightness: 50
     Player LED enabled: true
-    Enable Large Vibration Motor: true
-    Enable Small Vibration Motor: true
+    Large Vibration Motor Multiplier: 100
+    Small Vibration Motor Multiplier: 100
     Switch Vibration Motors: false
+    Vibration Threshold: 63
     Mouse Movement Mode: Relative
     Mouse Deadzone X Axis: 60
     Mouse Deadzone Y Axis: 60
@@ -168,7 +175,7 @@ XINPUT_SANTROLLER_GUITAR:
     Trigger Lerp Factor: 100
     Device Class Type: 1
     Vendor ID: 4794
-    Product ID: 512
+    Product ID: 256
   Buddy Device: "Null"
 CRKD_GUITAR_PC_MODE:
   Handler: SDL
