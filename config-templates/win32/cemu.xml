@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<configs>
 <GAMEPAD>
     <emulated_controller>
         <type>Wii U Pro Controller</type>
@@ -120,3 +121,4 @@
         </controller>
     </emulated_controller>
 </GAMEPAD>
+</configs>
