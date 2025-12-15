@@ -17,6 +17,7 @@ import {
 } from "../common/file.mjs";
 import { app } from "electron";
 import ipc from "node-ipc";
+import { debounce } from "lodash";
 
 const { dispatch, actions } = store;
 const logFromJoystickServer = createLogger("Joystick Server", null);
@@ -414,37 +415,44 @@ export async function uninstallSystemService(removeNode = false) {
  * Starts the Autojoy systemd user service.
  * @returns {Promise<{ok: boolean, message: string}>}
  */
-export function startSystemService() {
-  return new Promise((resolve) => {
-    if (process.platform !== "linux") {
-      resolve({ ok: false, message: "Service start supported on Linux only." });
-      return;
-    }
-
-    dispatch(actions.restartingServer());
-
-    const serviceName = "autojoy-backend.service";
-    execFile(
-      "systemctl",
-      ["--user", "start", serviceName],
-      { encoding: "utf8" },
-      (err, stdout, stderr) => {
-        if (err) {
-          const msg =
-            stderr?.toString?.() || err.message || "Failed to start service";
-          dispatch(actions.serverStopped());
-          resolve({ ok: false, message: msg });
-          return;
-        }
-        dispatch(actions.serverStarted());
+export const startSystemService = debounce(
+  function startSystemService() {
+    return new Promise((resolve) => {
+      if (process.platform !== "linux") {
         resolve({
-          ok: true,
-          message: stdout?.toString?.() || "Service started",
+          ok: false,
+          message: "Service start supported on Linux only.",
         });
-      },
-    );
-  });
-}
+        return;
+      }
+
+      dispatch(actions.restartingServer());
+
+      const serviceName = "autojoy-backend.service";
+      execFile(
+        "systemctl",
+        ["--user", "start", serviceName],
+        { encoding: "utf8" },
+        (err, stdout, stderr) => {
+          if (err) {
+            const msg =
+              stderr?.toString?.() || err.message || "Failed to start service";
+            dispatch(actions.serverStopped());
+            resolve({ ok: false, message: msg });
+            return;
+          }
+          dispatch(actions.serverStarted());
+          resolve({
+            ok: true,
+            message: stdout?.toString?.() || "Service started",
+          });
+        },
+      );
+    });
+  },
+  1000,
+  { leading: true },
+);
 
 /**
  * Stops the Autojoy systemd user service.
@@ -483,41 +491,48 @@ export function stopSystemService() {
  * Restarts the Autojoy systemd user service.
  * @returns {Promise<{ok: boolean, message: string}>}
  */
-export function restartSystemService() {
-  return new Promise((resolve) => {
-    if (process.platform !== "linux") {
-      resolve({
-        ok: false,
-        message: "Service restart supported on Linux only.",
-      });
-      return;
-    }
 
-    dispatch(actions.restartingServer());
-
-    const serviceName = "autojoy-backend.service";
-    execFile(
-      "systemctl",
-      ["--user", "restart", serviceName],
-      { encoding: "utf8" },
-      (err, stdout, stderr) => {
-        if (err) {
-          const msg =
-            stderr?.toString?.() || err.message || "Failed to restart service";
-          dispatch(actions.serverStopped());
-          resolve({ ok: false, message: msg });
-          return;
-        }
-        dispatch(actions.serverStarted());
-        createSystemServiceConnection();
+export const restartSystemService = debounce(
+  function restartSystemService() {
+    return new Promise((resolve) => {
+      if (process.platform !== "linux") {
         resolve({
-          ok: true,
-          message: stdout?.toString?.() || "Service restarted",
+          ok: false,
+          message: "Service restart supported on Linux only.",
         });
-      },
-    );
-  });
-}
+        return;
+      }
+
+      dispatch(actions.restartingServer());
+
+      const serviceName = "autojoy-backend.service";
+      execFile(
+        "systemctl",
+        ["--user", "restart", serviceName],
+        { encoding: "utf8" },
+        (err, stdout, stderr) => {
+          if (err) {
+            const msg =
+              stderr?.toString?.() ||
+              err.message ||
+              "Failed to restart service";
+            dispatch(actions.serverStopped());
+            resolve({ ok: false, message: msg });
+            return;
+          }
+          dispatch(actions.serverStarted());
+          createSystemServiceConnection();
+          resolve({
+            ok: true,
+            message: stdout?.toString?.() || "Service restarted",
+          });
+        },
+      );
+    });
+  },
+  1000,
+  { leading: true },
+);
 
 export function openServiceLogs(callback) {
   if (process.platform !== "linux") {

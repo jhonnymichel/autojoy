@@ -53,7 +53,7 @@ function handleSDLJoystickListUpdate(joystickList) {
   let newConfig;
   try {
     newConfig = loaders.ini(
-      path.resolve(gameSettingsPath, inputConfigFileName)
+      path.resolve(gameSettingsPath, inputConfigFileName),
     );
   } catch (e) {
     newConfig = {};
@@ -61,7 +61,7 @@ function handleSDLJoystickListUpdate(joystickList) {
 
   // updating device IDs to match what the game uses
   const fixedList = appendNumbersToSDLDeviceIds(
-    convertSDLToGameGUID(joystickList)
+    convertSDLToGameGUID(joystickList),
   );
 
   newConfig[assignedControllersKey] = { FillEmptySlots: 1 };
@@ -74,7 +74,7 @@ function handleSDLJoystickListUpdate(joystickList) {
   fixedList.forEach((selectedDevice, position) => {
     newConfig[selectedDevice.ghwtdeGUID] = structuredClone(
       configTemplates[selectedDevice.type] ??
-        configTemplates[joystickTypes.xinputGuitar] // since we don't want to use gamepads here as the vocal is keyboard...
+        configTemplates[joystickTypes.xinputGuitar], // since we don't want to use gamepads here as the vocal is keyboard...
     );
 
     // we disable regular gamepads to open space for full band (2 guitars + drums).
@@ -98,7 +98,7 @@ function handleSDLJoystickListUpdate(joystickList) {
 
   console.log(
     "GHWTDE - Input settings saved at",
-    path.resolve(gameSettingsPath, inputConfigFileName)
+    path.resolve(gameSettingsPath, inputConfigFileName),
   );
 }
 
@@ -108,11 +108,15 @@ const ghwtde = {
   },
   handleMicrophoneListUpdate(microphoneList) {
     const config = loaders.ini(
-      path.resolve(gameSettingsPath, mainConfigFileName)
+      path.resolve(gameSettingsPath, mainConfigFileName),
     );
 
     // this game only supports one microphone;
     const [firstMicrophone] = microphoneList;
+
+    if (!config.Audio) {
+      config.Audio = {};
+    }
 
     if (firstMicrophone) {
       config.Audio.MicDevice = firstMicrophone.name;
@@ -124,7 +128,7 @@ const ghwtde = {
 
     console.log(
       "GHWTDE - Microphone settings saved at",
-      path.resolve(gameSettingsPath, mainConfigFileName)
+      path.resolve(gameSettingsPath, mainConfigFileName),
     );
   },
 };

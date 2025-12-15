@@ -16,7 +16,10 @@
       </template>
     </MessageBanner>
     <MessageBanner
-      v-else-if="storeState.serverStatus !== 'running'"
+      v-else-if="
+        storeState.serverStatus !== 'running' &&
+        storeState.serverStatus !== 'restarting'
+      "
       level="warning"
     >
       <template #title>Joystick backend service is not running </template>
