@@ -20,7 +20,7 @@ const migrations = [
   {
     name: "SDL breaking changes -- overwriting all settings",
     execute() {
-      resetBindings
+      resetBindings();
     },
   },
 ];
