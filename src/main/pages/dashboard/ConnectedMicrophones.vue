@@ -54,6 +54,7 @@ const props = defineProps({
 function toggleMicrophoneManagement() {
   window.autojoy("dispatchAction", {
     action: "toggleMicrophoneManagement",
+    payload: !props.manageMicrophones,
   });
 }
 
