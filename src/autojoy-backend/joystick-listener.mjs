@@ -8,6 +8,7 @@ let deviceList = [];
 
 export const joystickListener = {
   async listen() {
+    sdl.joystick.on("*", sdlHandler);
     sdlHandler();
   },
   getJoystickList() {
@@ -66,8 +67,4 @@ async function sdlHandler() {
       }
     });
   }
-
-  setTimeout(() => {
-    sdlHandler();
-  }, 1000);
 }
