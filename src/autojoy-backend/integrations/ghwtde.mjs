@@ -30,21 +30,34 @@ const xinputPlayerIdentifiers = [
   "XINPUT_DEVICE_3",
 ];
 
-function convertSDLToGameGUID(arr) {
+/* 
+SDL GUID is 16 bytes: bus, CRC16(name), VID, 0, PID, 0, version, driver_signature, driver_data. 
+GHWTDE expects the prefix 03000000 regardless of CRC/name.
+Forces this prefix by zeroing bytes 1–3, keeping VID/PID/version and the backend bytes intact.
+The last two bytes differ based on SDL backend: HIDAPI/GameController vs evdev, hence _...010000 vs _...7200 forms
+Because I'm not sure it is safe to trust the SDL backend will be consistent at the OS level, we generate both forms and duplicate the config. 
+*/
+function createGameGUIDs(arr) {
   return arr.map((device) => ({
     ...device,
-    ghwtdeGUID:
+    ghwtdeGUIDs: [
       device.raw.guid.substring(0, 2) + "000000" + device.raw.guid.substring(8),
+      device.raw.guid.substring(0, 2) +
+        "000000" +
+        device.raw.guid.substring(8).replace(/0000$/, "7200"),
+    ],
   }));
 }
 
 function appendNumbersToSDLDeviceIds(arr) {
   const counts = {};
   return arr.map((item) => {
-    counts[item.ghwtdeGUID] = (counts[item.ghwtdeGUID] ?? -1) + 1;
     return {
       ...item,
-      ghwtdeGUID: `${item.ghwtdeGUID}_${counts[item.ghwtdeGUID]}`,
+      ghwtdeGUIDs: item.ghwtdeGUIDs.map((guid, index) => {
+        counts[guid] = (counts[guid] ?? -1) + 1;
+        return `${guid}_${counts[guid]}`;
+      }),
     };
   });
 }
@@ -60,9 +73,7 @@ function handleSDLJoystickListUpdate(joystickList) {
   }
 
   // updating device IDs to match what the game uses
-  const fixedList = appendNumbersToSDLDeviceIds(
-    convertSDLToGameGUID(joystickList),
-  );
+  const fixedList = appendNumbersToSDLDeviceIds(createGameGUIDs(joystickList));
 
   newConfig[assignedControllersKey] = { FillEmptySlots: 1 };
 
@@ -72,20 +83,22 @@ function handleSDLJoystickListUpdate(joystickList) {
   // FillEmptySlots so the game fills the positions.
   // Doing it like this because assigning two sdl devices with the same ID is broken.
   fixedList.forEach((selectedDevice, position) => {
-    newConfig[selectedDevice.ghwtdeGUID] = structuredClone(
-      configTemplates[selectedDevice.type] ??
-        configTemplates[joystickTypes.xinputGuitar], // since we don't want to use gamepads here as the vocal is keyboard...
-    );
+    selectedDevice.ghwtdeGUIDs.forEach((ghwtdeGUID) => {
+      newConfig[ghwtdeGUID] = structuredClone(
+        configTemplates[selectedDevice.type] ??
+          configTemplates[joystickTypes.xinputGuitar], // since we don't want to use gamepads here as the vocal is keyboard...
+      );
 
-    // we disable regular gamepads to open space for full band (2 guitars + drums).
-    // player 1 is always the keyboard and it can't be changed, and when a mic is selected,
-    // the keyboard becomes the vocals controller.
-    // FIXME: this doesn't do anything. but I tried lol
-    if (selectedDevice.type === joystickTypes.gamepad) {
-      newConfig[selectedDevice.ghwtdeGUID].Enabled = 0;
-    }
+      // we disable regular gamepads to open space for full band (2 guitars + drums).
+      // player 1 is always the keyboard and it can't be changed, and when a mic is selected,
+      // the keyboard becomes the vocals controller.
+      // FIXME: this doesn't do anything. but I tried lol
+      if (selectedDevice.type === joystickTypes.gamepad) {
+        newConfig[ghwtdeGUID].Enabled = 0;
+      }
 
-    newConfig[selectedDevice.ghwtdeGUID].DeviceName = selectedDevice.name;
+      newConfig[ghwtdeGUID].DeviceName = selectedDevice.name;
+    });
   });
 
   // deactivating all xinput positions to avoid xinput devices to be enabled twice (one as SDL once as Xinput), causing double inputs
