@@ -109,7 +109,12 @@ export const loaders = {
 
 export const savers = {
   yml(obj, filepath) {
-    const serialized = yaml.stringify(obj);
+    // Serialize each top-level key separately to avoid anchors
+    let serialized = "";
+    for (const key in obj) {
+      const yamlSection = yaml.stringify({ [key]: obj[key] });
+      serialized += yamlSection;
+    }
     saveFile(serialized, filepath);
   },
   ini(obj, filepath) {
