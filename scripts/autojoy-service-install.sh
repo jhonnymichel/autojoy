@@ -29,10 +29,15 @@ ensure_node() {
 	curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 	# shellcheck source=/dev/null
 	if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+		set +u
 		. "$NVM_DIR/nvm.sh"
+		nvm install --lts
+		nvm use --lts
+		set -u
+	else
+		echo "nvm.sh not found in $NVM_DIR" >&2
+		exit 1
 	fi
-	nvm install --lts
-	nvm use --lts
 	# Persist environment for systemd service via environment override
 	# Create environment file exporting PATH with nvm-managed node
 	echo "PATH=$PATH" > "$ENV_FILE"
