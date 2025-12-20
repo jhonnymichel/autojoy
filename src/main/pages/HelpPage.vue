@@ -5,8 +5,12 @@
     responding to button presses?
   </h3>
   <p>
-    Most emulators and games need to be restarted after joystick settings are
+    1. Most emulators and games need to be restarted after joystick settings are
     updated.
+  </p>
+  <p>
+    2. If launching games or emulators through steam, Steam Input must be
+    disabled.
   </p>
   <h3>Joystick is not detected by AutoJoy?</h3>
   <div class="actionable-text">
