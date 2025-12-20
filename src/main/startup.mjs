@@ -37,10 +37,7 @@ validateSettings(logFromApp);
   } else {
     logFromApp("Activating server");
     startServer();
-
-    if (serviceNeeded || noPaths) {
-      openDashboardPage();
-    }
+    openDashboardPage();
   }
 
   startTray();
