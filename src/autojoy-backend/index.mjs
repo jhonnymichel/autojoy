@@ -3,6 +3,7 @@ import { user } from "../common/settings.mjs";
 import { joystickListener } from "./joystick-listener.mjs";
 import { microphoneListener } from "./microphone-listener.mjs";
 import { sendEvent } from "./event-broadcaster.mjs";
+import { spawnSync } from "node:child_process";
 
 async function init() {
   console.log("Input server started. Using settings:\n", user.settings);
@@ -11,6 +12,7 @@ async function init() {
   joystickListener.onListChange((joystickList) => {
     console.log("Joystick list changed: ", joystickList);
     sendEvent(JSON.stringify({ type: "joystickList", data: joystickList }));
+    notifySettingsUpdated();
   });
 
   let rpcs3;
@@ -39,6 +41,7 @@ async function init() {
       sendEvent(
         JSON.stringify({ type: "microphoneList", data: microphoneList }),
       );
+      notifySettingsUpdated();
     });
 
     microphoneListener.onListChange((list) => {
@@ -59,3 +62,24 @@ async function init() {
 }
 
 init();
+
+function notifySettingsUpdated() {
+  if (process.platform !== "linux") {
+    return;
+  }
+  try {
+    const hasGetuid = typeof process.getuid === "function";
+    const uid = hasGetuid ? process.getuid() : undefined;
+    const env = { ...process.env };
+    if (uid !== undefined) {
+      env.DBUS_SESSION_BUS_ADDRESS = `unix:path=/run/user/${uid}/bus`;
+      env.XDG_RUNTIME_DIR = `/run/user/${uid}`;
+    }
+    const summary = "Autojoy";
+    const body =
+      "New device connected, restart emulators and games to apply new settings.";
+    spawnSync("notify-send", [summary, body], { encoding: "utf8", env });
+  } catch {
+    void 0;
+  }
+}
