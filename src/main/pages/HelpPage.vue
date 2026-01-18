@@ -8,10 +8,18 @@
     1. Most emulators and games need to be restarted after joystick settings are
     updated.
   </p>
-  <p>
-    2. If launching games or emulators through steam, Steam Input must be
-    disabled.
-  </p>
+  <div class="actionable-text">
+    <p>
+      2. If launching games or emulators through steam, Steam Input must be
+      disabled.
+    </p>
+    <div>
+      <ActionButton @click="showSteamInstructions = !showSteamInstructions">
+        {{ showSteamInstructions ? "Hide Instructions" : "Show Me How" }}
+      </ActionButton>
+    </div>
+  </div>
+  <HowToAccordion :src="disableSteamVideo" :open="showSteamInstructions" />
   <h3>Joystick is not detected by AutoJoy?</h3>
   <div class="actionable-text">
     <p>
@@ -76,9 +84,13 @@ import ActionButton from "./lib/ActionButton.vue";
 import { useRouter } from "vue-router";
 import GithubButton from "./lib/GithubButton.vue";
 import { usePlatform } from "./lib/composables";
+import { ref } from "vue";
+import HowToAccordion from "./lib/HowToAccordion.vue";
+import disableSteamVideo from "./assets/disable-steam-input-instructions.mp4";
 
 const router = useRouter();
 const platform = usePlatform();
+const showSteamInstructions = ref(false);
 
 function openUserFolder() {
   window.autojoy("openUserFolder");
