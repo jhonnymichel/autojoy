@@ -1,4 +1,37 @@
 <template>
+  <MessageBanner
+    v-if="storeState.steamInputNoticeDismissed === false"
+    level="warning"
+  >
+    <template #title>Disable Steam Input</template>
+    <template #content>
+      <p>
+        If you open games through Steam, make sure to disable Steam Input for
+        games you want autojoy to work with.
+      </p>
+      <ActionButton @click="toggleInstructions()">
+        {{ showInstructions ? "Hide Instructions" : "Show Me How" }}
+      </ActionButton>
+      <ActionButton secondary @click="dismissSteamInputNotice()">
+        Got it
+      </ActionButton>
+    </template>
+    <template #footer>
+      <transition name="accordion">
+        <div v-show="showInstructions" class="instructions-panel">
+          <video
+            ref="instructionsVideo"
+            :src="disableSteamVideo"
+            autoplay
+            loop
+            muted
+            playsinline
+            preload="auto"
+          ></video>
+        </div>
+      </transition>
+    </template>
+  </MessageBanner>
   <template v-if="platform === 'linux'">
     <MessageBanner
       v-if="storeState.serverStatus === 'pending-install'"
@@ -78,7 +111,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import ActionButton from "./lib/ActionButton.vue";
 import { usePlatform, useStoreState } from "./lib/composables";
@@ -86,10 +119,13 @@ import MessageBanner from "./lib/MessageBanner.vue";
 import ConnectedJoysticks from "./dashboard/ConnectedJoysticks.vue";
 import ConnectedMicrophones from "./dashboard/ConnectedMicrophones.vue";
 import ActionableText from "./lib/ActionableText.vue";
+import disableSteamVideo from "./assets/disable-steam-input-instructions.mp4";
 
 const storeState = useStoreState();
 const platform = usePlatform();
 const router = useRouter();
+const showInstructions = ref(false);
+const instructionsVideo = ref(null);
 const allPathsEmpty = computed(() => {
   if (!storeState.value.paths) {
     return false;
@@ -107,6 +143,53 @@ async function syncSettings() {
 
   alert("Settings synced successfully.");
 }
+
+function toggleInstructions() {
+  showInstructions.value = !showInstructions.value;
+  const videoEl = instructionsVideo.value;
+  if (!videoEl) return;
+  if (showInstructions.value) {
+    videoEl.play().catch(() => {
+      // ignore autoplay errors
+    });
+  } else {
+    if (typeof videoEl.pause === "function") {
+      videoEl.pause();
+    }
+    videoEl.currentTime = 0;
+  }
+}
+
+function dismissSteamInputNotice() {
+  window.autojoy("dispatchAction", {
+    action: "dismissSteamInputNotice",
+  });
+}
 </script>
 
-<style scoped></style>
+<style scoped>
+.instructions-panel {
+  overflow: hidden;
+}
+
+.instructions-panel video {
+  width: 100%;
+  display: block;
+  border-radius: 8px;
+}
+
+.accordion-enter-active,
+.accordion-leave-active {
+  transition: max-height 0.25s ease;
+}
+.accordion-enter-from,
+.accordion-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+.accordion-enter-to,
+.accordion-leave-from {
+  max-height: 1000px; /* large enough for content */
+  opacity: 1;
+}
+</style>

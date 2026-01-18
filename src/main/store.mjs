@@ -88,6 +88,16 @@ const store = {
         serverStatus: "pending-user-issued-restart",
       };
     },
+    dismissSteamInputNotice() {
+      user.settings = {
+        ...user.settings,
+        steamInputNoticeDismissed: true,
+      };
+
+      return {
+        steamInputNoticeDismissed: true,
+      };
+    },
     toggleMicrophoneUse({ device, position }) {
       const unusedList = store.state.unusedMicrophones;
 
@@ -192,6 +202,7 @@ const store = {
     unusedMicrophones: user.settings.unusedMicrophones ?? [],
     paths: user.paths,
     setupComplete: user.settings.setupComplete ?? false,
+    steamInputNoticeDismissed: user.settings.steamInputNoticeDismissed ?? false,
   },
   get state() {
     return store.__state;

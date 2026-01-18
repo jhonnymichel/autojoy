@@ -7,6 +7,9 @@
     <div class="banner-content">
       <slot name="content"></slot>
     </div>
+    <div class="banner-footer">
+      <slot name="footer"></slot>
+    </div>
   </div>
 </template>
 
