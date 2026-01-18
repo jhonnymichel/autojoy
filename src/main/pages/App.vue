@@ -51,7 +51,9 @@ router.afterEach(toggleTutorial);
 }
 
 .content {
-  flex: 1;
+  max-width: 1200px;
+  margin: auto;
+  width: calc(100% - 40px);
   padding: 20px;
 }
 
