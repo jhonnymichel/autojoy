@@ -17,19 +17,7 @@
       </ActionButton>
     </template>
     <template #footer>
-      <transition name="accordion">
-        <div v-show="showInstructions" class="instructions-panel">
-          <video
-            ref="instructionsVideo"
-            :src="disableSteamVideo"
-            autoplay
-            loop
-            muted
-            playsinline
-            preload="auto"
-          ></video>
-        </div>
-      </transition>
+      <HowToAccordion :src="disableSteamVideo" :open="showInstructions" />
     </template>
   </MessageBanner>
   <template v-if="platform === 'linux'">
@@ -119,13 +107,13 @@ import MessageBanner from "./lib/MessageBanner.vue";
 import ConnectedJoysticks from "./dashboard/ConnectedJoysticks.vue";
 import ConnectedMicrophones from "./dashboard/ConnectedMicrophones.vue";
 import ActionableText from "./lib/ActionableText.vue";
+import HowToAccordion from "./lib/HowToAccordion.vue";
 import disableSteamVideo from "./assets/disable-steam-input-instructions.mp4";
 
 const storeState = useStoreState();
 const platform = usePlatform();
 const router = useRouter();
 const showInstructions = ref(false);
-const instructionsVideo = ref(null);
 const allPathsEmpty = computed(() => {
   if (!storeState.value.paths) {
     return false;
@@ -146,18 +134,6 @@ async function syncSettings() {
 
 function toggleInstructions() {
   showInstructions.value = !showInstructions.value;
-  const videoEl = instructionsVideo.value;
-  if (!videoEl) return;
-  if (showInstructions.value) {
-    videoEl.play().catch(() => {
-      // ignore autoplay errors
-    });
-  } else {
-    if (typeof videoEl.pause === "function") {
-      videoEl.pause();
-    }
-    videoEl.currentTime = 0;
-  }
 }
 
 function dismissSteamInputNotice() {
@@ -168,28 +144,5 @@ function dismissSteamInputNotice() {
 </script>
 
 <style scoped>
-.instructions-panel {
-  overflow: hidden;
-}
-
-.instructions-panel video {
-  width: 100%;
-  display: block;
-  border-radius: 8px;
-}
-
-.accordion-enter-active,
-.accordion-leave-active {
-  transition: max-height 0.25s ease;
-}
-.accordion-enter-from,
-.accordion-leave-to {
-  max-height: 0;
-  opacity: 0;
-}
-.accordion-enter-to,
-.accordion-leave-from {
-  max-height: 1000px; /* large enough for content */
-  opacity: 1;
-}
+/* Accordion styles handled by HowToAccordion component */
 </style>
