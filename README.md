@@ -17,9 +17,11 @@ In some emulatoers, when you attach an USB peripheral such as a Microphone, you 
 
 ## Supported Operational Systems
 
-Currently only supports Windows.
+Windows and Linux (Tested on Bazzite).
 
 ## Supported Emulators Games and Peripherals
+
+### Windows
 
 | **Peripheral**                      | **RPCS3**       | **Dolphin**      | **GHWT:DE**      | **Cemu**         |
 | ----------------------------------- | --------------- | ---------------- | ---------------- | ---------------- |
@@ -38,7 +40,30 @@ Currently only supports Windows.
 \* Rock Band 2 and 3 drums are validated. Rock Band 1 Drums may work but they have not been tested.  
 \*\* Supports Xinput gamepads and the PS5 DualSense.  
 \*\*\* Supports any recording device connected to the computer, including Rock Band/Guitar Hero mics.  
-  - It's possible to filter out connected recording devices that you don't want to use. In the tray menu, uncheck unwanted devices.
+  - It's possible to filter out connected recording devices that you don't want to use. In the tray menu, uncheck unwanted devices.
+
+### Linux
+
+| **Peripheral**                      | **RPCS3**              | **Dolphin**      | **GHWT:DE**      | **Cemu**          |
+| ----------------------------------- | ---------------------- | ---------------- | ---------------- | ----------------- |
+| **Guitars**                         |                        |                  |                  |                   |
+| CRKD Les Paul (PC Mode)             | ✅                     | ✅               | ✅               | ❌                |
+| Xbox 360 RB & GH Guitars            | ✅                     | ✅               | ✅               | ❌                |
+| Santroller Guitars                  | ✅                     | ✅               | ✅               | ❌                |
+| PS3 GH Guitars                      | ✅ via Evdev (No Tilt) | ✅ (No Tilt)     | ❌ †             | ❌                |
+| **Drums**                           |                        |                  |                  |                   |
+| Xbox 360 Rock Band Drums \*         | ✅                     | ✅               | ✅               | ❌                |
+| Wii/PS3 Rock Band Drums \*          | ✅ via Evdev           | ✅               | ❌ †             | ❌                |
+| **Regular Gamepads**\*\*            | ✅                     | ✅               | ❌ Not Supported | ✅ (SDL)          |
+| **Microphones**\*\*\*               | ✅                     | ❌ Not Supported | ✅               | ❌ Not Supported  |
+
+---
+
+\* Rock Band 2 and 3 drums are validated. Rock Band 1 Drums may work but they have not been tested.  
+\*\* Supports any SDL-compatible gamepad.  
+\*\*\* Supports any recording device connected to the computer, including Rock Band/Guitar Hero mics.  
+  - It's possible to filter out connected recording devices that you don't want to use. In the tray menu, uncheck unwanted devices.  
+† GHWT:DE runs via Proton on Linux. PS3 and Wii/PS3 instruments use the evdev kernel interface, which Proton does not reliably pass through to Windows applications. These devices are not detected by GHWT:DE as a result.
 
 ## Caveats
 
@@ -50,6 +75,7 @@ Currently only supports Windows.
 - Guitar Hero Drums are not supported, but Wii drums can work with real wiimotes and that'd be the preferred way to use Guitar Hero Drums.
   - Xbox 360/PS3 Guitar Hero Drums may arrive in the future.
   - Real Wiimote auto config is planned as well.
+- On Linux, both portable installs and Flatpak installs are supported.
 
 ### Guitar Hero World Tour Definitive Edition
 
@@ -58,8 +84,10 @@ Currently only supports Windows.
 
 ### Cemu
 
-Only supports regular gamepads, no instruments. only supports Xinput devices.
-Why: SDL device IDs in Cemu differ from the ones retrieved from node-sdl, making it hard to support non-xinput devices.
+Only supports regular gamepads, no instruments.
+
+- **Windows**: Only supports Xinput devices. SDL device IDs in Cemu differ from the ones retrieved from node-sdl, making it hard to support non-xinput devices.
+- **Linux**: Supports any SDL-compatible gamepad.
 
 ## How to get the app
 
