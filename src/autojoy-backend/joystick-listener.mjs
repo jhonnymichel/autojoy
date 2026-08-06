@@ -5,6 +5,7 @@ import hid from "node-hid";
 
 const subscribers = [];
 let deviceList = [];
+let hasSyncedOnStartup = false;
 
 export const joystickListener = {
   async listen() {
@@ -49,15 +50,21 @@ async function sdlHandler() {
     return { ...createJoystick(device), hidInfo };
   });
 
-  if (
+  const hasChanged =
     newDeviceList.some(
       (value, position) =>
         value?.type !== deviceList[position]?.type ||
         value?.raw.id !== deviceList[position]?.raw.id ||
         value?.raw._index !== deviceList[position]?.raw._index,
-    ) ||
-    newDeviceList.length !== deviceList.length
-  ) {
+    ) || newDeviceList.length !== deviceList.length;
+
+  // always notify once on startup, even if the list is unchanged from the
+  // (empty) initial state. integrations re-derive their emulator configs
+  // from current settings on every notification, and settings changes are
+  // applied by restarting this process.
+  // TODO: fix this mess.
+  if (hasChanged || !hasSyncedOnStartup) {
+    hasSyncedOnStartup = true;
     deviceList = newDeviceList;
     subscribers.forEach((notify) => {
       try {
