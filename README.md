@@ -3,6 +3,10 @@
 Detects connected joystick and accessories and can automatically update emulators, games and other apps settings based on them.
 When joysticks are different from eachother (a guitar and a drum joystick, for example) and connection order matters, this becomes useful.
 
+
+<img width="984" height="837" alt="image" src="https://github.com/user-attachments/assets/785dcdf5-0e4a-463a-8199-c14325451b2a" />
+<img width="984" height="837" alt="image" src="https://github.com/user-attachments/assets/0e50dc27-e045-4f5a-8727-84d7f45b66ca" />
+
 ## Use Case
 
 If you play a game that uses a different type of joystick in an emulator (like rock band), you would:
