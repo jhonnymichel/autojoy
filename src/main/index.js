@@ -1,24 +1,15 @@
-import { app } from "electron";
-import { validateSettings } from "../common/settings.mjs";
-import store from "./store.mjs";
-import { createPathsWindow } from "./window.mjs";
-import { startServer } from "./joystick-server.mjs";
-import { startTray } from "./tray.mjs";
-import { logFromApp, resetLogFile } from "../common/logger.mjs";
+import { app, dialog } from "electron";
 
-resetLogFile();
-validateSettings(logFromApp);
+const gotTheLock = app.requestSingleInstanceLock();
 
-app.on("ready", () => {
-  if (Object.values(store.state.paths).every((path) => !path)) {
-    createPathsWindow();
+app.on("ready", async () => {
+  if (!gotTheLock) {
+    dialog.showErrorBox(
+      "Autojoy is already running!",
+      "Another instance of Autojoy is already running. Close other instances before opening the app.",
+    );
+    app.quit();
+  } else {
+    import("./startup.mjs");
   }
-
-  logFromApp("App started, activating server");
-  startServer();
-  startTray();
-});
-
-app.on("window-all-closed", (event) => {
-  event.preventDefault();
 });

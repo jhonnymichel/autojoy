@@ -1,83 +1,363 @@
 import path from "path";
-import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
 import store from "./store.mjs";
 import rootdir from "../common/rootdir.mjs";
-import { user } from "../common/settings.mjs";
+import {
+  getSystemServiceStatus,
+  installSystemService,
+  openServiceLogs,
+  restartSystemService,
+  stopSystemService,
+  uninstallSystemService,
+} from "./joystick-server.mjs";
+import { logFromApp } from "../common/logger.mjs";
+import { userFolderPath } from "../common/settings.mjs";
+import fs from "fs";
+import os from "os";
 
 const { dispatch, actions } = store;
-let aboutWindow = null;
+let logsWindow = null;
+let serviceLogsChild = null;
 
-export function createAboutWindow() {
-  if (!aboutWindow) {
-    aboutWindow = new BrowserWindow({
+const isDev = !app.isPackaged;
+const DEV_URL = "http://localhost:5173/index.html";
+const pagesDist = path.resolve(rootdir, "src/main/pages/dist");
+
+function loadPage(window, page = "") {
+  if (isDev) {
+    window.loadURL(`${DEV_URL}#${page}`);
+  } else {
+    window.loadFile(path.join(pagesDist, "index.html"), { hash: page });
+  }
+}
+
+let mainWindow;
+
+function createMainWindow() {
+  if (mainWindow) {
+    return;
+  }
+
+  mainWindow = new BrowserWindow({
+    autoHideMenuBar: true,
+    resizable: true,
+    icon: path.resolve(rootdir, "assets/tray.png"),
+    show: false, // Don't show the window immediately,
+    title: "Autojoy",
+    webPreferences: {
+      preload: path.resolve(rootdir, "src/main/pages/preload.cjs"),
+      contextIsolation: true,
+      nodeIntegrationInWorker: true,
+    },
+  });
+
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
+}
+
+export function createLogsWindow() {
+  if (!logsWindow) {
+    logsWindow = new BrowserWindow({
       autoHideMenuBar: true,
-      resizable: false,
+      resizable: true,
+      width: 900,
+      height: 600,
       icon: path.resolve(rootdir, "assets/tray.png"),
-      show: false, // Don't show the window immediately
+      show: false,
       webPreferences: {
         preload: path.resolve(rootdir, "src/main/pages/preload.cjs"),
         contextIsolation: true,
-        nodeIntegrationInWorker: true,
       },
     });
 
-    aboutWindow.loadFile(path.resolve(rootdir, "src/main/pages/about.html"));
+    logsWindow.loadFile(path.resolve(rootdir, "src/main/pages/live-logs.html"));
 
-    // Dereference the window object when it's closed
-    aboutWindow.on("closed", () => {
-      aboutWindow = null;
+    logsWindow.on("closed", () => {
+      // Ensure we stop streaming logs when window closes
+      try {
+        serviceLogsChild?.kill?.();
+      } catch {}
+      serviceLogsChild = null;
+      logsWindow = null;
     });
   }
 
-  // Show the window
-  aboutWindow.show();
+  logsWindow.show();
 }
 
-ipcMain.handle("getAppVersion", () => {
+export function openPathsPage() {
+  createMainWindow();
+
+  loadPage(mainWindow, "paths");
+  mainWindow.show();
+}
+
+export function openServicePage() {
+  createMainWindow();
+
+  loadPage(mainWindow, "service");
+  mainWindow.show();
+}
+
+export function openSetupPage(hash = "") {
+  createMainWindow();
+
+  loadPage(mainWindow, `start-setup${hash ? `#${hash}` : ""}`);
+  mainWindow.show();
+}
+
+export function openDashboardPage() {
+  createMainWindow();
+
+  loadPage(mainWindow);
+  mainWindow.show();
+}
+
+function exposeCommand(name, handler) {
+  ipcMain.handle(name, handler);
+}
+
+function subscribeToStore() {
+  store.subscribe(() => {
+    mainWindow?.webContents.send("storeUpdate", structuredClone(store.state));
+  });
+}
+
+subscribeToStore();
+
+exposeCommand("getAppVersion", () => {
   return app.getVersion();
 });
 
-ipcMain.handle("getUser", () => {
-  return structuredClone(user);
+exposeCommand("getStoreState", () => {
+  return structuredClone(store.state);
 });
 
-ipcMain.handle("setPaths", (event, paths) => {
-  dispatch(actions.setPaths(paths));
+exposeCommand("dispatchAction", (event, { action, payload }) => {
+  dispatch(actions[action](payload));
 });
 
-ipcMain.handle("openFolderDialog", async (event, paths) => {
+exposeCommand("openFolderDialog", async () => {
   const result = await dialog.showOpenDialog({
-    properties: ["openDirectory"], // Allow selecting folders
+    properties: ["openDirectory"],
   });
-
   return result.canceled ? null : result.filePaths[0];
 });
 
-let pathsWindow;
-export function createPathsWindow() {
-  if (!pathsWindow) {
-    pathsWindow = new BrowserWindow({
-      autoHideMenuBar: true,
-      resizable: false,
-      icon: path.resolve(rootdir, "assets/tray.png"),
-      show: false, // Don't show the window immediately
-      webPreferences: {
-        preload: path.resolve(rootdir, "src/main/pages/preload.cjs"),
-        contextIsolation: true,
-        nodeIntegrationInWorker: true,
-      },
-    });
+exposeCommand("installAutojoyService", async () => {
+  return installSystemService();
+});
 
-    pathsWindow.loadFile(path.resolve(rootdir, "src/main/pages/paths.html"));
+exposeCommand("restartAutojoyService", async () => {
+  return restartSystemService();
+});
 
-    // Dereference the window object when it's closed
-    pathsWindow.on("closed", () => {
-      pathsWindow = null;
-    });
+exposeCommand("stopAutojoyService", async () => {
+  return stopSystemService();
+});
+
+exposeCommand("openServiceLogs", async () => {
+  createLogsWindow();
+  // Avoid spawning multiple journalctl processes
+  if (serviceLogsChild) {
+    return true;
   }
+  serviceLogsChild = openServiceLogs((line) => {
+    try {
+      logsWindow?.webContents.send("serviceLog", line);
+    } catch (e) {
+      logFromApp("Error sending web contents to logs window", e.message);
+    }
+  });
+  return !!serviceLogsChild;
+});
 
-  // Show the window
-  pathsWindow.show();
-}
+exposeCommand(
+  "uninstallAutojoyService",
+  (event, { removeNode } = { removeNode: false }) => {
+    return uninstallSystemService(removeNode);
+  },
+);
 
-// <a href="https://www.flaticon.com/free-icons/joystick" title="joystick icons">Joystick icons created by Freepik - Flaticon (https://www.flaticon.com/free-icons/joystick)>
+exposeCommand("getSystemServiceStatus", () => {
+  return getSystemServiceStatus();
+});
+
+exposeCommand("getPlatform", () => {
+  return process.platform;
+});
+
+exposeCommand("openUserFolder", () => {
+  shell.openPath(userFolderPath);
+});
+
+exposeCommand("openExternalLink", (event, url) => {
+  shell.openExternal(url);
+});
+
+// Resolve default emulator/config paths per platform, preserving provided values.
+
+exposeCommand("autoDetectPaths", (event, currentPaths) => {
+  const platform = process.platform;
+  const homePath = os.homedir();
+
+  const result = { ...currentPaths };
+
+  console.log("Auto detecting paths. Current paths:", result);
+
+  const candidates = {
+    win32: {
+      rpcs3: [
+        path.join(process.env.APPDATA || "", "emudeck", "Emulators", "rpcs3"),
+        path.join(process.env.LOCALAPPDATA || "", "rpcs3"),
+      ],
+      cemu: [
+        path.join(process.env.APPDATA || "", "emudeck", "Emulators", "cemu"),
+        path.join(process.env.PROGRAMFILES || "C:/Program Files", "Cemu"),
+      ],
+      dolphin: [
+        path.join(
+          process.env.APPDATA || "",
+          "emudeck",
+          "Emulators",
+          "Dolphin-x64",
+        ),
+
+        path.join(
+          process.env.USERPROFILE || "",
+          "Documents",
+          "Dolphin Emulator",
+        ),
+      ],
+      ghwtde: [
+        path.join(
+          process.env.USERPROFILE || "",
+          "Documents",
+          "My Games",
+          "Guitar Hero World Tour Definitive Edition",
+        ),
+      ],
+    },
+    linux: {
+      rpcs3: [path.join(homePath, ".config", "rpcs3")],
+      cemu: [path.join(homePath, ".config", "Cemu")],
+      dolphin: [
+        path.join(homePath, ".var", "app", "org.DolphinEmu.dolphin-emu"),
+      ],
+      ghwtde: [
+        path.join(
+          homePath,
+          "Games",
+          "umu",
+          "umu-default",
+          "drive_c",
+          "users",
+          path.basename(homePath),
+          "My Documents",
+          "My Games",
+          "Guitar Hero World Tour Definitive Edition",
+        ),
+        path.join(
+          homePath,
+          "Games",
+          "Heroic",
+          "Prefixes",
+          "Guitar Hero World Tour DE",
+          "drive_c",
+          "users",
+          path.basename(homePath),
+          "My Documents",
+          "My Games",
+          "Guitar Hero World Tour Definitive Edition",
+        ),
+        path.join(
+          homePath,
+          "Games",
+          "Heroic",
+          "Prefixes",
+          "Guitar Hero World Tour",
+          "drive_c",
+          "users",
+          path.basename(homePath),
+          "My Documents",
+          "My Games",
+          "Guitar Hero World Tour Definitive Edition",
+        ),
+        path.join(
+          homePath,
+          "Games",
+          "Heroic",
+          "Prefixes",
+          "Guitar Hero World Tour Definitive Edition",
+          "drive_c",
+          "users",
+          path.basename(homePath),
+          "My Documents",
+          "My Games",
+          "Guitar Hero World Tour Definitive Edition",
+        ),
+        path.join(
+          homePath,
+          "Games",
+          "Heroic",
+          "Prefixes",
+          "GHWT",
+          "drive_c",
+          "users",
+          path.basename(homePath),
+          "My Documents",
+          "My Games",
+          "Guitar Hero World Tour Definitive Edition",
+        ),
+        path.join(
+          homePath,
+          "Games",
+          "Heroic",
+          "Prefixes",
+          "GHWTDE",
+          "drive_c",
+          "users",
+          path.basename(homePath),
+          "My Documents",
+          "My Games",
+          "Guitar Hero World Tour Definitive Edition",
+        ),
+      ],
+    },
+  };
+
+  const setIfEmpty = (key, paths) => {
+    if (result[key]) {
+      return false;
+    }
+    for (const p of paths) {
+      if (!p) continue;
+      try {
+        if (fs.existsSync(p)) {
+          result[key] = p;
+          return true;
+        }
+      } catch {
+        logFromApp("Error checking path existence", p);
+      }
+    }
+    return false;
+  };
+
+  console.log("Auto detecting paths. Current paths:", result);
+
+  const table = candidates[platform] || candidates.linux;
+  let found = false;
+  found = setIfEmpty("rpcs3", table.rpcs3) || found;
+  found = setIfEmpty("cemu", table.cemu) || found;
+  found = setIfEmpty("dolphin", table.dolphin) || found;
+  found = setIfEmpty("ghwtde", table.ghwtde) || found;
+
+  return {
+    success:
+      found ||
+      !!(result.rpcs3 || result.cemu || result.dolphin || result.ghwtde),
+    paths: result,
+  };
+});

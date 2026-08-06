@@ -7,3 +7,5 @@ logs.*
 dist/
 # Node.js native addon builds
 build/
+dev-app-data/
+*/**/petite-vue.iife.js

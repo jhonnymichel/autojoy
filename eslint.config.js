@@ -1,9 +1,21 @@
 import globals from "globals";
-import pluginJs from "@eslint/js";
-
+import { globalIgnores } from "eslint/config";
+import eslintjs from "@eslint/js";
+import tseslint from "typescript-eslint";
+import pluginVue from "eslint-plugin-vue";
+import prettierConfig from "@vue/eslint-config-prettier";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  {languageOptions: { globals: {...globals.browser, ...globals.node} }},
-  pluginJs.configs.recommended,
+  { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
+  eslintjs.configs.recommended,
+  ...tseslint.configs.recommended,
+  ...pluginVue.configs["flat/recommended"],
+  prettierConfig,
+  {
+    rules: {
+      "prettier/prettier": ["warn", { endOfLine: "auto" }],
+    },
+  },
+  globalIgnores(["**/dist/**", "**/node_modules/**"]),
 ];

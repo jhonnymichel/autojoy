@@ -12,6 +12,9 @@ export const microphoneListener = {
   onListChange(notify) {
     subscribers.push(notify);
   },
+  getMicrophoneList() {
+    return structuredClone(deviceList);
+  },
 };
 
 async function sdlMicrophoneHandler(sdl) {
@@ -25,7 +28,7 @@ async function sdlMicrophoneHandler(sdl) {
 
   if (
     newDeviceList.some(
-      (value, position) => value?.name !== deviceList[position]?.name
+      (value, position) => value?.name !== deviceList[position]?.name,
     ) ||
     newDeviceList.length !== deviceList.length
   ) {

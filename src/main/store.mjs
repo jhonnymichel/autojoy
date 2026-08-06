@@ -1,3 +1,4 @@
+import { logFromApp } from "../common/logger.mjs";
 import { user } from "../common/settings.mjs";
 import { getSystemSettings, updateSystemSettings } from "./system.mjs";
 
@@ -10,7 +11,7 @@ const store = {
     if (changes) {
       Object.defineProperties(
         store.__state,
-        Object.getOwnPropertyDescriptors(changes)
+        Object.getOwnPropertyDescriptors(changes),
       );
     }
 
@@ -66,6 +67,11 @@ const store = {
         serverStatus: "stopped-manually",
       };
     },
+    serverNotInstalled() {
+      return {
+        serverStatus: "pending-install",
+      };
+    },
     toggleOpenAtLogin(openAtLogin = false) {
       updateSystemSettings({
         openAtLogin,
@@ -82,15 +88,30 @@ const store = {
         serverStatus: "pending-user-issued-restart",
       };
     },
-    toggleMicrophoneUse(device) {
+    dismissSteamInputNotice() {
+      user.settings = {
+        ...user.settings,
+        steamInputNoticeDismissed: true,
+      };
+
+      return {
+        steamInputNoticeDismissed: true,
+      };
+    },
+    toggleMicrophoneUse({ device, position }) {
       const unusedList = store.state.unusedMicrophones;
 
       const microphoneList = store.state.microphoneList;
       const connectedMicsWithCurrentDeviceName = microphoneList.filter(
-        (d) => d.name === device.name
+        (d) => d.name === device.name,
       );
+
+      const deviceInStore = microphoneList.find(
+        (d, p) => d.name === device.name && p === position,
+      );
+
       const positionOfCurrentDevice =
-        connectedMicsWithCurrentDeviceName.indexOf(device);
+        connectedMicsWithCurrentDeviceName.indexOf(deviceInStore);
 
       const unusedListEntry = {
         name: device.name,
@@ -100,12 +121,12 @@ const store = {
       const newUnusedList = unusedList.find(
         (entry) =>
           entry.name === unusedListEntry.name &&
-          entry.position === unusedListEntry.position
+          entry.position === unusedListEntry.position,
       )
         ? unusedList.filter(
             (entry) =>
               entry.name !== unusedListEntry.name ||
-              entry.position !== unusedListEntry.position
+              entry.position !== unusedListEntry.position,
           )
         : [...unusedList, unusedListEntry];
 
@@ -121,22 +142,54 @@ const store = {
     },
     setPaths(paths) {
       const validPaths = Object.values(paths).every(
-        (value) => typeof value === "string"
+        (value) => typeof value === "string",
       );
       if (validPaths) {
         user.paths = paths;
+      } else {
+        logFromApp(
+          "Invalid paths provided, not saving.",
+          JSON.stringify(paths, null, 2),
+        );
       }
 
       return {
         paths: user.paths,
-        serverStatus: validPaths
-          ? "pending-user-issued-restart"
-          : store.state.serverStatus,
+        serverStatus:
+          validPaths && store.state.serverStatus !== "pending-install"
+            ? "pending-user-issued-restart"
+            : store.state.serverStatus,
+      };
+    },
+    completeSetup() {
+      user.settings = {
+        ...user.settings,
+        setupComplete: true,
+      };
+
+      return {
+        serverStatus: "pending-user-issued-restart",
+        setupComplete: true,
+      };
+    },
+    manualSync() {
+      return {
+        serverStatus: "pending-user-issued-restart",
+      };
+    },
+    resetSetup() {
+      user.settings = {
+        ...user.settings,
+        setupComplete: false,
+      };
+
+      return {
+        setupComplete: false,
       };
     },
   },
   __state: {
-    serverStatus: "starting", // starting, restarting, running, stopped-manually, crashed, pending-user-issued-restart, pending-issued-restart
+    serverStatus: "starting", // pending-install, starting, restarting, running, stopped-manually, crashed, pending-user-issued-restart, pending-issued-restart
     get openAtLogin() {
       const settings = getSystemSettings();
 
@@ -148,6 +201,8 @@ const store = {
     microphoneList: [],
     unusedMicrophones: user.settings.unusedMicrophones ?? [],
     paths: user.paths,
+    setupComplete: user.settings.setupComplete ?? false,
+    steamInputNoticeDismissed: user.settings.steamInputNoticeDismissed ?? false,
   },
   get state() {
     return store.__state;

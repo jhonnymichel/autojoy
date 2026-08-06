@@ -2,12 +2,15 @@ import { getMicrophonesInUse } from "../common/device-filters.mjs";
 import { user } from "../common/settings.mjs";
 import { joystickListener } from "./joystick-listener.mjs";
 import { microphoneListener } from "./microphone-listener.mjs";
+import { sendEvent } from "./event-broadcaster.mjs";
 
 async function init() {
   console.log("Input server started. Using settings:\n", user.settings);
+  console.log("Backend mode:", process.env.AUTOJOY_BACKEND_MODE);
+  console.log("Env mode:", process.env.AUTOJOY_ENV);
   joystickListener.onListChange((joystickList) => {
     console.log("Joystick list changed: ", joystickList);
-    process.send(JSON.stringify({ type: "joystickList", data: joystickList }));
+    sendEvent(JSON.stringify({ type: "joystickList", data: joystickList }));
   });
 
   let rpcs3;
@@ -33,21 +36,21 @@ async function init() {
   if (user.settings.manageMicrophones === true) {
     microphoneListener.onListChange((microphoneList) => {
       console.log("Microphone list changed: ", microphoneList);
-      process.send(
-        JSON.stringify({ type: "microphoneList", data: microphoneList })
+      sendEvent(
+        JSON.stringify({ type: "microphoneList", data: microphoneList }),
       );
     });
 
     microphoneListener.onListChange((list) => {
       if (user.paths.rpcs3) {
         rpcs3.handleMicrophoneListUpdate(
-          getMicrophonesInUse(list, user.settings.unusedMicrophones ?? [])
+          getMicrophonesInUse(list, user.settings.unusedMicrophones ?? []),
         );
       }
 
       if (user.paths.ghwtde) {
         ghwtde.handleMicrophoneListUpdate(
-          getMicrophonesInUse(list, user.settings.unusedMicrophones ?? [])
+          getMicrophonesInUse(list, user.settings.unusedMicrophones ?? []),
         );
       }
     });

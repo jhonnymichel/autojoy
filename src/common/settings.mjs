@@ -1,15 +1,26 @@
 import { logFromApp } from "./logger.mjs";
+import path from "path";
 import {
+  copyDir,
+  deleteDirectory,
   loaders,
   resolvePathFromPackagedRoot,
   resolvePathFromUserFolder,
   savers,
 } from "./file.mjs";
-import migrations from "../migrations.mjs";
 
 export const userFolderPath = resolvePathFromUserFolder(".");
-export const templatesFolderPath =
-  resolvePathFromUserFolder("config-templates");
+
+const packagedRootConfigTemplatesPath = path.join(
+  "config-templates",
+  process.platform === "win32" ? "win32" : "linux",
+);
+
+const isDev = process.env.AUTOJOY_ENV === "dev";
+if (isDev) {
+  console.log("Resetting bindings because we are in dev mode");
+  resetBindings()
+}
 
 // must validate and migrate paths before allowing user object to be used.
 migrateUserSettings();
@@ -32,7 +43,7 @@ export const user = {
 function amendNewDefaults({ filePath, templatePath, loader, saver }) {
   const userFile = loader(filePath);
   const appBaseFile = loader(
-    resolvePathFromPackagedRoot(templatePath ?? filePath)
+    resolvePathFromPackagedRoot(templatePath ?? filePath),
   );
 
   let itemsToAmend = [];
@@ -46,7 +57,7 @@ function amendNewDefaults({ filePath, templatePath, loader, saver }) {
   if (itemsToAmend.length) {
     logFromApp(
       `Amending new defaults (${itemsToAmend.join(", ")}) for:`,
-      filePath
+      filePath,
     );
     saver(userFile, filePath);
   }
@@ -60,7 +71,7 @@ function migrateUserFile({ filePath, templatePath, loader, saver }) {
     logFromApp("Creating not found user file: ", filePath);
     saver(
       loader(resolvePathFromPackagedRoot(templatePath ?? filePath)),
-      filePath
+      filePath,
     );
   }
 }
@@ -89,57 +100,94 @@ function migrateUserSettings() {
   });
   migrateUserFile({
     filePath: "config-templates/rpcs3.yml",
+    templatePath: path.join(packagedRootConfigTemplatesPath, "rpcs3.yml"),
     loader: loaders.yml,
     saver: savers.yml,
   });
   migrateUserFile({
     filePath: "config-templates/cemu.xml",
+    templatePath: path.join(packagedRootConfigTemplatesPath, "cemu.xml"),
     loader: loaders.xml,
     saver: savers.xml,
   });
   migrateUserFile({
     filePath: "config-templates/dolphin-gc.ini",
+    templatePath: path.join(packagedRootConfigTemplatesPath, "dolphin-gc.ini"),
     loader: loaders.ini,
     saver: savers.ini,
   });
   migrateUserFile({
     filePath: "config-templates/dolphin-wiimote-emulated.ini",
+    templatePath: path.join(
+      packagedRootConfigTemplatesPath,
+      "dolphin-wiimote-emulated.ini",
+    ),
     loader: loaders.ini,
     saver: savers.ini,
   });
   migrateUserFile({
     filePath: "config-templates/dolphin-wiimote-real.ini",
+    templatePath: path.join(
+      packagedRootConfigTemplatesPath,
+      "dolphin-wiimote-real.ini",
+    ),
     loader: loaders.ini,
     saver: savers.ini,
   });
   migrateUserFile({
     filePath: "config-templates/ghwtde.ini",
+    templatePath: path.join(packagedRootConfigTemplatesPath, "ghwtde.ini"),
     loader: loaders.ini,
     saver: savers.ini,
   });
 
-  const migrationsRan = loaders.json("user/migrations.json");
-  migrations.forEach((migration) => {
-    if (!migrationsRan[migration.name]) {
-      try {
-        migration.execute();
-        logFromApp(`Migration "${migration.name}" applied!`);
-        migrationsRan[migration.name] = new Date().toLocaleDateString();
-      } catch (e) {
-        logFromApp(`Migration "${migration.name}" failed: `, e.message);
+  try {
+    const migrations = require("../migrations.mjs").default;
+    const migrationsRan = loaders.json("user/migrations.json");
+    migrations.forEach((migration) => {
+      if (!migrationsRan[migration.name]) {
+        try {
+          migration.execute();
+          logFromApp(`Migration "${migration.name}" applied!`);
+          migrationsRan[migration.name] = new Date().toLocaleDateString();
+        } catch (e) {
+          logFromApp(`Migration "${migration.name}" failed: `, e.message);
+        }
       }
-    }
-  });
-  savers.json(migrationsRan, "user/migrations.json");
+    });
+    savers.json(migrationsRan, "user/migrations.json");
+  } catch (e) {
+    console.log("No migrations to run.");
+  }
+}
+
+export function resetBindings() {
+  deleteDirectory(path.resolve(userFolderPath, "config-templates"));
+  copyDir(
+    resolvePathFromPackagedRoot(packagedRootConfigTemplatesPath),
+    path.resolve(userFolderPath, "config-templates"),
+  );
 }
 
 export function validateSettings(log = (...msg) => console.log(...msg)) {
   const userSettings = user.settings;
 
+  if (userSettings.hasOwnProperty("setupComplete")) {
+    if (typeof userSettings.setupComplete !== "boolean") {
+      log(
+        `user settings.setupComplete invalid value. Should be true of false. found '${userSettings.setupComplete}'. Resetting it.`,
+      );
+      user.settings = {
+        ...user.settings,
+        setupComplete: false,
+      };
+    }
+  }
+
   if (userSettings.unusedMicrophones) {
     if (!Array.isArray(userSettings.unusedMicrophones)) {
       log(
-        `user settings.unusedMicrophones invalid value. Should be an array. found '${typeof userSettings.unusedMicrophones}'. Resetting it.`
+        `user settings.unusedMicrophones invalid value. Should be an array. found '${typeof userSettings.unusedMicrophones}'. Resetting it.`,
       );
 
       user.settings = {
@@ -149,11 +197,11 @@ export function validateSettings(log = (...msg) => console.log(...msg)) {
     } else if (
       userSettings.unusedMicrophones.some(
         (entry) =>
-          !entry.hasOwnProperty("name") || !entry.hasOwnProperty("position")
+          !entry.hasOwnProperty("name") || !entry.hasOwnProperty("position"),
       )
     ) {
       log(
-        "Invalid user settings.unusedMicrophones entries found. Resetting it."
+        "Invalid user settings.unusedMicrophones entries found. Resetting it.",
       );
 
       user.settings = {
@@ -165,7 +213,7 @@ export function validateSettings(log = (...msg) => console.log(...msg)) {
     if (userSettings.hasOwnProperty("manageMicrophones")) {
       if (typeof userSettings.manageMicrophones !== "boolean") {
         log(
-          `user settings.manageMicrophones invalid value. Should true of false. found '${userSettings.manageMicrophones}'. Resetting it.`
+          `user settings.manageMicrophones invalid value. Should true of false. found '${userSettings.manageMicrophones}'. Resetting it.`,
         );
         user.settings = {
           ...user.settings,

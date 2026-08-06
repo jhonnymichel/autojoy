@@ -1,18 +1,28 @@
 import { app, Menu, nativeImage, shell, Tray } from "electron";
 import path from "path";
 import store from "./store.mjs";
-import { createAboutWindow, createPathsWindow } from "./window.mjs";
+import { openDashboardPage, openSetupPage } from "./window.mjs";
 import rootdir from "../common/rootdir.mjs";
-import { userFolderPath } from "../common/settings.mjs";
+import { user, userFolderPath } from "../common/settings.mjs";
 import { isMicrophoneInUse } from "../common/device-filters.mjs";
 
 const { actions, dispatch } = store;
 
 export function startTray() {
   const icon = nativeImage.createFromPath(
-    path.resolve(rootdir, "assets/tray.png")
+    path.resolve(rootdir, "assets/tray.png"),
   );
   const tray = new Tray(icon);
+
+  const openApp = () => {
+    if (user.settings.setupComplete) {
+      openDashboardPage();
+    } else {
+      openSetupPage();
+    }
+  };
+
+  tray.on("click", openApp);
 
   tray.setTitle("Autojoy");
   tray.setToolTip("Autojoy");
@@ -20,21 +30,19 @@ export function startTray() {
   const setTrayMenu = () => {
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: `Autojoy controller service is ${store.state.serverStatus}`,
+        label: `Joystick backend is ${store.state.serverStatus.replace("-", " ")}`,
         type: "normal",
         enabled: false,
       },
       { type: "separator" },
       {
-        label: `Config paths`,
+        label: `Open Dashboard`,
         type: "normal",
-        click: () => {
-          createPathsWindow();
-        },
+        click: openApp,
       },
       { type: "separator" },
       {
-        label: `Open settings folder`,
+        label: `Open user folder`,
         type: "normal",
         click: () => {
           shell.openPath(userFolderPath);
@@ -60,7 +68,7 @@ export function startTray() {
         checked: store.state.manageMicrophones === true,
         click: () => {
           dispatch(
-            actions.toggleMicrophoneManagement(!store.state.manageMicrophones)
+            actions.toggleMicrophoneManagement(!store.state.manageMicrophones),
           );
         },
       },
@@ -69,11 +77,14 @@ export function startTray() {
             type: "checkbox",
             checked: isMicrophoneInUse(
               d,
+              index,
               store.state.microphoneList,
-              store.state.unusedMicrophones
+              store.state.unusedMicrophones,
             ),
             click: () => {
-              dispatch(actions.toggleMicrophoneUse(d));
+              dispatch(
+                actions.toggleMicrophoneUse({ device: d, position: index }),
+              );
             },
             label: `${d.name}`,
           }))
@@ -87,21 +98,18 @@ export function startTray() {
       {
         type: "separator",
       },
-      {
-        type: "checkbox",
-        label: "Open at startup",
-        checked: store.state.openAtLogin,
-        click: () => {
-          dispatch(actions.toggleOpenAtLogin(!store.state.openAtLogin));
-        },
-      },
-      {
-        type: "normal",
-        label: "About",
-        click: () => {
-          createAboutWindow();
-        },
-      },
+      ...(process.platform === "win32"
+        ? [
+            {
+              type: "checkbox",
+              label: "Open at startup",
+              checked: store.state.openAtLogin,
+              click: () => {
+                dispatch(actions.toggleOpenAtLogin(!store.state.openAtLogin));
+              },
+            },
+          ]
+        : []),
       {
         type: "normal",
         label: "Exit",
@@ -117,7 +125,7 @@ export function startTray() {
       // idiotic hack to update Open at startup value before opening tray.
       e.preventDefault();
       contextMenu.items.find(
-        (item) => item.label === "Open at startup"
+        (item) => item.label === "Open at startup",
       ).checked = store.state.openAtLogin;
       contextMenu.removeAllListeners("menu-will-show");
       setTimeout(() => {
