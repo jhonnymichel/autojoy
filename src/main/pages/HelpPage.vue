@@ -78,6 +78,20 @@
       <ActionButton @click="openUserFolder()">Open User Folder</ActionButton>
     </div>
   </div>
+  <template v-if="platform === 'linux'">
+    <h3>Uninstalling</h3>
+    <div class="actionable-text">
+      <p>
+        Before deleting the AppImage, uninstall the joystick backend service
+        from the Service page, then delete the AppImage file.
+      </p>
+      <div>
+        <ActionButton @click="router.push('/service')"
+          >Manage Service</ActionButton
+        >
+      </div>
+    </div>
+  </template>
 </template>
 <script setup>
 import ActionButton from "./lib/ActionButton.vue";

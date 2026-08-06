@@ -92,3 +92,7 @@ Only supports regular gamepads, no instruments.
 ## How to get the app
 
 Download from the [releases](https://github.com/jhonnymichel/autojoy/releases) page!
+
+## Uninstalling (Linux)
+
+Before deleting the AppImage, open the app, go to the Service page and click **Uninstall Service**. Then delete the AppImage file.
