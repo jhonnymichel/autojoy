@@ -98,6 +98,17 @@ const store = {
         steamInputNoticeDismissed: true,
       };
     },
+    setDolphinWiimoteMode(mode) {
+      user.settings = {
+        ...user.settings,
+        dolphinWiimoteMode: mode,
+      };
+
+      return {
+        dolphinWiimoteMode: mode,
+        serverStatus: "pending-user-issued-restart",
+      };
+    },
     toggleMicrophoneUse({ device, position }) {
       const unusedList = store.state.unusedMicrophones;
 
@@ -203,6 +214,7 @@ const store = {
     paths: user.paths,
     setupComplete: user.settings.setupComplete ?? false,
     steamInputNoticeDismissed: user.settings.steamInputNoticeDismissed ?? false,
+    dolphinWiimoteMode: user.settings.dolphinWiimoteMode ?? "emulated",
   },
   get state() {
     return store.__state;

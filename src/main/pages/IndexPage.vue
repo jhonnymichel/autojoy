@@ -85,6 +85,10 @@
     :unused-microphones="storeState.unusedMicrophones ?? []"
     :manage-microphones="storeState.manageMicrophones ?? false"
   />
+  <DolphinSettings
+    v-if="storeState.paths?.dolphin"
+    :mode="storeState.dolphinWiimoteMode ?? 'emulated'"
+  />
   <h3>Sync Input Settings</h3>
 
   <ActionableText>
@@ -106,6 +110,7 @@ import { usePlatform, useStoreState } from "./lib/composables";
 import MessageBanner from "./lib/MessageBanner.vue";
 import ConnectedJoysticks from "./dashboard/ConnectedJoysticks.vue";
 import ConnectedMicrophones from "./dashboard/ConnectedMicrophones.vue";
+import DolphinSettings from "./dashboard/DolphinSettings.vue";
 import ActionableText from "./lib/ActionableText.vue";
 import HowToAccordion from "./lib/HowToAccordion.vue";
 import disableSteamVideo from "./assets/disable-steam-input-instructions.mp4";

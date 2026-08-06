@@ -34,7 +34,7 @@ const wiiConstants = {
   playerIdentifiers: ["Wiimote1", "Wiimote2", "Wiimote3", "Wiimote4"],
   wiimoteSources: {
     emulated: "1",
-    real: "2", // TODO: support real wiimotes
+    real: "2",
     none: "0",
   },
 };
@@ -180,26 +180,33 @@ async function handleSDLJoystickListUpdate(joystickList) {
     prependNumbersToSDLDeviceNames(renameSDLControllers(joystickList)),
   );
 
+  const wiimoteMode = user.settings.dolphinWiimoteMode ?? "emulated";
   const newConfig = {};
 
-  wiiConstants.playerIdentifiers.forEach((identifier, position) => {
-    const joystick = renamedList[position];
+  if (wiimoteMode === "real") {
+    wiiConstants.playerIdentifiers.forEach((identifier) => {
+      newConfig[identifier] = { Source: wiiConstants.wiimoteSources.real };
+    });
+  } else {
+    wiiConstants.playerIdentifiers.forEach((identifier, position) => {
+      const joystick = renamedList[position];
 
-    // setting disconnected devices
-    if (!joystick) {
-      newConfig[identifier] = configTemplates.wiimoteEmulated.GAMEPAD;
-      newConfig[identifier].Source = wiiConstants.wiimoteSources.none;
-      return;
-    }
+      // setting disconnected devices
+      if (!joystick) {
+        newConfig[identifier] = configTemplates.wiimoteEmulated.GAMEPAD;
+        newConfig[identifier].Source = wiiConstants.wiimoteSources.none;
+        return;
+      }
 
-    newConfig[identifier] = structuredClone(
-      configTemplates.wiimoteEmulated[joystick.type] ??
-        configTemplates.wiimoteEmulated.GAMEPAD,
-    );
+      newConfig[identifier] = structuredClone(
+        configTemplates.wiimoteEmulated[joystick.type] ??
+          configTemplates.wiimoteEmulated.GAMEPAD,
+      );
 
-    newConfig[identifier].Device = joystick.name;
-    newConfig[identifier].Source = wiiConstants.wiimoteSources.emulated;
-  });
+      newConfig[identifier].Device = joystick.name;
+      newConfig[identifier].Source = wiiConstants.wiimoteSources.emulated;
+    });
+  }
 
   savers.ini(
     newConfig,
@@ -245,6 +252,10 @@ async function handleSDLJoystickListUpdate(joystickList) {
     "DOLPHIN - GC Input settings saved at",
     path.resolve(dolphinPath, gamecubeConstants.inputConfigFilePath),
   );
+
+  newMainConfig.Wiimote ??= {};
+  newMainConfig.Wiimote.ContinuousScan =
+    wiimoteMode === "real" ? "True" : "False";
 
   savers.ini(
     newMainConfig,

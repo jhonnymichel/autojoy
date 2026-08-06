@@ -1,4 +1,5 @@
 {
   "manageMicrophones": true,
-  "unusedMicrophones": []
+  "unusedMicrophones": [],
+  "dolphinWiimoteMode": "emulated"
 }
