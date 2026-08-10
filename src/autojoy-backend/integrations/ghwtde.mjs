@@ -30,12 +30,18 @@ const xinputPlayerIdentifiers = [
   "XINPUT_DEVICE_3",
 ];
 
-/* 
-SDL GUID is 16 bytes: bus, CRC16(name), VID, 0, PID, 0, version, driver_signature, driver_data. 
-GHWTDE expects the prefix 03000000 regardless of CRC/name.
-Forces this prefix by zeroing bytes 1–3, keeping VID/PID/version and the backend bytes intact.
+/*
+SDL GUID is 16 bytes: bus, CRC16(name), VID, 0, PID, 0, version, driver_signature, driver_data.
+The CRC16(name) bytes vary per connection: SDL reports a
+different name string for the same physical controller depending on how it's plugged
+in (e.g. wired vs Bluetooth), so its hash changes even though the hardware didn't.
+The same controller reports the same bus byte
+wired and wireless, only the CRC16(name) moved.
+GHWTDE expects the prefix 03000000 regardless of that CRC/name.
+Forces this prefix by zeroing bytes 1–3 (CRC16(name), plus the always-zero upper byte
+of "bus"), keeping VID/PID/version and the backend bytes intact.
 The last two bytes differ based on SDL backend: HIDAPI/GameController vs evdev, hence _...010000 vs _...7200 forms
-Because I'm not sure it is safe to trust the SDL backend will be consistent at the OS level, we generate both forms and duplicate the config. 
+Because I'm not sure it is safe to trust the SDL backend will be consistent at the OS level, we generate both forms and duplicate the config.
 */
 function createGameGUIDs(arr) {
   return arr.map((device) => ({
