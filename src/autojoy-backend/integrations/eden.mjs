@@ -151,7 +151,7 @@ const playerIdentifiers = [
   "player_7_",
 ];
 const playerIdentifierRegex = /player_\d_/;
-const controllerGuidIdenifierRegex = /guid:.+,/;
+const controllerGuidIdenifierRegex = /guid:[0-9a-f]+/i;
 
 function getJoystickSubtype(joystick) {
   const joystickName = joystick.name.toLowerCase();
@@ -160,6 +160,7 @@ function getJoystickSubtype(joystick) {
     "ps",
     "playstation",
     "play station",
+    "dualsense",
     "nintendo switch",
     "switch",
   ];
@@ -188,14 +189,14 @@ function handleJoystickListUpdate(joystickList) {
   try {
     newConfig = loaders.ini(configFile);
   } catch (e) {
-    newConfig = {};
+    newConfig = { Controls: {} };
   }
 
   playerIdentifiers.forEach((identifier, position) => {
     const joystick = joystickList[position];
 
     if (!joystick) {
-      newConfig[`${identifier}connected`] = false;
+      newConfig.Controls[`${identifier}connected`] = false;
       return;
     }
 
@@ -203,14 +204,14 @@ function handleJoystickListUpdate(joystickList) {
     const joystickGUID = getJoystickGUID(joystick);
 
     const config = structuredClone(
-      configTemplates[`${joystick.type}.${joystickSubtype}`] ?? {},
+      configTemplates[`${joystick.type}/${joystickSubtype}`] ?? {},
     );
 
     Object.entries(config).forEach(([key, value]) => {
-      newConfig[key.replace(playerIdentifierRegex, identifier)] = value.replace(
-        controllerGuidIdenifierRegex,
-        `guid:${joystickGUID}`,
-      );
+      newConfig.Controls[key.replace(playerIdentifierRegex, identifier)] =
+        typeof value === "string"
+          ? value.replace(controllerGuidIdenifierRegex, `guid:${joystickGUID}`)
+          : value;
     });
   });
 
