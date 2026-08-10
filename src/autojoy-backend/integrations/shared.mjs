@@ -30,10 +30,10 @@ export function getFixedOldDeviceSDLName(device) {
   let name = getFixedX360ControllerName(device);
 
   if (
-    device.hidInfo?.manufacturer.includes(
+    device.hidInfo?.manufacturer?.includes(
       "Licensed by Sony Computer Entertainment",
     ) ||
-    device.hidInfo?.manufacturer.includes("Licensed by Nintendo of America")
+    device.hidInfo?.manufacturer?.includes("Licensed by Nintendo of America")
   ) {
     name = `${device.hidInfo.manufacturer.trim()} ${device.hidInfo.product.trim()}`;
   }

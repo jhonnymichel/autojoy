@@ -101,7 +101,7 @@ const tooltips = {
       "The Dolphin install folder. When using the flatpack image, it's usually ~/.var/app/org.DolphinEmu.dolphin-emu/",
     ghwtde:
       "It's the game settings folder by default inside your Documents/My Games directory.",
-    eden: "Eden isn't auto-detected on Linux yet. Manually point this to your Eden installation folder.",
+    eden: "THe Eden config folder. Usually ~/.config/eden/",
   },
 };
 

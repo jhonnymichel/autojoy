@@ -253,7 +253,7 @@ exposeCommand("autoDetectPaths", (event, currentPaths) => {
       dolphin: [
         path.join(homePath, ".var", "app", "org.DolphinEmu.dolphin-emu"),
       ],
-      eden: [],
+      eden: [path.join(homePath, ".config", "eden")],
       ghwtde: [
         path.join(
           homePath,

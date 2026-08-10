@@ -141,8 +141,7 @@ import { createJoystickFromXinputDevice } from "../joystick.mjs";
 const configTemplates = loaders.ini("config-templates/eden.ini");
 const configFile = path.resolve(
   user.paths.eden,
-  "user",
-  "config",
+  ...(process.platform === "win32" ? ["user", "config"] : []),
   "qt-config.ini",
 );
 const playerIdentifiers = [
