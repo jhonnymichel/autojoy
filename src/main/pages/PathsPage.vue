@@ -73,9 +73,16 @@ const fields = [
   { key: "dolphin", label: "Dolphin" },
   { key: "cemu", label: "Cemu" },
   { key: "ghwtde", label: "Guitar Hero World Tour: Definitive Edition" },
+  { key: "eden", label: "Eden" },
 ];
 
-const paths = reactive({ rpcs3: "", dolphin: "", cemu: "", ghwtde: "" });
+const paths = reactive({
+  rpcs3: "",
+  dolphin: "",
+  cemu: "",
+  ghwtde: "",
+  eden: "",
+});
 const tooltips = {
   win32: {
     rpcs3:
@@ -85,6 +92,7 @@ const tooltips = {
       "If using EmuDeck, it's the installation folder by default inside %AppData%/emudeck/Emulators.\nIf using standalone Dolphin, it's the Dolphin Emulator folder inside your Documents.",
     ghwtde:
       "It's the game settings folder by default inside your Documents/My Games folder.",
+    eden: "The Eden installation folder.\nIf using EmuDeck, it's by default inside %AppData%/emudeck/Emulators/eden-windows-msvc.",
   },
   linux: {
     rpcs3: "The RPCS3 config folder. Usually ~/.config/rpcs3/",
@@ -93,6 +101,7 @@ const tooltips = {
       "The Dolphin install folder. When using the flatpack image, it's usually ~/.var/app/org.DolphinEmu.dolphin-emu/",
     ghwtde:
       "It's the game settings folder by default inside your Documents/My Games directory.",
+    eden: "Eden isn't auto-detected on Linux yet. Manually point this to your Eden installation folder.",
   },
 };
 

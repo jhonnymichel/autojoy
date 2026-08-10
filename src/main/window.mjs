@@ -238,6 +238,14 @@ exposeCommand("autoDetectPaths", (event, currentPaths) => {
           "Guitar Hero World Tour Definitive Edition",
         ),
       ],
+      eden: [
+        path.join(
+          process.env.APPDATA || "",
+          "emudeck",
+          "Emulators",
+          "eden-windows-msvc",
+        ),
+      ],
     },
     linux: {
       rpcs3: [path.join(homePath, ".config", "rpcs3")],
@@ -245,6 +253,7 @@ exposeCommand("autoDetectPaths", (event, currentPaths) => {
       dolphin: [
         path.join(homePath, ".var", "app", "org.DolphinEmu.dolphin-emu"),
       ],
+      eden: [],
       ghwtde: [
         path.join(
           homePath,
@@ -353,11 +362,18 @@ exposeCommand("autoDetectPaths", (event, currentPaths) => {
   found = setIfEmpty("cemu", table.cemu) || found;
   found = setIfEmpty("dolphin", table.dolphin) || found;
   found = setIfEmpty("ghwtde", table.ghwtde) || found;
+  found = setIfEmpty("eden", table.eden) || found;
 
   return {
     success:
       found ||
-      !!(result.rpcs3 || result.cemu || result.dolphin || result.ghwtde),
+      !!(
+        result.rpcs3 ||
+        result.cemu ||
+        result.dolphin ||
+        result.ghwtde ||
+        result.eden
+      ),
     paths: result,
   };
 });

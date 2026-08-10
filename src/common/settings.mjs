@@ -140,6 +140,12 @@ function migrateUserSettings() {
     loader: loaders.ini,
     saver: savers.ini,
   });
+  migrateUserFile({
+    filePath: "config-templates/eden.ini",
+    templatePath: path.join(packagedRootConfigTemplatesPath, "eden.ini"),
+    loader: loaders.ini,
+    saver: savers.ini,
+  });
 
   try {
     const migrations = require("../migrations.mjs").default;
