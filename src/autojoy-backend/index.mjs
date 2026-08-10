@@ -31,6 +31,10 @@ async function init() {
     ghwtde = (await import("./integrations/ghwtde.mjs")).default;
     joystickListener.onListChange(ghwtde.handleJoystickListUpdate);
   }
+  if (user.paths.eden) {
+    const eden = (await import("./integrations/eden.mjs")).default;
+    joystickListener.onListChange(eden.handleJoystickListUpdate);
+  }
   joystickListener.listen();
 
   if (user.settings.manageMicrophones === true) {
