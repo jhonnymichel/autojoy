@@ -27,39 +27,40 @@ Windows and Linux (Tested on Bazzite).
 
 ### Windows
 
-| **Peripheral**                      | **RPCS3**       | **Dolphin**      | **GHWT:DE**      | **Cemu**         |
-| ----------------------------------- | --------------- | ---------------- | ---------------- | ---------------- |
-| **Guitars**                         |                 |                  |                  |                  |
-| CRKD Les Paul (PC Mode)             | ✅              | ✅               | ✅               | ❌               |
-| Xbox 360 RB & GH Guitars            | ✅              | ✅               | ✅               | ❌               |
-| Santroller Guitars                  | ✅              | ✅               | ✅               | ❌               |
-| PS3 GH Guitars                      | ✅ (No Tilt)    | ✅ (No Tilt)     | ✅ (No Tilt)     | ❌               |
-| **Drums**                           |                 |                  |                  |                  |
-| Xbox 360/Wii/PS3 Rock Band Drums \* | ✅              | ✅               | ✅               | ❌               |
-| **Regular Gamepads**\*\*            | ✅ (Xinput/DS5) | ✅ (Xinput/DS5)  | ❌ Not Supported | ✅ (Xinput only) |
-| **Microphones**\*\*\*               | ✅              | ❌ Not Supported | ✅               | ❌ Not Supported |
+| **Peripheral**                      | **RPCS3**       | **Dolphin**      | **GHWT:DE**      | **Cemu**         | **Eden**         |
+| ----------------------------------- | --------------- | ---------------- | ---------------- | ---------------- | ---------------- |
+| **Guitars**                         |                 |                  |                  |                  |                  |
+| CRKD Les Paul (PC Mode)             | ✅              | ✅               | ✅               | ❌               | ❌               |
+| Xbox 360 RB & GH Guitars            | ✅              | ✅               | ✅               | ❌               | ❌               |
+| Santroller Guitars                  | ✅              | ✅               | ✅               | ❌               | ❌               |
+| PS3 GH Guitars                      | ✅ (No Tilt)    | ✅ (No Tilt)     | ✅ (No Tilt)     | ❌               | ❌               |
+| **Drums**                           |                 |                  |                  |                  |                  |
+| Xbox 360/Wii/PS3 Rock Band Drums \* | ✅              | ✅               | ✅               | ❌               | ❌               |
+| **Regular Gamepads**\*\*            | ✅  | ✅   | ❌ Not Supported | ✅ (Xinput only) | ✅‡ |
+| **Microphones**\*\*\*               | ✅              | ❌ Not Supported | ✅               | ❌ Not Supported | ❌ Not Supported |
 
 ---
 
 \* Rock Band 2 and 3 drums are validated. Rock Band 1 Drums may work but they have not been tested.  
 \*\* Supports Xinput gamepads and the PS5 DualSense.  
 \*\*\* Supports any recording device connected to the computer, including Rock Band/Guitar Hero mics.  
-  - It's possible to filter out connected recording devices that you don't want to use. In the tray menu, uncheck unwanted devices.
+  - It's possible to filter out connected recording devices that you don't want to use. In the tray menu, uncheck unwanted devices.  
+
 
 ### Linux
 
-| **Peripheral**                      | **RPCS3**              | **Dolphin**      | **GHWT:DE**      | **Cemu**          |
-| ----------------------------------- | ---------------------- | ---------------- | ---------------- | ----------------- |
-| **Guitars**                         |                        |                  |                  |                   |
-| CRKD Les Paul (PC Mode)             | ✅                     | ✅               | ✅               | ❌                |
-| Xbox 360 RB & GH Guitars            | ✅                     | ✅               | ✅               | ❌                |
-| Santroller Guitars                  | ✅                     | ✅               | ✅               | ❌                |
-| PS3 GH Guitars                      | ✅ via Evdev (No Tilt) | ✅ (No Tilt)     | ❌ †             | ❌                |
-| **Drums**                           |                        |                  |                  |                   |
-| Xbox 360 Rock Band Drums \*         | ✅                     | ✅               | ✅               | ❌                |
-| Wii/PS3 Rock Band Drums \*          | ✅ via Evdev           | ✅               | ❌ †             | ❌                |
-| **Regular Gamepads**\*\*            | ✅                     | ✅               | ❌ Not Supported | ✅ (SDL)          |
-| **Microphones**\*\*\*               | ✅                     | ❌ Not Supported | ✅               | ❌ Not Supported  |
+| **Peripheral**                      | **RPCS3**              | **Dolphin**      | **GHWT:DE**      | **Cemu**          | **Eden**          |
+| ----------------------------------- | ---------------------- | ---------------- | ---------------- | ----------------- | ----------------- |
+| **Guitars**                         |                        |                  |                  |                   |                   |
+| CRKD Les Paul (PC Mode)             | ✅                     | ✅               | ✅               | ❌                | ❌                |
+| Xbox 360 RB & GH Guitars            | ✅                     | ✅               | ✅               | ❌                | ❌                |
+| Santroller Guitars                  | ✅                     | ✅               | ✅               | ❌                | ❌                |
+| PS3 GH Guitars                      | ✅ via Evdev (No Tilt) | ✅ (No Tilt)     | ❌ †             | ❌                | ❌                |
+| **Drums**                           |                        |                  |                  |                   |                   |
+| Xbox 360 Rock Band Drums \*         | ✅                     | ✅               | ✅               | ❌                | ❌                |
+| Wii/PS3 Rock Band Drums \*          | ✅ via Evdev           | ✅               | ❌ †             | ❌                | ❌                |
+| **Regular Gamepads**\*\*            | ✅                     | ✅               | ❌ Not Supported | ✅          | ✅ |
+| **Microphones**\*\*\*               | ✅                     | ❌ Not Supported | ✅               | ❌ Not Supported  | ❌ Not Supported  |
 
 ---
 
@@ -67,7 +68,9 @@ Windows and Linux (Tested on Bazzite).
 \*\* Supports any SDL-compatible gamepad.  
 \*\*\* Supports any recording device connected to the computer, including Rock Band/Guitar Hero mics.  
   - It's possible to filter out connected recording devices that you don't want to use. In the tray menu, uncheck unwanted devices.  
-† GHWT:DE runs via Proton on Linux. PS3 and Wii/PS3 instruments use the evdev kernel interface, which Proton does not reliably pass through to Windows applications. These devices are not detected by GHWT:DE as a result.
+† GHWT:DE runs via Proton on Linux. PS3 and Wii/PS3 instruments use the evdev kernel interface, which Proton does not reliably pass through to Windows applications. These devices are not detected by GHWT:DE as a result.  
+
+
 
 ## Caveats
 
@@ -92,6 +95,10 @@ Only supports regular gamepads, no instruments.
 
 - **Windows**: Only supports Xinput devices. SDL device IDs in Cemu differ from the ones retrieved from node-sdl, making it hard to support non-xinput devices.
 - **Linux**: Supports any SDL-compatible gamepad.
+
+### Eden
+
+Only supports regular gamepads, no instruments.
 
 ## How to get the app
 
