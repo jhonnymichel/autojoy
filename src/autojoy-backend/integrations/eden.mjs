@@ -151,7 +151,22 @@ const playerIdentifiers = [
   "player_7_",
 ];
 const playerIdentifierRegex = /player_\d_/;
+const portIdentifier = /port:\d/;
 const controllerGuidIdenifierRegex = /guid:[0-9a-f]+/i;
+
+function addPortNumberToJoysticks(arr) {
+  const counts = {};
+  return arr.map((item) => {
+    const guid = getJoystickGUID(item);
+
+    if (counts.hasOwnProperty(guid)) {
+      counts[guid] += 1;
+    } else {
+      counts[guid] = 0;
+    }
+    return { ...item, port: counts[guid] };
+  });
+}
 
 function getJoystickSubtype(joystick) {
   const joystickName = joystick.name.toLowerCase();
@@ -192,8 +207,10 @@ function handleJoystickListUpdate(joystickList) {
     newConfig = { Controls: {} };
   }
 
+  const joysticksWithPortNumbers = addPortNumberToJoysticks(joystickList);
+
   playerIdentifiers.forEach((identifier, position) => {
-    const joystick = joystickList[position];
+    const joystick = joysticksWithPortNumbers[position];
 
     if (!joystick) {
       newConfig.Controls[`${identifier}connected`] = false;
@@ -202,6 +219,7 @@ function handleJoystickListUpdate(joystickList) {
 
     const joystickSubtype = getJoystickSubtype(joystick);
     const joystickGUID = getJoystickGUID(joystick);
+    const joystickPort = joystick.port;
 
     const config = structuredClone(
       configTemplates[`${joystick.type}/${joystickSubtype}`] ?? {},
@@ -210,7 +228,9 @@ function handleJoystickListUpdate(joystickList) {
     Object.entries(config).forEach(([key, value]) => {
       newConfig.Controls[key.replace(playerIdentifierRegex, identifier)] =
         typeof value === "string"
-          ? value.replace(controllerGuidIdenifierRegex, `guid:${joystickGUID}`)
+          ? value
+              .replace(controllerGuidIdenifierRegex, `guid:${joystickGUID}`)
+              .replace(portIdentifier, `port:${joystickPort}`)
           : value;
     });
   });
