@@ -132,6 +132,11 @@ player_1_vibration_strength\default=true
 import path from "path";
 import { loaders, savers } from "../../common/file.mjs";
 import { user } from "../../common/settings.mjs";
+import {
+  getXinputJoystickType,
+  getXinputVendorAndProductIds,
+} from "../../common/joystick.mjs";
+import { createJoystickFromXinputDevice } from "../joystick.mjs";
 
 const configTemplates = loaders.ini("config-templates/eden.ini");
 const configFile = path.resolve(
@@ -153,6 +158,102 @@ const playerIdentifiers = [
 const playerIdentifierRegex = /player_\d_/;
 const portIdentifier = /port:\d/;
 const controllerGuidIdenifierRegex = /guid:[0-9a-f]+/i;
+
+// SDL's GUID ends in 2 driver-specific bytes (driver_signature, driver_data) set by
+// whichever internal joystick driver claimed the device - see SDL_CreateJoystickGUID()
+// call sites in SDL_rawinputjoystick.c ('r', 0) vs SDL_xinputjoystick.c ('x', XInput
+// subtype). Our own SDL2-based capture resolves xinput-capable pads through the
+// rawinput driver by default, while Eden's SDL3 has rawinput disabled by default
+// (SDL_HINT_JOYSTICK_RAWINPUT default flipped from true to false between SDL2 and
+// SDL3) and falls through to the xinput driver instead - same physical device, two
+// different tails. To make our guid match what Eden itself generates, we look up the
+// device's real XInput subtype and reconstruct the xinput driver's tail locally,
+// instead of trusting our own (rawinput-derived) one.
+async function addXinputTailToDevices(arr) {
+  if (process.platform !== "win32") {
+    return arr;
+  }
+
+  const xinput = await import("xinput-ffi");
+  const devSubtypeNumberByName = Object.fromEntries(
+    Object.entries(xinput.constants.DEVSUBTYPE).map(([number, name]) => [
+      name,
+      Number(number),
+    ]),
+  );
+
+  const xinputDevices = [];
+  for (
+    let position = 0;
+    position < xinput.constants.XUSER_MAX_COUNT;
+    position++
+  ) {
+    try {
+      const device = await xinput.getCapabilitiesEx(position);
+      xinputDevices.push(createJoystickFromXinputDevice(device));
+    } catch {
+      // either the device is not connected or the xinput device could not be identified and we report it as not connected
+      xinputDevices.push(null);
+    }
+  }
+
+  const assignedXinputIndexes = [];
+
+  return arr.map((item) => {
+    const deviceType = item.type;
+    const vendorId = item.raw.vendor;
+    const productId = item.raw.product;
+    const equivalentXinputDeviceIndex = xinputDevices.findIndex(
+      (xinputDevice, index) => {
+        if (!xinputDevice) {
+          return false;
+        }
+
+        const xinputDeviceType = getXinputJoystickType(
+          xinputDevice.raw.capabilities.dubType,
+        );
+
+        const { vendorId: xinputVendorId, productId: xinputProductId } =
+          getXinputVendorAndProductIds(
+            xinputDevice.raw.vendorId,
+            xinputDevice.raw.productId,
+          );
+
+        const hasFullMatch =
+          xinputDeviceType === deviceType &&
+          xinputVendorId === vendorId &&
+          xinputProductId === productId;
+
+        const hasVendorAndProduct =
+          xinputVendorId === vendorId && xinputProductId === productId;
+        const hasVendorAndType =
+          xinputDeviceType === deviceType && xinputVendorId === vendorId;
+
+        const hasMatch =
+          (hasFullMatch || hasVendorAndProduct || hasVendorAndType) &&
+          !assignedXinputIndexes.includes(index);
+
+        if (hasMatch) {
+          assignedXinputIndexes.push(index);
+        }
+
+        return hasMatch;
+      },
+    );
+
+    if (equivalentXinputDeviceIndex === -1) {
+      return item;
+    }
+
+    const subtypeName =
+      xinputDevices[equivalentXinputDeviceIndex].raw.capabilities.dubType;
+
+    return {
+      ...item,
+      xinputSubtype: devSubtypeNumberByName[subtypeName] ?? 1,
+    };
+  });
+}
 
 function addPortNumberToJoysticks(arr) {
   const counts = {};
@@ -192,14 +293,24 @@ function getJoystickSubtype(joystick) {
 }
 
 function getJoystickGUID(joystick) {
-  return (
-    joystick.raw.guid.substring(0, 2) +
-    "000000" +
-    joystick.raw.guid.substring(8)
-  );
+  // Eden (SDL3) only clears the CRC16(name) bytes at offset 2 - see SDL_joystick.c's
+  // GetGUID(): `std::memset(data.data() + 2, 0, sizeof(u16))`. bus/vendor/product/
+  // version/tail are otherwise passed through as-is.
+  const crcCleared =
+    joystick.raw.guid.substring(0, 4) + "0000" + joystick.raw.guid.substring(8);
+
+  if (joystick.xinputSubtype === undefined) {
+    return crcCleared;
+  }
+
+  // Reconstruct the xinput driver's tail (driver_signature 'x' = 0x78, driver_data =
+  // XInput subtype) so the guid matches what Eden's SDL3 would generate for the same
+  // device, instead of keeping our own rawinput-derived tail.
+  const subtypeHex = joystick.xinputSubtype.toString(16).padStart(2, "0");
+  return crcCleared.substring(0, crcCleared.length - 4) + "78" + subtypeHex;
 }
 
-function handleJoystickListUpdate(joystickList) {
+async function handleSDLJoystickListUpdate(joystickList) {
   let newConfig;
   try {
     newConfig = loaders.ini(configFile);
@@ -207,7 +318,10 @@ function handleJoystickListUpdate(joystickList) {
     newConfig = { Controls: {} };
   }
 
-  const joysticksWithPortNumbers = addPortNumberToJoysticks(joystickList);
+  const joysticksWithXinputTails = await addXinputTailToDevices(joystickList);
+  const joysticksWithPortNumbers = addPortNumberToJoysticks(
+    joysticksWithXinputTails,
+  );
 
   playerIdentifiers.forEach((identifier, position) => {
     const joystick = joysticksWithPortNumbers[position];
@@ -216,6 +330,8 @@ function handleJoystickListUpdate(joystickList) {
       newConfig.Controls[`${identifier}connected`] = false;
       return;
     }
+
+    newConfig.Controls[`${identifier}connected`] = true;
 
     const joystickSubtype = getJoystickSubtype(joystick);
     const joystickGUID = getJoystickGUID(joystick);
@@ -236,8 +352,12 @@ function handleJoystickListUpdate(joystickList) {
   });
 
   savers.ini(newConfig, path.resolve(configFile));
-  console.log("Eden - Input settings saved at", configFile);
+  console.log("EDEN - Input settings saved at", configFile);
 }
 
-const eden = { handleJoystickListUpdate };
+const eden = {
+  handleJoystickListUpdate(joystickList) {
+    handleSDLJoystickListUpdate(joystickList);
+  },
+};
 export default eden;
